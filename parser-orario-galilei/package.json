@@ -1,0 +1,14 @@
+{
+  "name": "parser-orario-galilei",
+  "version": "1.0.0",
+  "description": "Questo progetto serve a leggere, gestire e presentare in un'app gli orari scolastici di studenti e professori del Galileo Galilei Crema",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "pdfreader": "^1.0.4"
+  }
+}
