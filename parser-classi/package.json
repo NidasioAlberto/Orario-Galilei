@@ -1,0 +1,12 @@
+{
+  "name": "parser-classi",
+  "version": "1.0.0",
+  "description": "Permette di ottenere la lista delle classi",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}

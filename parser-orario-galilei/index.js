@@ -102,7 +102,7 @@ const giorni = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sa
  * @param {number} tipo 0 per classi, 1 per aule e 2 per prof 
  * @param {number} tipo 0 per classi, 1 per aule e 2 per prof
  */
-async function parseOrario(urlPdf, tipo) {
+async function parseOrario(urlPdf, tipo, debug = false) {
     //Controllo se urlPdf è una stringa
     if(typeof urlPdf == 'string') {
         //1: scarico il file
@@ -115,7 +115,7 @@ async function parseOrario(urlPdf, tipo) {
         let dati = analizzaDati(righe, tipo)
 
         //-: formatto i dati per mostrarli nella console
-        mostraTabella(dati.tabellaPerOre)
+        if(debug) mostraTabella(dati.tabellaPerOre)
 
         //console.log(JSON.stringify(dati.tabellaPerOre))
 
@@ -134,7 +134,7 @@ async function scaricaFile(url, path) {
     //Controllo che i dati siano stringhe
     if(typeof url == 'string' && typeof path == 'string') {
         return new Promise((resolve, reject) => {
-            var file = fs.createWriteStream(path);
+            var file = fs.createWriteStream(path)
             http.get(url, (response) => {
                 response.pipe(file);
                 file.on('finish', () => {
