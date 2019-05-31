@@ -6,10 +6,11 @@ const debug = false
 
 console.time('classi')
 parserGalilei.ottieniOrariClassi(2019, debug).then(orariClassi => {
+    console.log(JSON.stringify(orariClassi))
     console.timeEnd('classi')
 })
 
-console.time('aule')
+/*console.time('aule')
 parserGalilei.ottieniOrariAule(2019, debug).then(orariAule => {
     console.timeEnd('aule')
 })
@@ -17,4 +18,4 @@ parserGalilei.ottieniOrariAule(2019, debug).then(orariAule => {
 console.time('prof')
 parserGalilei.ottieniOrariProfessori(debug).then(orariProfessori => {
     console.timeEnd('prof')
-})
+})*/

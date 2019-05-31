@@ -420,12 +420,12 @@ function analizzaDati(righe, tipo) {
  
         tabellaPerOre.forEach(ora => {
             tabellaPerGiorni[i].info1.push({
-                name: ora.info1[i].nome,
-                timeFrameName: ora.giorno
+                nome: (ora.info1[i].nome != undefined ? ora.info1[i].nome : ''),
+                ora: ora.ora
             })
             tabellaPerGiorni[i].info2.push({
-                name: ora.info2[i].nome,
-                timeFrameName: ora.timeFrameName
+                nome: (ora.info2[i].nome != undefined ? ora.info2[i].nome : ''),
+                ora: ora.ora
             })
         })
     })
@@ -455,7 +455,7 @@ function dividiRiga(divisori, riga) {
             divisioni[i + 1].nome = riga.elementi.filter(elemento => {
                 return (i != -1 ? elemento.x > divisori[i] : true) && (i != 4 ? elemento.x < divisori[i + 1] : true)
             }).map(elemento => elemento.testo.replace(/ /g, '')).join('')
-            if(divisioni[i + 1].nome == '') divisioni[i + 1].nome = undefined
+            if(divisioni[i + 1].nome == undefined) divisioni[i + 1].nome = ''
         }
     }
 
