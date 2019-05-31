@@ -4,18 +4,20 @@ const parserGalilei = require('./parser-orario-galilei')
 
 const debug = false
 
-console.time('classi')
+/*console.time('classi')
 parserGalilei.ottieniOrariClassi(2019, debug).then(orariClassi => {
-    console.log(JSON.stringify(orariClassi))
+    console.log(orariClassi)
     console.timeEnd('classi')
 })
 
-/*console.time('aule')
+console.time('aule')
 parserGalilei.ottieniOrariAule(2019, debug).then(orariAule => {
+    console.log(orariAule)
     console.timeEnd('aule')
-})
+})*/
 
 console.time('prof')
 parserGalilei.ottieniOrariProfessori(debug).then(orariProfessori => {
+    console.log(orariProfessori)
     console.timeEnd('prof')
-})*/
+})

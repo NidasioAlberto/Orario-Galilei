@@ -1,0 +1,96 @@
+
+<mat-card class="card-principale">
+    <mat-card-header>
+        <mat-card-title>Orari scolastivi istituto Galileo Galilei Crema</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <mat-tab-group>
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mat-icon class="example-tab-icon">class</mat-icon>
+                    Classi
+                </ng-template>
+                
+                <!-- Lista classi -->
+                <mat-accordion>
+                    <mat-expansion-panel *ngFor='let classe of classi | async'>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                Orario {{classe.classe}}
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+
+                        <table class="tabella">
+                            <tr *ngFor="let ora of classe.orarioPerOre">
+                                <td colspan="2">{{ora.ora}}</td>
+                                <td *ngFor="let info of ora.info1">
+                                    {{info.nome}}
+                                    <br>
+                                    {{ora.info2[ora.info1.indexOf(info)].nome}}
+                                </td>
+                            </tr>
+                        </table>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </mat-tab>
+        
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mat-icon class="example-tab-icon">meeting_room</mat-icon>
+                    Aule
+                </ng-template>
+
+                <!-- Lista aule -->
+                <mat-accordion>
+                    <mat-expansion-panel *ngFor='let aula of aule | async'>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                Orario {{aula.aula}}
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+
+                        <table class="tabella">
+                            <tr *ngFor="let ora of aula.orarioPerOre">
+                                <td colspan="2">{{ora.ora}}</td>
+                                <td *ngFor="let info of ora.info1">
+                                    {{info.nome}}
+                                    <br>
+                                    {{ora.info2[ora.info1.indexOf(info)].nome}}
+                                </td>
+                            </tr>
+                        </table>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </mat-tab>
+        
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mat-icon class="example-tab-icon">person</mat-icon>
+                    Professori
+                </ng-template>
+        
+                <!-- Lista professori -->
+                <mat-accordion>
+                        <mat-expansion-panel *ngFor='let professore of professori | async'>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    Orario {{professore.professore}}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+
+                            <table class="tabella">
+                                <tr *ngFor="let ora of professore.orarioPerOre">
+                                    <td colspan="2">{{ora.ora}}</td>
+                                    <td *ngFor="let info of ora.info1">
+                                        {{info.nome}}
+                                        <br>
+                                        {{ora.info2[ora.info1.indexOf(info)].nome}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </mat-expansion-panel>
+                    </mat-accordion>
+            </mat-tab>
+        </mat-tab-group>
+    </mat-card-content>
+</mat-card>
