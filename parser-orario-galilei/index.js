@@ -1,9 +1,27 @@
 const pdfreader = require("pdfreader")
-const http = require('http')
+const fetch = require('node-fetch')
 const fs = require('fs')
 
-//0 = classi, 1 = aule, 2 = prof
-const altezzaGiorni = [6.615, 6.885, 6.105]
+/* Spiegazione:
+Il module pdfreader ha una funzione per analizzare le tabelle presenti nei pdf,
+ma non funziona con il pdf della scuola. Per questo motivo utilizzo la funzione
+base della libreria che permette di ottenere ogni elemento di testo presenti nel
+pdf con le rispettive coordinate. Questo ci permette di capire cosa c'è e su
+quele riga e, visto che l'altezza delle righe sono sempre le stesse possiamo
+leggerle manualmente una volta e poi utilizzare questi dati per ottenere gli orari.
+Questa libreria funziona sia con gli orari degli studenti, sia con quelli delle
+aule e sia con quelli degli insegnanti.
+
+Change log
+
+1.0.0 - Versione completa.
+
+1.1.0 - L'obbiettivo di questa versione è quello di rielaborare il codice, risolvendo
+    errori e bug e migliorare le performance del codice.
+*/
+
+//Dati essenziali per l'elaborazione delle pagine e dei pdf
+const altezzaGiorni = [6.615, 6.885, 6.105] //0 = classi, 1 = aule, 2 = prof
 const altezzeLineeDati = [
     [
         {
@@ -88,211 +106,261 @@ const altezzeLineeDati = [
 const giorni = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
 const lettereAlfabeto = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 const percorsoPrimario = 'http://www.galileicrema.it:8080'
+const percorsoListaClassi = '/intraitis/Didattica/orario/OrarioQueryClasse.asp'
+const percorsoListaAule = '/intraitis/didattica/orario/orarioqueryaula.asp'
+const percorsoListaProfessori = '/Intraitis/Lib/ListaInsegnanti.asp?prossima=/Intraitis/Didattica/Orario/OrarioCaricaDocente.asp&cosa=ORARIO%20SETTIMANALE&lettera='
 
-/*
-    Spiegazione:
-    La libreire pdfreader ha una funzione per analizzare le tabelle presenti nei pdf, ma non funziona con il pdf della scuola.
-    Per questo motivo utilizzo la funzione base della libreria che permette di ottenere ogni elemento di testo presenti nel
-    pdf con le rispettive coordinate. Questo ci permette di capire cosa c'è e su quele riga e, visto che l'altezza delle righe
-    sono sempre le stesse possiamo leggerle manualmente una volta e poi utilizzare questi dati per ottenere gli orari.
-    Questa libreria funziona sia con gli orari degli studenti, sia con quelli delle aule e sia con quelli degli insegnanti.
-*/
-
-//Funzioni principali
+//Funzioni principali esportate dal modulo
 
 /**
- * Questa funzione accetta l'url da cui scaricare il pdf, lo converte e ritorna i dati
- * @param {stirng} urlPdf 
- * @param {number} tipo 0 per classi, 1 per aule e 2 per prof
+ * Questa funzione permette di ottenere la lista delle classi
+ * @param {string} urlClassi 
  */
-async function parserOrario(urlPdf, tipo, debug = false) {
-    //Controllo se urlPdf è una stringa
-    if(typeof urlPdf == 'string') {
-        let fileName = 'tmp/' + Math.floor(Math.random() * (10e10)).toString()
+async function ottieniListaClassi(urlClassi = percorsoPrimario + percorsoListaClassi) {
+    try {
+        //1: Recupero la pagina hmtl
+        let paginaHtml = await fetch(urlClassi).then(res => res.text())
+    
+        //2: Estraggo le classi
+        let classi = paginaHtml.match(/Value="(.+)"/g)
+        return classi.map(classe => classe.match(/"(.+)"/)[1])
+    } catch(err) {
+        throw 'Impossibile recuperare le aule'
+    }
+}
+exports.ottieniListaClassi = ottieniListaClassi
 
-        //1: scarico il file
-        try {
-            await scaricaFile(urlPdf, fileName)
+/**
+ * Questa funzione permette di ottenere la lista di tutte le aule
+ * @param {string} urlAule 
+ */
+async function ottieniListaAule(urlAule = percorsoPrimario + percorsoListaAule) {
+    try {
+        //1: Recupero la pagina hmtl
+        let paginaHtml = await fetch(urlAule).then(res => res.text())
+
+        //2: Estraggo le aule
+        let aule = paginaHtml.match(/Value="(.+)"/g)
+        return aule.map(classe => classe.match(/"(.+)"/)[1])
+    } catch(err) {
+        throw 'Impossibile recuperare le aule'
+    }
+}
+exports.ottieniListaAule = ottieniListaAule
+
+/**
+ * Questra funzione permette di ottenere la lista dei professori e i link ai loro orari
+ * @param {string} urlProf 
+ */
+async function ottieniListaProfessori(urlProf = percorsoPrimario + percorsoListaProfessori) {
+    try {
+        //             1: Per ogni lettera             2: Ottengo la pagina web
+        let promesse = lettereAlfabeto.map(lettera => fetch(urlProf + lettera).then(res => res.text()).then(paginaHtml => {
+            try {
+                //3: Estraggo le informazioni dei professori, quindi nomi e link ai link dei pdf ;)
+                let informazioni = paginaHtml.match(/<a HREF="(.*?)">(?:(.|\n|\t|\r)*?)<FONT face="Verdana" size=3>(.*?)<\/font><\/a>/g)
     
-            //2: estraggo le informazioni e le controllo
-            let righe = await estraiInformazioni(fileName)
-    
-            //2.1: elimino il file
-            fs.unlinkSync(fileName)
-    
-            if(righe.length == 0) {
-                throw Error('non è stato possibile recuperare i dati')
-            } else {
-                //3: cambio il formato dei dati
-                let dati = analizzaDati(righe, tipo)
-        
-                //-: formatto i dati per mostrarli nella console
-                if(debug) mostraTabella(dati.tabellaPerOre)
-        
-                //4: fine! ritorno i dati
-                console.log('concluso tipo', tipo, ':', urlPdf)
-                return dati
+                //4: recupero tutti i link corretti ai pdf e riorganizzo le informazioni
+                return informazioni.map(match => {
+                    try {
+                        let info = match.match(/<a HREF="(.*?)">(?:(?:.|\n|\t|\r)*?)<FONT face="Verdana" size=3>(.*?)<\/font><\/a>/)
+
+                        let professore = {
+                            percorsoOrario: info[1],
+                            nome: info[2]
+                        }
+
+                        return professore
+                    } catch(err) {
+                        return undefined
+                    }
+                })//.filter(professore => professore != undefined)
+            } catch(err) {
+                return undefined
             }
-        } catch(err) {
-            console.log('ciao')
-            return undefined
+        }))
+
+        return Promise.all(promesse).then(promesseCompletate => {
+            return promesseCompletate.filter(promessaCompletata => promessaCompletata != undefined).reduce((acc, val) => acc.concat(val), [])
+        })
+    } catch(err) {
+        throw 'Impossibile recuperare i professori'
+    }
+}
+exports.ottieniListaProfessori = ottieniListaProfessori
+
+/**
+ * Questa funzione permette di ottenere l'orario di una classe, di un'aula o di un'insegnante dato un url
+ * @param {string} urlPdf
+ * @param {number} tipo
+ * @param {boolean} debug
+ */
+async function ottieniOrario(urlPdf, tipo, debug = false) {
+    if(debug) console.time(urlPdf)
+    try {
+        //Controllo se urlPdf è una stringa
+        if(typeof urlPdf == 'string') {
+            //1: Scarico il file
+            let buffer = await fetch(urlPdf).then(res => res.buffer())
+    
+            //2: Estraggo le informazioni
+            let righe = await estraiInformazioni(buffer)
+
+            //3: cambio il formato dei dati
+            let dati = analizzaDati(righe, tipo)
+            
+            //-: formatto i dati per mostrarli nella console
+            if(debug) {
+                mostraTabella(dati.tabellaPerOre)
+                console.timeEnd(urlPdf)
+            }
+
+            //4: fine! ritorno i dati
+            return dati
+        } else {
+            throw 'url non corretto'
         }
-    } else {
-        throw undefined
+    } catch(err) {
+        return undefined
+        //throw 'impossibile recuperare l\'orario'
     }
 }
+exports.ottieniOrario = ottieniOrario
 
 /**
- * Questa funzione permette di ottenere la lista di tutte le classi del Galilei, i caso di errore ritorna un array vuoto
- * @param {string} urlClassi 
+ * Questa funzione permette di ottenere la lista delle classi e tutti i loro orari
+ * @param {number} anno
  */
-async function parserClassi(urlClassi = 'http://www.galileicrema.it:8080/intraitis/Didattica/orario/OrarioQueryClasse.asp') {
-    //Recupero la pagina hmtl
-    let paginaHtml = await ottieniPagina(urlClassi)
-
-    //Estraggo le classi
-    let classi = paginaHtml.match(/Value="(.+)"/g)
-
-    if(classi == undefined || classi == null) {
-        return []
-    } else {
-        return classi.map(classe => {
-            return classe.match(/"(.+)"/)[1]
-        })
+async function ottieniOrariClassi(anno, debug = false) {
+    try {
+        //1: Recupero la lista delle classi
+        let classi = await ottieniListaClassi()
+    
+        //2: Recupero i loro orari
+        let orari = await Promise.all(classi.map(async classe => {
+            try {
+                return {
+                    classe,
+                    orario: await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + classe + '.pdf', 0, debug)
+                }
+            } catch(err) {
+                return undefined
+            }
+        }).filter(promessa => promessa != undefined))
+    
+        //3: Ritorno gli orari
+        return orari.filter(orario => orario.orario != undefined)
+    } catch(err) {
+        throw 'impossibile recuperare classi e orari'
     }
 }
+exports.ottieniOrariClassi = ottieniOrariClassi
 
 /**
- * Questa funzione permette di ottenere la lista di tutte le classi del Galilei, i caso di errore ritorna un array vuoto
- * @param {string} urlClassi 
+ * Questa funzione permette di ottenere la lista delle aule e tutti i loro orari
+ * @param {number} anno 
  */
-async function parserAule(urlClassi = 'http://www.galileicrema.it:8080/intraitis/didattica/orario/orarioqueryaula.asp') {
-    //Recupero la pagina hmtl
-    let paginaHtml = await ottieniPagina(urlClassi)
-
-    //Estraggo le aule
-    let aule = paginaHtml.match(/Value="(.+)"/g)
-
-    if(aule == undefined || aule == null) {
-        return []
-    } else {
-        return aule.map(classe => {
-            return classe.match(/"(.+)"/)[1]
-        })
+async function ottieniOrariAule(anno, debug = false) {
+    try {
+        //1: Recupero la lista delle aule
+        let aule = await ottieniListaAule()
+    
+        //2: Recupero i loro orari
+        let orari = await Promise.all(aule.map(async aula => {
+            try {
+                return {
+                    aula,
+                    orario: await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + aula + '.pdf', 1, debug)
+                }
+            } catch(err) {
+                return undefined
+            }
+        }).filter(promessa => promessa != undefined))
+        
+        //3: Ritorno gli orari
+        return orari.filter(orario => orario.orario != undefined)
+    } catch(err) {
+        console.log(err)
+        throw 'impossibile recuperare aule e orari'
     }
 }
+exports.ottieniOrariAule = ottieniOrariAule
 
 /**
- * Questa funzione permette di ottenere la lista di tutti gli insegnanti del Galilei e il link ai loro orari
- * @param {string} urlProf
+ * Questa funzione permette di ottenere la lista delle aule e tutti i loro orari
  */
-async function parserProf(urlProf = 'http://www.galileicrema.it:8080/Intraitis/Lib/ListaInsegnanti.asp?prossima=/Intraitis/Didattica/Orario/OrarioCaricaDocente.asp&cosa=ORARIO%20SETTIMANALE&lettera=') {
-    let professori = []
-
-    for(let i in lettereAlfabeto) {
-        //ottengo la pagina una lettera alla volta
-        let paginaHtml = await ottieniPagina(urlProf + lettereAlfabeto[i])
-
-        //Estraggo i professori
-        let informazioni = paginaHtml.match(/<a HREF="(.*?)">(?:(.|\n|\t|\r)*?)<FONT face="Verdana" size=3>(.*?)<\/font><\/a>/g)
-        if(informazioni != undefined && informazioni != null) await informazioni.map(async match => {
-                let info = match.match(/<a HREF="(.*?)">(?:(?:.|\n|\t|\r)*?)<FONT face="Verdana" size=3>(.*?)<\/font><\/a>/)
-
-                info[1] = await ottieniLinkPdf(percorsoPrimario, info[1])
-
-                professori.push({
-                    percorsoOrario: info[1],
-                    nome: info[2]
-                })
-        })
-        //altrimenti vuol dire che nessun professore è stato trovato con la lettera corrente, proseguiamo
+async function ottieniOrariProfessori(debug = false) {
+    try {
+        //1: Recupero la lista dei professori
+        let professori = await ottieniListaProfessori()
+    
+        //2: Recupero i loro orari
+        let orari = await Promise.all(professori.map(async professore => {
+            try {
+                return {
+                    professore: professore.nome,
+                    orario: await ottieniOrario('http://www.galileicrema.it:8080' + professore.percorsoOrario, 2, debug)
+                }
+            } catch(err) {
+                return undefined
+            }
+        }).filter(promessa => promessa != undefined))
+        
+        //3: Ritorno gli orari
+        return orari.filter(orario => orario.orario != undefined)
+    } catch(err) {
+        console.log(err)
+        throw 'impossibile recuperare aule e orari'
     }
-
-    return professori
 }
+exports.ottieniOrariProfessori = ottieniOrariProfessori
 
 //Funzioni secondarie
 
 /**
- * Questa funzione permette di scaricare un file dato un url
- * @param {*} pdfUrl indirizzo url del file da scaricare
+ * Permette di ottenere le informazioni presenti nel pdf
+ * @param {Buffer} buffer 
  */
-async function scaricaFile(url, path) {
-    //Controllo che i dati siano stringhe
-    if(typeof url == 'string' && typeof path == 'string') {
-        return new Promise((resolve, reject) => {
-            var file = fs.createWriteStream(path)
-            http.get(url, (response) => {
-                response.pipe(file);
-                file.on('finish', () => {
-                    file.close()
-                    resolve()
-                })
-            }).on('error', (err) => {
-                console.log(err)
-                fs.unlinkSync(path)
-                reject(err)
-            })
-        })
-    } else {
-        throw new TypeError('i parametri url e path non sono stringhe')
-    }
-}
-
-/**
- * Questa funzione permette di leggere un pdf ed ottenere i dati al suo intenrno divisi per righe
- * @param {string} path percorso del file pdf da leggere
- */
-async function estraiInformazioni(path) {
+async function estraiInformazioni(buffer) {
+    let righe = []
     return new Promise((resolve, reject) => {
-        //Controllo che il parametri sia una stringa
-        if(typeof path == 'string') {
-            let righe = []
-            fs.readFile(path, (err, pdfBuffer) => {
-                if(err) {
-                    resolve([])
-                } else {
-                    new pdfreader.PdfReader().parseBuffer(pdfBuffer, (err2, item) => {
-                        if(err2) {
-                            reject(err2)
-                        } else if(item != undefined) {
-                            //Processo i dati
-                            if(item.x != undefined && item.y != undefined) {
-                                //1: controllo se la riga è già stata registrata
-                                let trovato = false
-                                righe.forEach(riga => {
-                                    if(riga.y == item.y) {
-                                        riga.elementi.push({
-                                            x: item.x,
-                                            //y: item.y,
-                                            testo: item.text
-                                        })
-                                        trovato = true
-                                        return false
-                                    }
-                                })
-                                //2: altrimenti la aggiungo
-                                if(!trovato) righe.push({
-                                    y: item.y,
-                                    elementi: [
-                                        {
-                                            x: item.x,
-                                            //y: item.y,
-                                            testo: item.text
-                                        }
-                                    ]
-                                })
-                            }
-                        } else {
-                            //I dati sono pronti, li ritorno
-                            resolve(righe)
+        new pdfreader.PdfReader().parseBuffer(buffer, (err, item) => {
+            if(err) {
+                reject(err)
+            } else if(item != undefined) {
+                //Processo i dati
+                if(item.x != undefined && item.y != undefined) {
+                    //1: controllo se la riga è già stata registrata
+                    let trovato = false
+                    righe.forEach(riga => {
+                        if(riga.y == item.y) {
+                            riga.elementi.push({
+                                x: item.x,
+                                //y: item.y,
+                                testo: item.text
+                            })
+                            trovato = true
+                            return false
                         }
                     })
+                    //2: altrimenti la aggiungo
+                    if(!trovato) righe.push({
+                        y: item.y,
+                        elementi: [
+                            {
+                                x: item.x,
+                                //y: item.y,
+                                testo: item.text
+                            }
+                        ]
+                    })
                 }
-            })
-        } else {
-            resolve([])
-        }
+            } else {
+                //I dati sono pronti, li ritorno se non sono vuoti
+                if(righe.length > 0) resolve(righe)
+                else reject('nessun dato trovato')
+            }
+        })
     })
 }
 
@@ -307,7 +375,7 @@ function analizzaDati(righe, tipo) {
     let tabellaPerOre = []
     let tabellaPerGiorni = []
 
-    //Trovo il minimo e il massimo valore x dei giorni della settimana che utilizzerò per capire in che giorno si trovano le magterie e le aule
+    //1: Trovo il minimo e il massimo valore x dei giorni della settimana che utilizzerò per capire in che giorno si trovano le magterie e le aule
     righe.forEach(riga => {
         if(riga.y == altezzaGiorni[tipo]) {
             riga.elementi.forEach((elemento, i) => {
@@ -323,13 +391,13 @@ function analizzaDati(righe, tipo) {
         }
     })
 
-    //Ora divido i numeri in 6 sezioni
+    //2: Ora divido i numeri in 6 sezioni
     let spazio = (max - min) / 5
     for(let i = 0; i < 5; i++) {
         divisori.push(min + spazio/2 + spazio * i)
     }
 
-    //A questo punto trovo le informazioni (prima e seconda riga) per ciascuna ora
+    //3: A questo punto trovo le informazioni (prima e seconda riga) per ciascuna ora
     altezzeLineeDati[tipo].forEach(altezzaLineaDati => {
         tabellaPerOre.push({
             ora: altezzaLineaDati.ora,
@@ -342,8 +410,7 @@ function analizzaDati(righe, tipo) {
         })
     })
 
-    //transform the data from byTimeFrame to byDay
-    //Trasformo i dati dlla divisione per ore a una divisione per giorni
+    //4: Trasformo i dati dlla divisione per ore a una divisione per giorni
     giorni.forEach((giorno, i) => {
         tabellaPerGiorni.push({
             giorno,
@@ -383,10 +450,10 @@ function dividiRiga(divisori, riga) {
     })
 
     if(riga != undefined) {
-        //Lunedì - venerdì
+        //Lunedì - sabato
         for(let i = -1; i < 5; i++) {
             divisioni[i + 1].nome = riga.elementi.filter(elemento => {
-                return (i != -1 ? elemento.x > divisori[i] : true) && (1 != 4 ? elemento.x < divisori[i + 1] : true)
+                return (i != -1 ? elemento.x > divisori[i] : true) && (i != 4 ? elemento.x < divisori[i + 1] : true)
             }).map(elemento => elemento.testo.replace(/ /g, '')).join('')
             if(divisioni[i + 1].nome == '') divisioni[i + 1].nome = undefined
         }
@@ -414,58 +481,3 @@ function mostraTabella(tabellaPerOre) {
 
     console.table(tabellaPerConsole)
 }
-
-/**
- * Questa funzione permette di ottenere il link del pdf dell'orario di un professore a partire dal link presente nella pagina della lista dei professori, ritorno una stringa vuota in caso di errore
- * @param {*} urlPrimario 
- */
-async function ottieniLinkPdf(percorsoPrimario, percorsoSecondario) {
-    let paginaHtml = await ottieniPagina(percorsoPrimario + percorsoSecondario)
-
-    //trovo il link nella pagina
-    let match = paginaHtml.match(/<a HREF="(.+)">/)
-
-    if(match == undefined || match == null) return ''
-    else {
-        if(match[1] != undefined) return match[1]
-        else return ''
-    }
-}
-
-/**
- * Questa funzione permette di ottenere il testo di una pagina web dato il suo url, nel caso di qualsiasi errore ritorna una stringa vuota
- * @param {*} url 
- */
-async function ottieniPagina(url) {
-    return new Promise((resolve, reject) => {
-        //Controllo che i dati siano stringhe
-        if(typeof url == 'string') {
-            try {
-                http.get(url, (res) => {
-                    let content = ''
-
-                    res.setEncoding("utf8")
-
-                    res.on("data", function (chunk) {
-                        content += chunk;
-                    })
-
-                    res.on("end", function () {
-                        resolve(content)
-                    })
-                }).on('error', (err) => {
-                    resolve('')
-                })
-            } catch(err) {
-                resolve('')
-            }
-        } else {
-            resolve('')
-        }
-    })
-}
-
-exports.parserOrario = parserOrario
-exports.parserClassi = parserClassi
-exports.parserProf = parserProf
-exports.parserAule = parserAule
