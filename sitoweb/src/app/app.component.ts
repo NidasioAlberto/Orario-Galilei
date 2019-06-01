@@ -1,7 +1,8 @@
 import { Component } from '@angular/core'
 import { AngularFirestore } from '@angular/fire/firestore'
-import { Classe, Aula, Professore, OrarioPerOra } from './tipi';
-import { Observable } from 'rxjs';
+import { Classe, Aula, Professore, OrarioPerOra } from './tipi'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 @Component({
     selector: 'app-root',
@@ -22,5 +23,12 @@ export class AppComponent {
 
         //3: Recupero i professori
         this.professori = firestore.collection<Professore>('Professori').valueChanges()
+
+        //Test
+        firestore.collection<Classe>('Classi').get().pipe(
+            map(querySnapshot => {
+                return querySnapshot.docs
+            })
+        ).subscribe(console.log)
     }
 }
