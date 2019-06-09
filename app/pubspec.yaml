@@ -1,0 +1,25 @@
+name: app
+description: Mostra gli orari di classi, aule e professori
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^0.1.2
+  cloud_firestore: ^0.12.1
+  flare_flutter: ^1.5.0
+  shared_preferences: ^0.5.3+1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  assets:
+    - assets/
+
+  uses-material-design: true
