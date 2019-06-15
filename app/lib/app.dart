@@ -1,4 +1,4 @@
-import 'package:app/preferiti.dart';
+/*import 'package:app/preferiti.dart';
 import 'package:app/ricerca.dart';
 import 'package:app/top_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -84,4 +84,4 @@ class AppScaffoldState extends State<AppScaffold> {
       ),
     );
   }
-}
+}*/

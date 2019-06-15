@@ -1,11 +1,11 @@
 import 'package:app/elemento_lista.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Ricerca extends StatelessWidget {
-  String valoreRicerca;
-  List dati;
+  final String valoreRicerca;
 
-  Ricerca({this.valoreRicerca, this.dati}) {
+  Ricerca(this.valoreRicerca) {
     dati = dati.where((elemento) {
       RegExp regExp = RegExp(valoreRicerca, caseSensitive: false);
 
@@ -23,6 +23,8 @@ class Ricerca extends StatelessWidget {
       }
       else return false;
     }).toList();
+
+
   }
 
   @override
@@ -33,5 +35,15 @@ class Ricerca extends StatelessWidget {
         return ElementoLista(dati[position]);
       },
     );
+  }
+
+  ricerca(String _valoreRicerca) {
+  }
+
+  ricercaClassi(String _valoreRicerca) {
+    //Cerco tra le classi
+    Firestore.instance.collection('Classi').snapshots()
+      .map((querySnap) => querySnap.documents.map((documentSnap) => documentSnap.data))
+      .map((classi) => classi.where((classe) => RegExp(valoreRicerca, caseSensitive: false).hasMatch(classe['nome']));
   }
 }

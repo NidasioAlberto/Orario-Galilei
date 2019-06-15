@@ -31,7 +31,7 @@ class PaginaOrarioState extends State<PaginaOrario> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(64.0 + altezzaStatusBar),
-        child: TopBar(titolo: widget.oggetto, onCerca: (valore) {
+        child: TopBar((valore) {
             print('ciao');
           }, onPreferito: (preferito) async {
             SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -49,7 +49,7 @@ class PaginaOrarioState extends State<PaginaOrario> {
             print(preferiti.toString());
 
             sharedPreferences.setStringList('Preferiti', preferiti);
-          },
+          }, preferito: false, titolo: widget.oggetto,
         ),
       ),
       body: SafeArea(

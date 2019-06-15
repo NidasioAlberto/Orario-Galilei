@@ -16,7 +16,7 @@ export const sincronizzaClassi = functions.pubsub.schedule('10 7 */1 * *').onRun
 
         
         return Promise.all(orariClassi.map(async classe => firestore.collection('Classi').doc(classe.classe).set({
-            classe: classe.classe,
+            nome: classe.classe,
             orarioPerOre: classe.orario.tabellaPerOre,
             orarioPerGiorni: classe.orario.tabellaPerGiorni,
             ultimoAggiornamento: admin.firestore.Timestamp.now()
@@ -40,7 +40,7 @@ export const sincronizzaAule = functions.pubsub.schedule('15 7 */1 * *').onRun(a
 
         
         return Promise.all(orariAule.map(async aula => firestore.collection('Aule').doc(aula.aula).set({
-            aula: aula.aula,
+            nome: aula.aula,
             orarioPerOre: aula.orario.tabellaPerOre,
             orarioPerGiorni: aula.orario.tabellaPerGiorni,
             ultimoAggiornamento: admin.firestore.Timestamp.now()
@@ -64,7 +64,7 @@ export const sincronizzaProfessori = functions.pubsub.schedule('20 7 */1 * *').o
 
         
         return Promise.all(orariProfessori.map(async professore => firestore.collection('Professori').doc(professore.professore).set({
-            professore: professore.professore,
+            nome: professore.professore,
             orarioPerOre: professore.orario.tabellaPerOre,
             orarioPerGiorni: professore.orario.tabellaPerGiorni,
             ultimoAggiornamento: admin.firestore.Timestamp.now()
