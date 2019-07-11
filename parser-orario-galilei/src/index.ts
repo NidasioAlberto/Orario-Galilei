@@ -1,4 +1,4 @@
-import { percorsoPrimario, percorsoListaClassi, percorsoListaAule, percorsoListaProfessori, lettereAlfabeto, RigaDati, altezzeLineeDati, ElementoTabellaPerOre, ElementoTabellaPerGiorni, altezzaGiorni, giorni, InfoOre } from "./utils"
+import { percorsoPrimario, percorsoListaClassi, percorsoListaAule, percorsoListaProfessori, lettereAlfabeto, RigaDati, altezzeLineeDati, ElementoTabellaPerOre, ElementoTabellaPerGiorni, altezzaGiorni, giorni, InfoOre, TabelleOrario, Orario } from "./utils"
 const pdfreader = require('pdfreader')
 import axios from 'axios'
 
@@ -44,7 +44,7 @@ export async function ottieniListaClassi(urlClassi: string = percorsoPrimario + 
             let match = classe.match(/"(.+)"/)
             if(match != null) return match[1]
             else return null
-        }).filter(classe => classe) //Rimuovo gli eventuali elementi nulli
+        }).filter(classe => classe != null) as string[] //Rimuovo gli eventuali elementi nulli
     } catch(err) {
         throw 'Impossibile recuperare le classi'
     }
@@ -189,16 +189,19 @@ export async function ottieniOrariClassi(anno: string, tabellaPerGiorni: boolean
         let orari = await Promise.all(classi.map(async classe => {
             try {
                 return {
-                    classe,
-                    orario: await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + classe + '.pdf', 0, tabellaPerGiorni, debug)
+                    nome: classe,
+                    tabelleOrario: await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + classe + '.pdf', 0, tabellaPerGiorni, debug)
                 }
             } catch(err) {
                 return undefined
             }
-        }).filter(promessa => promessa != undefined))
+        }).filter(promessa => promessa != undefined)) as Orario[]
     
         //3: Ritorno gli orari
-        return orari.filter(orario => orario != undefined && orario.orario != undefined)
+        return {
+            orari: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined),
+            lista: classi
+        }
     } catch(err) {
         if(debug) console.log(err)
         throw 'impossibile recuperare classi e orari'
@@ -220,16 +223,19 @@ export async function ottieniOrariAule(anno: string, tabellaPerGiorni: boolean =
         let orari = await Promise.all(aule.map(async aula => {
             try {
                 return {
-                    aula,
-                    orario: await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + aula + '.pdf', 1, tabellaPerGiorni, debug)
+                    nome: aula,
+                    tabelleOrario: await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + aula + '.pdf', 1, tabellaPerGiorni, debug)
                 }
             } catch(err) {
                 return undefined
             }
-        }).filter(promessa => promessa != undefined))
+        }).filter(promessa => promessa != undefined)) as Orario[]
         
         //3: Ritorno gli orari
-        return orari.filter(orario => orario != undefined && orario.orario != undefined)
+        return {
+            orari: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined),
+            lista: aule
+        }
     } catch(err) {
         throw 'impossibile recuperare aule e orari'
     }
@@ -249,16 +255,19 @@ export async function ottieniOrariProfessori(tabellaPerGiorni: boolean = false, 
         let orari = await Promise.all(professori.map(async professore => {
             try {
                 return {
-                    professore: professore.nome,
-                    orario: await ottieniOrario('http://www.galileicrema.it:8080' + professore.percorsoOrario, 2, tabellaPerGiorni, debug)
+                    nome: professore.nome,
+                    tabelleOrario: await ottieniOrario('http://www.galileicrema.it:8080' + professore.percorsoOrario, 2, tabellaPerGiorni, debug)
                 }
             } catch(err) {
                 return undefined
             }
-        }).filter(promessa => promessa != undefined))
+        }).filter(promessa => promessa != undefined)) as Orario[]
         
         //3: Ritorno gli orari
-        return orari.filter(orario => orario != undefined && orario.orario != undefined)
+        return {
+            orari: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined),
+            lista: professori
+        }
     } catch(err) {
         throw 'impossibile recuperare aule e orari'
     }
@@ -317,7 +326,7 @@ async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
  * @param {RigaDati[]} righe le righe del pdf
  * @param {number} tipo 0 per classi, 1 per aule e 2 per prof 
  */
-function analizzaDati(righe: RigaDati[], tipo: number, tabellaPerGiorniRichiesta: boolean = false) {
+function analizzaDati(righe: RigaDati[], tipo: number, tabellaPerGiorniRichiesta: boolean = false): TabelleOrario {
     let min: number = 0, max: number = 0
     let divisori: number[] = []
     let tabellaPerOre: ElementoTabellaPerOre[] = []

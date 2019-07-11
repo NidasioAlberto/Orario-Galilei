@@ -1,11 +1,12 @@
 {
   "name": "parser-orario-galilei",
-  "version": "2.0.0",
+  "version": "2.1.1",
   "description": "Questa libreria permette di ottenere gli orari delle classi, aule e professori del Galilei di Crema",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prepare": "tsc"
   },
   "author": "Alberto Nidasio",
   "license": "MIT",
@@ -20,5 +21,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/NidasioAlberto/Orario-Galilei/tree/master/parser-orario-galilei"
-  }
+  },
+  "files": [
+    "lib/**/*"
+  ]
 }

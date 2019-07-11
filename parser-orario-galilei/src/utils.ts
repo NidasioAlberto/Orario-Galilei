@@ -155,3 +155,13 @@ export interface InfoGiorni {
     ora: string
     nome: string
 }
+
+export interface TabelleOrario {
+    tabellaPerOre: ElementoTabellaPerOre[];
+    tabellaPerGiorni?: ElementoTabellaPerGiorni[];
+}
+
+export interface Orario {
+    nome: string,
+    tabelleOrario: TabelleOrario
+}
