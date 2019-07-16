@@ -16,7 +16,7 @@ class PaginaOrario extends StatefulWidget {
 class PaginaOrarioState extends State<PaginaOrario> {
   int giorno = 0;
   String testoGiorno = 'Lunedì';
-
+                             
   @override
   void initState() {
     super.initState();
@@ -31,17 +31,17 @@ class PaginaOrarioState extends State<PaginaOrario> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(64.0 + altezzaStatusBar),
-        child: TopBar((valore) {
-            print('ciao');
-          }, onPreferito: (preferito) async {
+        child: TopBar(onPreferito: (preferito) async {
             SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
             List<String> preferiti = sharedPreferences.getStringList('Preferiti');
 
+            print(preferiti.toString());
+
             if(preferiti == null) preferiti = List<String>();
 
             if(preferito) {
-              preferiti.add(widget.idDocumento);
+              if(!preferiti.contains(widget.idDocumento)) preferiti.add(widget.idDocumento);
             } else {
               preferiti.remove(widget.idDocumento);
             }

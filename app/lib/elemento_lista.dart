@@ -21,16 +21,8 @@ class ElementoLista extends StatelessWidget {
     fuoriOrario1 = controlloFuoriOrario(ora, giorno);
     fuoriOrario2 = controlloFuoriOrario(ora + 1, giorno);
 
-    //3: Controllo il tipo di dato
-    if(dati['classe'] != null) {
-      titolo = 'Classe: ' + dati['classe'];
-    }
-    else if(dati['aula'] != null) {
-      titolo = 'Aula: ' + dati['aula'];
-    }
-    else if(dati['professore'] != null) {
-      titolo = 'Professore: ' + dati['professore'];
-    }
+    //3: Imposto il titolo
+    titolo = dati['tipo'] + ': ' + dati['nome'];
   }
 
   @override
@@ -40,7 +32,7 @@ class ElementoLista extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => PaginaOrario(this.titolo, this.dati, this.giorno, dati['id']),
+            builder: (context) => PaginaOrario(this.titolo, this.dati, this.giorno, dati['nome']),
           ),
         );
       },

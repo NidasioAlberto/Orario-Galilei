@@ -7,7 +7,7 @@ class TopBar extends StatefulWidget {
   final String titolo;
   final bool preferito;
 
-  TopBar(this.onCerca, {this.onPreferito, this.titolo, this.preferito = false});
+  TopBar({this.onCerca, this.onPreferito, this.titolo, this.preferito = false});
 
   @override
   _TopBarState createState() => _TopBarState();
@@ -59,16 +59,25 @@ class _TopBarState extends State<TopBar> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(left: 10.0),
-                child: (widget.titolo == null ?
-                  TextField(
-                    controller: controllerRicerca,
-                    decoration: InputDecoration.collapsed(
-                      hintStyle: TextStyle(
-                        fontSize: 20
+                child: Container(
+                  child: (widget.titolo == null ?
+                    TextField(
+                      controller: controllerRicerca,
+                      decoration: InputDecoration(
+                        hintStyle: TextStyle(
+                          fontSize: 20
+                        ), 
+                        hintText: 'Cerca',
+                        border: InputBorder.none
                       ),
-                      hintText: 'Cerca'
-                    ),
-                  ) : Text(widget.titolo, style: TextStyle(fontSize: 20))
+                      /*InputDecoration.collapsed(
+                        hintStyle: TextStyle(
+                          fontSize: 20
+                        ), 
+                        hintText: 'Cerca',
+                      )*/
+                    ) : Text(widget.titolo, style: TextStyle(fontSize: 20))
+                  ),
                 )
               )
             ),
@@ -94,7 +103,7 @@ class _TopBarState extends State<TopBar> {
             )),
             //Se il titolo è stato speficato mostro l'incona per impostare l'orario come preferito
             (widget.titolo == null ? null : IconButton(
-              icon: Icon((widget.preferito ? Icons.star : Icons.star_border)),
+              icon: Icon(preferito ? Icons.star : Icons.star_border),
               onPressed: () => setState(() {
                 preferito = !preferito;
                 widget.onPreferito(preferito);

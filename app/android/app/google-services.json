@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "888548877861-4sof6n16sppei9cftlc79gnvajcn6eeb.apps.googleusercontent.com",
+          "client_id": "888548877861-3n7bhj5ven9t5f5b7u04hv6d3blj1m8l.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.galileiorari.app",
-            "certificate_hash": "7699060734b20e4bba255702a3644c3cf45f24b5"
+            "certificate_hash": "a4b29d69fbaeb6bf8be5a8eb5a039948f109fdd1"
           }
         },
         {

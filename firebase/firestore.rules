@@ -1,0 +1,13 @@
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /Aule/{aula} {
+      allow read;
+    }
+    match /Classi/{aula} {
+      allow read;
+    }
+    match /Professori/{aula} {
+      allow read;
+    }
+  }
+}
