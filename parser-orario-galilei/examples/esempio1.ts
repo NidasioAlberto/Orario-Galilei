@@ -2,9 +2,12 @@ import { ottieniOrariClassi, ottieniOrariAule, ottieniOrariProfessori } from "..
 
 const anno = '2019'
 
-//Classi
-console.time('classi')
-ottieniOrariClassi(anno).then((dati) => {
-    console.timeEnd('classi')
-    console.log(JSON.stringify(dati[0]))
-}).catch(console.log)
+async function sincronizzaAule() {
+    try {
+        return await ottieniOrariAule('2019')
+    } catch(err) {
+        throw err
+    }
+}
+
+sincronizzaAule().then(console.log)

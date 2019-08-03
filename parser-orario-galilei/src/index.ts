@@ -266,7 +266,7 @@ export async function ottieniOrariProfessori(tabellaPerGiorni: boolean = false, 
         //3: Ritorno gli orari
         return {
             orari: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined),
-            lista: professori
+            lista: professori.map(professore => professore.nome)
         }
     } catch(err) {
         throw 'impossibile recuperare aule e orari'
