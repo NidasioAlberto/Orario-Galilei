@@ -1,0 +1,117 @@
+html {
+    font-family: 'Roboto';
+    font-weight: 400;
+    min-width: 500px;
+}
+
+body {
+    margin: 0;
+}
+
+@media only screen and (max-width: 768px) {
+    .contenuto {
+      width: 100%;
+    }
+}
+
+.contenuto {
+    margin: 0 auto;
+    max-width: 800px;
+}
+
+.card-con-bordi {
+    border-radius: 8px;
+    background-color: white;
+}
+
+.main-navbar {
+    position: absolute;
+    width: 100%;
+    top: 0px;
+    min-width: 500px;
+}
+
+.main-navbar-content {
+    height: 48px;
+    display: flex;
+    margin: 12px;
+}
+
+.logo {
+    padding: 0px;
+}
+
+.logo img {
+    width: 48px;
+    height: 48px;
+}
+
+.ricerca {
+    height: 44px;
+    padding-top: 4px;
+    flex-grow: 1;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.ricerca input {
+    height: 100%;
+    width: 100%;
+    border: 0px;
+    margin: 0px;
+    float: left;
+    outline: none;
+    -webkit-box-shadow: none;
+            box-shadow: none;
+    padding: 0 0;
+    font-size: 20px;
+}
+
+.ricerca input::placeholder {
+    color: rgb(75, 75, 75);
+}
+
+.lista-ricerca {
+    margin-top: 84px;
+}
+
+.elemento-lista-ricerca {
+    padding: 12px;
+    margin-top: 12px;
+    margin-left: 12px;
+    margin-right: 12px;
+}
+
+.preview-orari {
+    margin-top: 8px;
+    margin-left: -4px;
+    margin-right: -4px;
+    height: 28px;
+    display: flex;
+}
+
+.preview-orari i {
+    font-size: 28px;
+}
+
+.tag-ora {
+    padding: 4px 8px;
+    margin: 0px 4px;
+    display: inline;
+    min-width: inherit;
+}
+
+.tag-ora-corrente {
+    background-color: #4688F4;
+    color: white;
+}
+
+.tag-ora-successiva {
+    background-color: #FFC107;
+}
+
+/* z-depths */
+.z-depth-1 {
+    -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+}

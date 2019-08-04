@@ -1,0 +1,8 @@
+<div class="contenuto lista-ricerca">
+    <div *ngFor="let indiceOrario of indiciFiltrati | async">
+        <app-elemento-ricerca
+            [indiceOrario]="indiceOrario"
+            [giorno]="giorno"
+            [ora]="ora"></app-elemento-ricerca>
+    </div>
+</div>
