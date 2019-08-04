@@ -135,7 +135,7 @@ export interface RigaDati {
 }
 
 export interface ElementoTabellaPerOre {
-    ora: string
+    ora: number
     info1: InfoOre[]
     info2: InfoOre[]
 }
@@ -152,7 +152,7 @@ export interface InfoOre {
 }
 
 export interface InfoGiorni {
-    ora: string
+    ora: number
     nome: string
 }
 

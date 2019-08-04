@@ -20,6 +20,8 @@ Change log
     errori e bug e migliorare le performance del codice.
 
 2.0.0 - Questa versione aggiunge supporto per typescript!
+2.2.0 - Sistemato un bug, invece cha salvare il nome del professore nell'indice, veniva salvato l'oggetto professore
+2.3.0 - L'ora degli orari adesso è salvata come  numero da 0 a 7 invece che come stringa
 */
 
 //Funzioni principali esportate dal modulo
@@ -356,7 +358,7 @@ function analizzaDati(righe: RigaDati[], tipo: number, tabellaPerGiorniRichiesta
     //3: A questo punto trovo le informazioni (prima e seconda riga) per ciascuna ora
     altezzeLineeDati[tipo].forEach(altezzaLineaDati => {
         tabellaPerOre.push({
-            ora: altezzaLineaDati.ora,
+            ora: trasformaOra(altezzaLineaDati.ora),
             info1: dividiRiga(divisori, righe.find(riga => {
                 return riga.y == altezzaLineaDati.altezze[0]
             })),
@@ -456,4 +458,22 @@ function mostraTabella(tabellaPerOre: ElementoTabellaPerOre[]) {
     })
 
     console.table(tabellaPerConsole)
+}
+
+/**
+ * Permette di convertire la dicitura dell'ora in un valore da 0 a 7
+ * @param ora ora in formato stringa
+ */
+function trasformaOra(ora: string) {
+    switch(ora) {
+        case '1':   return 0
+        case '2':   return 1
+        case '3':   return 2
+        case '4':   return 3
+        case '5':   return 4
+        case '6':   return 5
+        case '1p':  return 6
+        case '20':  return 7
+        default: return NaN
+    }
 }
