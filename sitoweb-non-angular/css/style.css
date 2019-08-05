@@ -1,0 +1,71 @@
+body {
+    margin: 0;
+}
+
+/* Per smartphone (in base alla larghezza dello schermo */
+@media only screen and (max-width: 768px) {
+    [class*="nav-wrapper"] {
+      width: 100%;
+    }
+}
+
+.main-navbar {
+    margin: 12px;
+    height: 48px;
+    border-radius: 8px;
+}
+
+.logo {
+    padding: 0px !important;
+}
+
+.logo img {
+    width: 48px;
+    height: 48px;
+}
+
+.ricerca {
+    height: 48px;
+    padding-top: 4px !important;
+}
+
+.ricerca input {
+    height: 100% !important;
+    border: 0px !important;
+    margin: 0px !important;
+    float: left;
+}
+
+.ricerca input:focus {
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+
+.ricerca input::placeholder {
+    color: rgb(75, 75, 75);
+    font-size: 20px;
+}
+
+.recipe-details{
+    grid-area: details;
+    margin-top: 6px;
+}
+
+.recipe-delete{
+    grid-area: delete;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+}
+
+.recipe-delete i{
+    font-size: 18px;
+}
+
+.recipe-title{
+    font-weight: bold;
+}
+
+.recipe-ingredients{
+    font-size: 0.8em;
+}
