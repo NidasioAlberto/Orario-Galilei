@@ -9,6 +9,8 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { RicercaComponent } from './ricerca/ricerca.component';
 import { ElementoRicercaComponent } from './ricerca/elemento-ricerca/elemento-ricerca.component';
+import { ScrollingModule } from '@angular/cdk/scrolling'
+
 
 @NgModule({
   declarations: [
@@ -21,7 +23,8 @@ import { ElementoRicercaComponent } from './ricerca/elemento-ricerca/elemento-ri
     AppRoutingModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule
+    AngularFirestoreModule,
+    ScrollingModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

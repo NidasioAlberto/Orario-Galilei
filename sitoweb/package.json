@@ -7,11 +7,13 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "firebase-deploy": "ng build --prod && firebase deploy"
   },
   "private": true,
   "dependencies": {
     "@angular/animations": "~8.2.0",
+    "@angular/cdk": "^8.1.2",
     "@angular/common": "~8.2.0",
     "@angular/compiler": "~8.2.0",
     "@angular/core": "~8.2.0",

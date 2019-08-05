@@ -1,7 +1,9 @@
+$app-min-width: 300px;
+
 html {
     font-family: 'Roboto';
     font-weight: 400;
-    min-width: 500px;
+    min-width: $app-min-width;
 }
 
 body {
@@ -25,10 +27,11 @@ body {
 }
 
 .main-navbar {
-    position: absolute;
+    position: fixed;
     width: 100%;
     top: 0px;
-    min-width: 500px;
+    min-width: $app-min-width;
+    z-index: 100;
 }
 
 .main-navbar-content {
@@ -71,8 +74,19 @@ body {
     color: rgb(75, 75, 75);
 }
 
+cdk-virtual-scroll-viewport {
+    height: 100vh;
+    -ms-overflow-style: none;  // IE 10+
+    overflow: -moz-scrollbars-none;  // Firefox
+}
+
+cdk-virtual-scroll-viewport::-webkit-scrollbar {
+    display: none; // Safari and Chrome
+}
+
 .lista-ricerca {
     margin-top: 84px;
+    margin-bottom: 12px;
 }
 
 .elemento-lista-ricerca {
@@ -99,6 +113,9 @@ body {
     margin: 0px 4px;
     display: inline;
     min-width: inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .tag-ora-corrente {
@@ -114,4 +131,40 @@ body {
 .z-depth-1 {
     -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
             box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+}
+
+@-webkit-keyframes zoomIn {
+    from {
+      opacity: 0;
+      -webkit-transform: scale3d(0.8, 0.8 0.8);
+      transform: scale3d(0.8, 0.8, 0.8);
+    }
+  
+    50% {
+      opacity: 1;
+    }
+}
+  
+@keyframes zoomIn {
+    from {
+        opacity: 0.5;
+        -webkit-transform: scale3d(0.8, 0.8, 0.8);
+        transform: scale3d(0.8, 0.8, 0.8);
+    }
+  
+    50% {
+        opacity: 1;
+    }
+}
+  
+.zoomIn {
+    -webkit-animation-name: zoomIn;
+    animation-name: zoomIn;
+}
+
+.animated {
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }

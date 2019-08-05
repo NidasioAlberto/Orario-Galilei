@@ -1,8 +1,10 @@
-<div class="contenuto lista-ricerca">
-    <div *ngFor="let indiceOrario of indiciFiltrati | async">
-        <app-elemento-ricerca
-            [indiceOrario]="indiceOrario"
-            [giorno]="giorno"
-            [ora]="ora"></app-elemento-ricerca>
+<cdk-virtual-scroll-viewport itemSize="80">
+    <div class="lista-ricerca contenuto">
+        <div *cdkVirtualFor="let indiceOrario of indiciFiltrati | async" class="animated zoomIn">
+            <app-elemento-ricerca
+                [indiceOrario]="indiceOrario"
+                [giorno]="giorno"
+                [ora]="ora"></app-elemento-ricerca>
+        </div>
     </div>
-</div>
+</cdk-virtual-scroll-viewport>

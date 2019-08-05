@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FirestoreService } from '../core/firestore.service';
 import { Observable, combineLatest, interval } from 'rxjs';
-import { map, skipWhile, distinctUntilChanged, distinct, startWith } from 'rxjs/operators';
+import { map, distinctUntilChanged, startWith } from 'rxjs/operators';
 import { ElementoIndice } from '../utils/indice';
 
 const intervalloAggiornamento = 5 * 1000;
