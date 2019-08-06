@@ -23,7 +23,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling'
     AppRoutingModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule,
+    AngularFirestoreModule.enablePersistence(),
     ScrollingModule,
   ],
   providers: [],

@@ -1,5 +1,5 @@
 export interface ElementoTabellaPerOre {
-    ora: string
+    ora: number
     info1: InfoOre[]
     info2: InfoOre[]
 }
@@ -16,7 +16,7 @@ export interface InfoOre {
 }
 
 export interface InfoGiorni {
-    ora: string
+    ora: number
     nome: string
 }
 
@@ -26,6 +26,15 @@ export interface TabelleOrario {
 }
 
 export interface Orario {
-    nome: string,
+    nome: string
     tabelleOrario: TabelleOrario
+}
+
+export interface ProssimoImpegno {
+    ora: number
+    oraLable: string
+    giorno: number
+    giornoLable: string
+    info1: string
+    info2: string
 }

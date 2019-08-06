@@ -1,15 +1,13 @@
-<div class="card-con-bordi elemento-lista-ricerca z-depth-1">
+<div class="card-con-bordi elemento-lista-ricerca z-depth-1" (click)="apriOrario()">
     <div>
         {{tipo}}: {{indiceOrario.nome}}
-
     </div>
     <div class="preview-orari">
-        <div class="card-con-bordi z-depth-1 tag-ora tag-ora-corrente">
-            1a: i29 - Sistemi
-        </div>
-        <i class="material-icons">arrow_forward</i>
-        <div class="card-con-bordi z-depth-1 tag-ora tag-ora-successiva">
-            2a: i30 - Lettere
+        <div class="card-con-bordi z-depth-1 tag-ora" [ngClass]="{
+                'tag-ora-corrente': i == 0,
+                'tag-ora-successiva': i > 0
+            }" *ngFor="let impegno of prossimiImpegni | async; let i = index">
+            {{impegno}}
         </div>
     </div>
 </div>
