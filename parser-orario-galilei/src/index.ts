@@ -473,7 +473,7 @@ function trasformaOra(ora: string) {
         case '5':   return 4
         case '6':   return 5
         case '1p':  return 6
-        case '20':  return 7
+        case '2p':  return 7
         default: return NaN
     }
 }
