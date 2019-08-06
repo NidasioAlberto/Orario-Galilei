@@ -202,7 +202,7 @@ export async function ottieniOrariClassi(anno: string, tabellaPerGiorni: boolean
         //3: Ritorno gli orari
         return {
             orari: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined),
-            lista: classi
+            lista: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined).map(orario => orario.nome)
         }
     } catch(err) {
         if(debug) console.log(err)
@@ -236,7 +236,7 @@ export async function ottieniOrariAule(anno: string, tabellaPerGiorni: boolean =
         //3: Ritorno gli orari
         return {
             orari: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined),
-            lista: aule
+            lista: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined).map(orario => orario.nome)
         }
     } catch(err) {
         throw 'impossibile recuperare aule e orari'
@@ -268,7 +268,7 @@ export async function ottieniOrariProfessori(tabellaPerGiorni: boolean = false, 
         //3: Ritorno gli orari
         return {
             orari: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined),
-            lista: professori.map(professore => professore.nome)
+            lista: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined).map(orario => orario.nome)
         }
     } catch(err) {
         throw 'impossibile recuperare aule e orari'
