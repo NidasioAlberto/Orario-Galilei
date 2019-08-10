@@ -28,6 +28,8 @@ export interface TabelleOrario {
 export interface Orario {
     nome: string
     tabelleOrario: TabelleOrario
+    collection?: string
+    tipo?: string
 }
 
 export interface ProssimoImpegno {

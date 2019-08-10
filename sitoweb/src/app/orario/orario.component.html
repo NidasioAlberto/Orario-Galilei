@@ -1,0 +1,15 @@
+<div class="contenuto contenuto orario animated zoomIn">
+    <div class="card-con-bordi card-orario z-depth-1">
+        <div class="titolo-orario">
+                {{(orario | async).tipo}}: {{(orario | async).nome}}
+        </div>
+
+        <div style="overflow: auto">
+            <div class="orario-lista-impegni">
+                <app-lista-impegni [impegni]="impegni"></app-lista-impegni>
+            </div>
+        </div>
+            
+        <app-grafico-orario [orario]="orario" [impegni]="impegni"></app-grafico-orario>
+    </div>
+</div>

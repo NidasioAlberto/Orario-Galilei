@@ -1,0 +1,6 @@
+<div class="card-con-bordi z-depth-1 tag-ora" [ngClass]="{
+        'tag-ora-corrente': i == 0,
+        'tag-ora-successiva': i > 0
+    }" *ngFor="let impegno of impegni | async; let i = index">
+    {{impegno}}
+</div>

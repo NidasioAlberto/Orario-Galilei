@@ -111,6 +111,7 @@ cdk-virtual-scroll-viewport::-webkit-scrollbar {
     margin-right: -4px;
     padding-top: 2px;
     padding-bottom: 2px;
+    display: inline-block;
 }
 
 .preview-orari i {
@@ -130,6 +131,45 @@ cdk-virtual-scroll-viewport::-webkit-scrollbar {
 
 .tag-ora-successiva {
     background-color: #FFC107;
+}
+
+.orario {
+    margin-top: 84px;
+}
+
+.card-orario {
+    margin: 12px;
+}
+
+.grafico-orario {
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+.grafico-orario td {
+    width: 97px;
+    height: 47px;
+    min-width: 97px;
+    min-height: 47px;
+    background-color: transparent;
+    text-align: center;
+}
+
+.contenitore-grafico {
+    overflow: auto;
+    margin: 8px 0;
+}
+
+.titolo-orario {
+    font-size: 20px;
+    text-align: center;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.orario-lista-impegni {
+    margin: 0 auto;
+    display: table;
 }
 
 /* z-depths */

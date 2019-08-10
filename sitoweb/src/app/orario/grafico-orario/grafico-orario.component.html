@@ -1,0 +1,14 @@
+<div class="contenitore-grafico">
+    <table *ngIf="orario | async; let datiOrario" class="grafico-orario">
+        <tr *ngFor="let indexOra of [-1, 0, 1, 2, 3, 4, 5, 6, 7]">
+            <td *ngFor="let indexGiorno of [-1, 0, 1, 2, 3, 4, 5]" [ngStyle]="preparaStileCella(indexOra, indexGiorno)">
+                <div [ngClass]="preparaClasse(orario, indexOra, indexGiorno)">
+                    {{trovaInfo(datiOrario, indexOra, indexGiorno, 1)}}
+                    <div *ngIf="indexOra != -1 && indexGiorno != -1">
+                        {{trovaInfo(datiOrario, indexOra, indexGiorno, 2)}}
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>

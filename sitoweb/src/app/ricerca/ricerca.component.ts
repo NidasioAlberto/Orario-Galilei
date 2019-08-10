@@ -4,8 +4,7 @@ import { FirestoreService } from '../core/firestore.service';
 import { Observable, combineLatest, interval } from 'rxjs';
 import { map, distinctUntilChanged, startWith } from 'rxjs/operators';
 import { ElementoIndice } from '../utils/indice';
-
-const intervalloAggiornamento = 5 * 1000;
+import { TempoService } from '../core/tempo.service';
 
 @Component({
   selector: 'app-ricerca',
@@ -20,7 +19,7 @@ export class RicercaComponent implements OnInit {
   giorno: Observable<number>
   ora: Observable<number>
 
-  constructor(private router: ActivatedRoute, private firestore: FirestoreService) { }
+  constructor(private router: ActivatedRoute, private firestore: FirestoreService, private tempo: TempoService) { }
 
   ngOnInit() {
     //Debug
@@ -42,15 +41,9 @@ export class RicercaComponent implements OnInit {
       console.log('dati filtrati: ', risultati.length)
     })
 
-    //Recupero il giorno e l'ora da passere ai risultati
-    this.giorno = interval(intervalloAggiornamento).pipe(map((index) => (new Date().getDay() - 1))).pipe(
-      startWith((new Date().getDay() - 1)),
-      distinctUntilChanged()
-    )
-    this.ora = interval(intervalloAggiornamento).pipe(map((index) => (new Date().getHours() - 8))).pipe(
-      startWith((new Date().getHours() - 8)),
-      distinctUntilChanged()
-    )
+    //Recupero l'ora e il giorno dal TempoService
+    this.giorno = this.tempo.ottieniGiorno()
+    this.ora = this.tempo.ottieniOra()
   }
 
 }
