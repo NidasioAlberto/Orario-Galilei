@@ -1,8 +1,7 @@
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { FirestoreService } from './core/firestore.service';
-import { Observable, fromEvent, combineLatest } from 'rxjs';
+import { Observable, fromEvent } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +16,15 @@ export class AppComponent implements OnInit, AfterViewInit {
   constructor(private router: Router) { }
 
   ngOnInit() {
+    this.router.events.subscribe(event => {
+      if(event instanceof NavigationEnd) {
+        if(event.url.indexOf('ricerca') < 0) this.barraRicerca.nativeElement.value = ''
+        else {
+          let urlData = this.router.parseUrl(event.url)
+          this.barraRicerca.nativeElement.value = urlData.queryParams.valore
+        }
+      }
+    })
   }
 
   ngAfterViewInit() {

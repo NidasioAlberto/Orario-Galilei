@@ -22,9 +22,6 @@ export class RicercaComponent implements OnInit {
   constructor(private router: ActivatedRoute, private firestore: FirestoreService, private tempo: TempoService) { }
 
   ngOnInit() {
-    //Debug
-    console.log('ngOnInit')
-
     //Recupero gli indici da database
     this.indici = this.firestore.ottieniIndici()
 
@@ -35,11 +32,6 @@ export class RicercaComponent implements OnInit {
     this.indiciFiltrati = combineLatest(this.valoreRicerca, this.indici).pipe(
       map(elementiRicerca => elementiRicerca[1].filter(elemento => RegExp(elementiRicerca[0], 'i').test(elemento.nome)))
     )
-
-    //Debug
-    this.indiciFiltrati.subscribe(risultati => {
-      console.log('dati filtrati: ', risultati.length)
-    })
 
     //Recupero l'ora e il giorno dal TempoService
     this.giorno = this.tempo.ottieniGiorno()

@@ -57,7 +57,6 @@ export class ElementoRicercaComponent implements OnInit {
    */
 
   apriOrario() {
-    console.log('Apri orario')
     this.router.navigate(['/orario'], {
       queryParams: {
         collection: this.indiceOrario.collection,

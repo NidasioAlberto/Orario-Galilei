@@ -1,5 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, Input, OnInit } from '@angular/core';
+import { Observable, combineLatest } from 'rxjs';
 import { Orario, InfoOre, ProssimoImpegno } from 'src/app/utils/orario';
 import { map } from 'rxjs/operators';
 
@@ -8,12 +8,23 @@ import { map } from 'rxjs/operators';
   templateUrl: './grafico-orario.component.html',
   styleUrls: ['./grafico-orario.component.scss']
 })
-export class GraficoOrarioComponent {
+export class GraficoOrarioComponent implements OnInit {
 
   @Input() orario: Observable<Orario>
   @Input() impegni: Observable<ProssimoImpegno[]>
 
+  dati: Observable<{
+    orario: Orario,
+    impegni: ProssimoImpegno[]
+  }>
+
   constructor() { }
+
+  ngOnInit() {
+    this.dati = combineLatest(this.orario, this.impegni).pipe(map(dati => { 
+      return { orario: dati[0], impegni: dati[1] }
+    }))
+  }
 
   trovaInfo(orario: Orario, ora: number, giorno: number, info: number): string {
     if(ora == -1) {
@@ -56,12 +67,11 @@ export class GraficoOrarioComponent {
     let datiGiorno = datiInfo.find(infoOra => infoOra.giorno == giorno)
     if(datiGiorno == undefined) return ''
 
-    console.log(arguments, datiGiorno)
-
     return datiGiorno.nome
   }
 
   preparaStileCella(ora: number, giorno: number) {
+
     return {
       'border-top': (ora != -1 ? '1px solid black' : '1px solid transparent'),
       'border-bottom': (ora != 7 ? '1px solid black' : '1px solid transparent'),
@@ -72,14 +82,5 @@ export class GraficoOrarioComponent {
       'min-width': (giorno == -1 ? '30px' : '97px'),
       'min-height': (ora == -1 ? '20px' : '47px')
     }
-  }
-
-  preparaClasse(orario: Orario, ora: number, giorno: number) {
-    return this.impegni.pipe(map(impegni => {
-      let impegno = impegni.find(impegno => impegno.ora == ora && impegno.giorno == giorno)
-      return {
-        'tag-ora-corrente': (impegno != undefined ? false : true)
-      }
-    }))
   }
 }

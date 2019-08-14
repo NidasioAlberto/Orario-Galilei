@@ -123,7 +123,6 @@ export class FirestoreService {
           for(let k = oraPartenzaControllo; k < 8; k++) {
             //Controllo se siamo arrivata alla fine
             if(k == oraFine && giornoControllo == giornoFine) {
-              console.log('Raggiunta la fine')
               return undefined
             }
 

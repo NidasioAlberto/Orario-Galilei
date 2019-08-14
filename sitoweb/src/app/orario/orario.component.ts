@@ -15,7 +15,8 @@ import { TempoService } from '../core/tempo.service';
 export class OrarioComponent implements OnInit {
 
   orario: Observable<Orario>
-  impegni: Observable<string[]>
+  impegni: Observable<ProssimoImpegno[]>
+  impegniLable: Observable<string[]>
 
   constructor(private router: ActivatedRoute, private firestore: FirestoreService, private tempo: TempoService) { }
 
@@ -24,6 +25,9 @@ export class OrarioComponent implements OnInit {
 
     this.impegni = combineLatest(this.orario, this.tempo.ottieniOra(), this.tempo.ottieniGiorno()).pipe(
       map(dati => this.firestore.trovaProssimiImpegni(dati[1], dati[2], dati[0], 2)),
+    )
+
+    this.impegniLable = this.impegni.pipe(
       map(impegni => impegni.map(impegno =>
         impegno.giornoLable +
         ' ' +
@@ -34,7 +38,5 @@ export class OrarioComponent implements OnInit {
         (impegno.info2 != undefined ? impegno.info2 : '')
       ))
     )
-
-    //this.impegni = this.orario.pipe(map(orario => this.firestore.trovaProssimiImpegni()))
   }
 }

@@ -9,8 +9,7 @@ import { Observable } from 'rxjs';
 })
 export class ListaImpegniComponent {
 
-  @Input() impegni: Observable<ProssimoImpegno>[]
+  @Input() impegni: Observable<ProssimoImpegno[]>
 
   constructor() { }
-
 }
