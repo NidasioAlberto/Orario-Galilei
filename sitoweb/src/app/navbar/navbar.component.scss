@@ -1,0 +1,46 @@
+.main-navbar {
+  position: fixed;
+  width: 100%;
+  top: 0px;
+  z-index: 100;
+}
+
+.main-navbar-content {
+  height: 48px;
+  display: flex;
+  margin: 12px;
+}
+
+.logo {
+  padding: 0px;
+}
+
+.logo img {
+  width: 48px;
+  height: 48px;
+}
+
+.ricerca {
+  height: 44px;
+  padding-top: 4px;
+  flex-grow: 1;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.ricerca input {
+  height: 100%;
+  width: 100%;
+  border: 0px;
+  margin: 0px;
+  float: left;
+  outline: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  padding: 0 0;
+  font-size: 20px;
+}
+
+.ricerca input::placeholder {
+  color: rgb(75, 75, 75);
+}

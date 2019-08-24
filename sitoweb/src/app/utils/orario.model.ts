@@ -21,8 +21,8 @@ export interface InfoGiorni {
 }
 
 export interface TabelleOrario {
-    tabellaPerOre: ElementoTabellaPerOre[];
-    tabellaPerGiorni?: ElementoTabellaPerGiorni[];
+    tabellaPerOre: ElementoTabellaPerOre[]
+    tabellaPerGiorni?: ElementoTabellaPerGiorni[]
 }
 
 export interface Orario {

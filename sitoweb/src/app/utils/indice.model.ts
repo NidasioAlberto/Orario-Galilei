@@ -3,6 +3,6 @@ export interface DocumentoIndice {
 }
 
 export interface ElementoIndice {
-    nome: string,
+    nome: string
     collection: string
 }

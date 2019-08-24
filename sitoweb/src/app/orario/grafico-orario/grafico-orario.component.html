@@ -1,17 +1,17 @@
 <div class="contenitore-grafico">
-    <table *ngIf="orario | async as orario; else caricamento" class="grafico-orario">
-        <tr *ngFor="let indexOra of [-1, 0, 1, 2, 3, 4, 5, 6, 7]">
-            <td *ngFor="let indexGiorno of [-1, 0, 1, 2, 3, 4, 5]" [ngStyle]="preparaStileCella(indexOra, indexGiorno)">
-                <div>
-                    {{trovaInfo(orario, indexOra, indexGiorno, 1)}}
-                    <div *ngIf="indexOra != -1 && indexGiorno != -1">
-                        {{trovaInfo(orario, indexOra, indexGiorno, 2)}}
-                    </div>
-                </div>
-            </td>
-        </tr>
-    </table>
-    <ng-template #caricamento>
-        <div style="text-align: center;">Caricamento ...</div>
-    </ng-template> 
+	<table *ngIf="orario | async as orario; else caricamento" class="grafico-orario">
+		<tr *ngFor="let indexOra of [-1, 0, 1, 2, 3, 4, 5, 6, 7]">
+			<td *ngFor="let indexGiorno of [-1, 0, 1, 2, 3, 4, 5]" [ngStyle]="preparaStileCella(indexOra, indexGiorno)">
+				<div>
+					{{trovaInfo(orario, indexOra, indexGiorno, 1)}}
+					<div *ngIf="indexOra != -1 && indexGiorno != -1">
+						{{trovaInfo(orario, indexOra, indexGiorno, 2)}}
+					</div>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<ng-template #caricamento>
+		<div style="text-align: center;">Caricamento ...</div>
+	</ng-template>
 </div>

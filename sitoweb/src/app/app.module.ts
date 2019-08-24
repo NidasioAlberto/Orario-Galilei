@@ -1,28 +1,39 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser'
+import { NgModule } from '@angular/core'
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { ServiceWorkerModule } from '@angular/service-worker';
-import { environment } from '../environments/environment';
-import { AngularFireModule } from '@angular/fire';
-import { AngularFirestoreModule } from '@angular/fire/firestore';
-import { RicercaComponent } from './ricerca/ricerca.component';
-import { ElementoRicercaComponent } from './ricerca/elemento-ricerca/elemento-ricerca.component';
-import { ScrollingModule } from '@angular/cdk/scrolling';
-import { OrarioComponent } from './orario/orario.component';
-import { GraficoOrarioComponent } from './orario/grafico-orario/grafico-orario.component';
-import { ListaImpegniComponent } from './utils/lista-impegni/lista-impegni.component'
+import { AppRoutingModule } from './app-routing.module'
+import { AppComponent } from './app.component'
+import { ServiceWorkerModule } from '@angular/service-worker'
+import { environment } from '../environments/environment'
+import { AngularFireModule } from '@angular/fire'
+import { AngularFirestoreModule } from '@angular/fire/firestore'
+import { RicercaComponent } from './ricerca/ricerca.component'
+import { ScrollingModule } from '@angular/cdk/scrolling'
+import { OrarioComponent } from './orario/orario.component'
+import { GraficoOrarioComponent } from './orario/grafico-orario/grafico-orario.component'
+import { ListaImpegniComponent } from './lista-impegni/lista-impegni.component'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { NavbarComponent } from './navbar/navbar.component'
+import { FormsModule } from '@angular/forms'
+import { StorageModule } from '@ngx-pwa/local-storage';
 
+// Angular material components
+import { MatButtonModule } from '@angular/material/button';
+import { PreferitiComponent } from './preferiti/preferiti.component';
+import { ListaOrariComponent } from './lista-orari/lista-orari.component';
+import { ElementoListaOrariComponent } from './lista-orari/elemento-lista-orari/elemento-lista-orari.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     RicercaComponent,
-    ElementoRicercaComponent,
     OrarioComponent,
     GraficoOrarioComponent,
-    ListaImpegniComponent
+    ListaImpegniComponent,
+    NavbarComponent,
+    PreferitiComponent,
+    ListaOrariComponent,
+    ElementoListaOrariComponent
   ],
   imports: [
     BrowserModule,
@@ -31,6 +42,13 @@ import { ListaImpegniComponent } from './utils/lista-impegni/lista-impegni.compo
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule.enablePersistence(),
     ScrollingModule,
+    BrowserAnimationsModule,
+    FormsModule,
+
+    // Angular material components
+    MatButtonModule,
+
+    StorageModule.forRoot({ IDBNoWrap: true }),
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,0 +1,16 @@
+@import '../../styles.scss';
+
+.tag-ora {
+  padding: 4px 8px;
+  margin: 4px 4px;
+  display: inline-block;
+}
+
+.tag-ora-corrente {
+  background-color: $primary-color;
+  color: white;
+}
+
+.tag-ora-successiva {
+  background-color: $accent-color;
+}
