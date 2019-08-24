@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, SimpleChanges, OnChanges } from '@angular/core';
 import { Observable, combineLatest, of } from 'rxjs';
 import { Orario, ProssimoImpegno } from 'src/app/utils/orario.model';
 import { FirestoreService } from 'src/app/core/firestore.service';
@@ -12,7 +12,7 @@ import { TempoService } from 'src/app/core/tempo.service';
   templateUrl: './elemento-lista-orari.component.html',
   styleUrls: ['./elemento-lista-orari.component.scss']
 })
-export class ElementoListaOrariComponent implements OnInit {
+export class ElementoListaOrariComponent implements OnInit, OnChanges {
   @Input() indiceOrario: ElementoIndice
   @Input() orarioOffline: Orario
 
@@ -30,17 +30,7 @@ export class ElementoListaOrariComponent implements OnInit {
   ngOnInit() {
     // Controllo i dati ricevuti
     if (this.indiceOrario !== undefined) {
-      // Recupero il documento dell'orario
-      this.orario = this.firestore.ottieniOrario(this.indiceOrario)
-
-      // Imposto il tipo in base alla collection del documento
-      if (this.indiceOrario.collection === 'Aule') {
-        this.tipo = 'Aula'
-      } else if (this.indiceOrario.collection === 'Classi') {
-        this.tipo = 'Classe'
-      } else if (this.indiceOrario.collection === 'Professori') {
-        this.tipo = 'Professore'
-      }
+      this.recuperaOrario()
     } else {
       this.orario = of(this.orarioOffline)
 
@@ -66,6 +56,24 @@ export class ElementoListaOrariComponent implements OnInit {
         (impegno.info2 !== undefined ? impegno.info2 : '')
       ))
     )
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.recuperaOrario()
+  }
+
+  recuperaOrario() {
+    // Recupero il documento dell'orario
+    this.orario = this.firestore.ottieniOrario(this.indiceOrario)
+
+    // Imposto il tipo in base alla collection del documento
+    if (this.indiceOrario.collection === 'Aule') {
+      this.tipo = 'Aula'
+    } else if (this.indiceOrario.collection === 'Classi') {
+      this.tipo = 'Classe'
+    } else if (this.indiceOrario.collection === 'Professori') {
+      this.tipo = 'Professore'
+    }
   }
 
   apriOrario() {
