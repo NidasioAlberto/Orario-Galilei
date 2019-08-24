@@ -127,7 +127,7 @@ export async function ottieniListaProfessori(urlProf: string = percorsoPrimario 
                 }).filter(professore => professore != undefined) as {
                     percorsoOrario: string;
                     nome: string;
-                } []
+                }[]
             } catch (err) {
                 return undefined
             }
@@ -143,7 +143,10 @@ export async function ottieniListaProfessori(urlProf: string = percorsoPrimario 
 
         if (professori == undefined) throw undefined
 
-        return professori
+        return professori as {
+            percorsoOrario: string;
+            nome: string;
+        }[]
     } catch (err) {
         throw 'Impossibile recuperare i professori'
     }
