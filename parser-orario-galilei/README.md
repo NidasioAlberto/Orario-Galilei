@@ -5,6 +5,7 @@ Questo modulo npm permette di ottenere gli orari di classi, aule e professori pe
 ## Esempio
 
 Codice:
+
 ```Typescript
 const anno = '2019'
 
@@ -17,6 +18,7 @@ ottieniOrariClassi(anno).then((dati) => {
 ```
 
 Output:
+
 ```JSON
 {
     "classe":"1CA",
