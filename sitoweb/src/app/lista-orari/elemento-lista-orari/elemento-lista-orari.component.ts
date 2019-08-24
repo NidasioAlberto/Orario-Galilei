@@ -1,9 +1,9 @@
 import { Component, OnInit, Input, SimpleChanges, OnChanges } from '@angular/core';
-import { Observable, combineLatest, of } from 'rxjs';
+import { Observable, combineLatest, of, Subject, BehaviorSubject } from 'rxjs';
 import { Orario, ProssimoImpegno } from 'src/app/utils/orario.model';
 import { FirestoreService } from 'src/app/core/firestore.service';
 import { ElementoIndice } from 'src/app/utils/indice.model';
-import { map } from 'rxjs/operators';
+import { map, switchMap, filter } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { TempoService } from 'src/app/core/tempo.service';
 
@@ -18,6 +18,8 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
 
   orario: Observable<Orario>
   prossimiImpegni: Observable<string[]>
+
+  observableIndiceOrario = new BehaviorSubject<ElementoIndice>(this.indiceOrario);
 
   tipo: string
 
@@ -44,6 +46,19 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
       }
     }
 
+    this.observableIndiceOrario.pipe(
+      filter(indiceOrario => indiceOrario !== undefined)
+    ).subscribe(indiceOrario => {
+      // Imposto il tipo in base alla collection del documento
+      if (indiceOrario.collection === 'Aule') {
+        this.tipo = 'Aula'
+      } else if (indiceOrario.collection === 'Classi') {
+        this.tipo = 'Classe'
+      } else if (indiceOrario.collection === 'Professori') {
+        this.tipo = 'Professore'
+      }
+    })
+
     this.prossimiImpegni = combineLatest(this.tempo.ora, this.tempo.giorno, this.orario).pipe(
       map(dati => this.firestore.trovaProssimiImpegni(dati[0], dati[1], dati[2], 2)),
       map(impegni => impegni.map(impegno =>
@@ -59,21 +74,14 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.recuperaOrario()
+    this.observableIndiceOrario.next(this.indiceOrario)
   }
 
   recuperaOrario() {
     // Recupero il documento dell'orario
-    this.orario = this.firestore.ottieniOrario(this.indiceOrario)
-
-    // Imposto il tipo in base alla collection del documento
-    if (this.indiceOrario.collection === 'Aule') {
-      this.tipo = 'Aula'
-    } else if (this.indiceOrario.collection === 'Classi') {
-      this.tipo = 'Classe'
-    } else if (this.indiceOrario.collection === 'Professori') {
-      this.tipo = 'Professore'
-    }
+    this.orario = this.observableIndiceOrario.pipe(
+      switchMap(indiceOrario => this.firestore.ottieniOrario(indiceOrario))
+    )
   }
 
   apriOrario() {
