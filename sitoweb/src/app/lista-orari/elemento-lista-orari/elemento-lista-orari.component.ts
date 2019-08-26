@@ -3,7 +3,7 @@ import { Observable, combineLatest, of, Subject, BehaviorSubject } from 'rxjs';
 import { Orario, ProssimoImpegno } from 'src/app/utils/orario.model';
 import { FirestoreService } from 'src/app/core/firestore.service';
 import { ElementoIndice } from 'src/app/utils/indice.model';
-import { map, switchMap, filter } from 'rxjs/operators';
+import { map, switchMap, filter, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { TempoService } from 'src/app/core/tempo.service';
 
@@ -60,17 +60,24 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
     })
 
     this.prossimiImpegni = combineLatest(this.tempo.ora, this.tempo.giorno, this.orario).pipe(
-      map(dati => this.firestore.trovaProssimiImpegni(dati[0], dati[1], dati[2], 2)),
-      map(impegni => impegni.map(impegno =>
-        impegno.giornoLable +
+      map(dati => {
+        console.log('recupero gli impegni', dati)
+        return this.firestore.trovaProssimiImpegni(dati[0], dati[1], dati[2], 2)
+      }),
+      map(impegni => impegni.map(impegno => {
+        console.log('impegni: ', impegno)
+        return impegno.giornoLable +
         ' ' +
         impegno.oraLable +
         ': ' +
         (impegno.info1 !== undefined ? impegno.info1 : '') +
         (impegno.info1 !== undefined && impegno.info2 !== undefined ? ' ' : '') +
         (impegno.info2 !== undefined ? impegno.info2 : '')
-      ))
+      }))
     )
+
+    this.orario.subscribe(console.log)
+    this.prossimiImpegni.subscribe(console.log)
   }
 
   ngOnChanges(changes: SimpleChanges): void {

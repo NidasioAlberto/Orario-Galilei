@@ -82,6 +82,7 @@ export class FirestoreService {
    * @param numeroImpegni numero di impegni da estrarre, è possibile impostarlo ad Infinity, verranno recuperati tutti gli impegni!
    */
   trovaProssimiImpegni(ora: number, giorno: number, orario: Orario, numeroImpegni: number) {
+    console.log('Trovo i prossimi impegni', arguments)
     let oraPartenza = ora
     let giornoPartenza = giorno
     let oraFine = ora
@@ -91,6 +92,7 @@ export class FirestoreService {
 
     for (let i = 0; i < numeroImpegni; i++) {
       const impegno = this.trovaProssimoImpegno(oraPartenza, giornoPartenza, oraFine, giornoFine, orario)
+      console.log('impegno trovato', impegno)
 
       if (impegno !== undefined) {
         oraPartenza = impegno.ora + 1
@@ -107,6 +109,7 @@ export class FirestoreService {
       }
     }
 
+    console.log('impegni calcolati', impegni)
     return impegni
   }
 
@@ -119,7 +122,13 @@ export class FirestoreService {
    * @param orario L'orario da utilizzare per cercare l'impegno
    */
   trovaProssimoImpegno(oraPartenza: number, giornoPartenza: number, oraFine: number, giornoFine: number, orario: Orario): ProssimoImpegno {
+    console.log('trovo un impegno', arguments)
     // Nei commenti di questa funzione per ora e giorno corrente si intendono quelli del ciclo for
+
+    // Se l'ora e il giorno di partenza coincidono, diminuisco la dine di un'ora
+    if (oraPartenza === oraFine && giornoPartenza === giornoFine) {
+      oraFine--
+    }
 
     if (orario === undefined || orario.tabelleOrario.tabellaPerGiorni === undefined) {
       return undefined
@@ -129,9 +138,13 @@ export class FirestoreService {
 
       for (let i = 0; i < 6; i++) {
         // Cerco i dati del giorno corrente
+        console.log('Cerco i dati del giorno corrente', i)
         const datiGiornoCorrente = orario.tabelleOrario.tabellaPerGiorni.find(orarioGiorno => orarioGiorno.giorno === giornoControllo)
 
+        console.log(datiGiornoCorrente)
+
         if (datiGiornoCorrente !== undefined) {
+          console.log('Continuo 1', oraPartenzaControllo)
           for (let k = oraPartenzaControllo; k < 8; k++) {
             // Controllo se siamo arrivata alla fine
             if (k === oraFine && giornoControllo === giornoFine) {
@@ -139,8 +152,10 @@ export class FirestoreService {
             }
 
             // Cerco i dati dell'ora corrente
+            console.log('Cerco i dati dell\'ora corrente', k)
             const datiOraCorrenteInfo1 = datiGiornoCorrente.info1.find(orarioOra => orarioOra.ora === k)
             const datiOraCorrenteInfo2 = datiGiornoCorrente.info2.find(orarioOra => orarioOra.ora === k)
+            console.log(datiOraCorrenteInfo1, datiOraCorrenteInfo2)
 
             if (datiOraCorrenteInfo1 !== undefined || datiOraCorrenteInfo2 !== undefined) {
               // In questo caso abbiamo trovato il prossimo impegno!
