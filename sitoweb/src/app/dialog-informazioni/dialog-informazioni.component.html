@@ -1,0 +1,27 @@
+<h1 mat-dialog-title>
+    Benvenuto
+</h1>
+<div mat-dialog-content>
+    <div class="messaggio-importante">
+        Tieni premuto (o tasto destro) il logo per tornare qui!
+    </div>
+    <p>Questa app ti permette di visualizzare gli orari di classi, aule e professori dell'istituto IIS Galileo Galilei
+        Crema.</p>
+        <h4>Registro aggiornamenti app</h4>
+        <mat-accordion>
+            <mat-expansion-panel *ngFor="let aggiornamento of aggiornamentiApp" [hideToggle]="hideToggle">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        {{aggiornamento.dataPubblicazione}}
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        {{aggiornamento.descrizioneBreve}}
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                {{aggiornamento.descrizione}}
+            </mat-expansion-panel>
+        </mat-accordion>
+        <div class="contenitore-versione-app">
+            <div class="versione-app">v:{{versione}}</div>
+        </div>
+</div>

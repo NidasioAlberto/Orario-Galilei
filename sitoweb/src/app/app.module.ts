@@ -15,13 +15,17 @@ import { ListaImpegniComponent } from './lista-impegni/lista-impegni.component'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { NavbarComponent } from './navbar/navbar.component'
 import { FormsModule } from '@angular/forms'
-import { StorageModule } from '@ngx-pwa/local-storage';
+import { StorageModule } from '@ngx-pwa/local-storage'
 
 // Angular material components
-import { MatButtonModule } from '@angular/material/button';
-import { PreferitiComponent } from './preferiti/preferiti.component';
-import { ListaOrariComponent } from './lista-orari/lista-orari.component';
-import { ElementoListaOrariComponent } from './lista-orari/elemento-lista-orari/elemento-lista-orari.component';
+import { MatButtonModule } from '@angular/material/button'
+import { MatDialogModule } from '@angular/material/dialog'
+import { MatExpansionModule } from '@angular/material/expansion'
+
+import { PreferitiComponent } from './preferiti/preferiti.component'
+import { ListaOrariComponent } from './lista-orari/lista-orari.component'
+import { ElementoListaOrariComponent } from './lista-orari/elemento-lista-orari/elemento-lista-orari.component'
+import { DialogInformazioniComponent } from './dialog-informazioni/dialog-informazioni.component'
 
 @NgModule({
   declarations: [
@@ -33,7 +37,8 @@ import { ElementoListaOrariComponent } from './lista-orari/elemento-lista-orari/
     NavbarComponent,
     PreferitiComponent,
     ListaOrariComponent,
-    ElementoListaOrariComponent
+    ElementoListaOrariComponent,
+    DialogInformazioniComponent
   ],
   imports: [
     BrowserModule,
@@ -47,10 +52,13 @@ import { ElementoListaOrariComponent } from './lista-orari/elemento-lista-orari/
 
     // Angular material components
     MatButtonModule,
+    MatDialogModule,
+    MatExpansionModule,
 
     StorageModule.forRoot({ IDBNoWrap: true }),
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [DialogInformazioniComponent]
 })
 export class AppModule { }

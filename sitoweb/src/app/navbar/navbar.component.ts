@@ -1,6 +1,8 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { take, filter } from 'rxjs/operators';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogInformazioniComponent } from '../dialog-informazioni/dialog-informazioni.component';
 
 @Component({
   selector: 'app-navbar',
@@ -13,12 +15,12 @@ export class NavbarComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.pipe(take(2)).subscribe(queryParams => {
-      console.log(queryParams)
       this.valoreRicerca = queryParams.valore
     })
 
@@ -29,9 +31,19 @@ export class NavbarComponent implements OnInit {
         this.valoreRicerca = ''
       }
     })
+
+    // Pressioni lunge su mobile
+    window.oncontextmenu = (event: MouseEvent) => {
+      this.mostraInfo()
+      return false
+    }
   }
 
   tornaAllaHome() {
     this.router.navigate(['/'])
+  }
+
+  mostraInfo() {
+    this.dialog.open(DialogInformazioniComponent)
   }
 }

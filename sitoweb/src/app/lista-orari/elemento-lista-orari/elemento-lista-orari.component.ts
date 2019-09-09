@@ -61,11 +61,9 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
 
     this.prossimiImpegni = combineLatest(this.tempo.ora, this.tempo.giorno, this.orario).pipe(
       map(dati => {
-        console.log('recupero gli impegni', dati)
         return this.firestore.trovaProssimiImpegni(dati[0], dati[1], dati[2], 2)
       }),
       map(impegni => impegni.map(impegno => {
-        console.log('impegni: ', impegno)
         return impegno.giornoLable +
         ' ' +
         impegno.oraLable +
@@ -75,9 +73,6 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
         (impegno.info2 !== undefined ? impegno.info2 : '')
       }))
     )
-
-    this.orario.subscribe(console.log)
-    this.prossimiImpegni.subscribe(console.log)
   }
 
   ngOnChanges(changes: SimpleChanges): void {
