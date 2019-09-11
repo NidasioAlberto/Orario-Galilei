@@ -1,12 +1,9 @@
 import { Injectable } from '@angular/core';
-import { AngularFireModule } from '@angular/fire';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DocumentoIndice, ElementoIndice } from '../utils/indice.model';
-import { EventEmitter, element } from 'protractor';
 import { Orario, ProssimoImpegno } from '../utils/orario.model';
-import { Aggiornamento } from '../utils/aggiornamento.model';
 
 @Injectable({
   providedIn: 'root'
@@ -20,11 +17,11 @@ export class FirestoreService {
    */
   ottieniIndici() {
     // Recupero gli indici di classi, aule e professori
-    return combineLatest(
+    return combineLatest([
       this.db.collection('Aule').doc<DocumentoIndice>('Indici').valueChanges(),
       this.db.collection('Classi').doc<DocumentoIndice>('Indici').valueChanges(),
       this.db.collection('Professori').doc<DocumentoIndice>('Indici').valueChanges(),
-    ).pipe(
+    ]).pipe(
       map(indici => {
         return [
           ...indici[0].lista.map(nome => {
@@ -57,20 +54,25 @@ export class FirestoreService {
   ottieniOrario(indiceOrario: ElementoIndice): Observable<Orario> {
     return this.db.collection(indiceOrario.collection).doc<Orario>(indiceOrario.nome).snapshotChanges().pipe(
       map(snapshot => {
+        console.log(snapshot, snapshot.payload.data())
         const dati = snapshot.payload.data()
-        dati.collection = snapshot.payload.ref.parent.id
-        switch (dati.collection) {
-          case 'Classi':
-            dati.tipo = 'Classe'
-            break
-          case 'Aule':
-            dati.tipo = 'Aula'
-            break
-          case 'Professori':
-            dati.tipo = 'Professore'
-            break
+        if (dati !== undefined) {
+          dati.collection = snapshot.payload.ref.parent.id
+          switch (dati.collection) {
+            case 'Classi':
+              dati.tipo = 'Classe'
+              break
+            case 'Aule':
+              dati.tipo = 'Aula'
+              break
+            case 'Professori':
+              dati.tipo = 'Professore'
+              break
+          }
+          return dati
+        } else {
+          return undefined
         }
-        return dati
       })
     )
   }

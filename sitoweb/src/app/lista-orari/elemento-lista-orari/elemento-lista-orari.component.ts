@@ -3,7 +3,7 @@ import { Observable, of, BehaviorSubject, combineLatest } from 'rxjs';
 import { Orario } from 'src/app/utils/orario.model';
 import { FirestoreService } from 'src/app/core/firestore.service';
 import { ElementoIndice } from 'src/app/utils/indice.model';
-import { map, switchMap, filter, tap } from 'rxjs/operators';
+import { map, switchMap, filter } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { TempoService } from 'src/app/core/tempo.service';
 
@@ -33,7 +33,7 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
     // Controllo i dati ricevuti
     if (this.indiceOrario !== undefined) {
       this.recuperaOrario()
-    } else {
+    } else if (this.orarioOffline !== undefined) {
       this.orario = of(this.orarioOffline)
 
       // Imposto il tipo in base alla collection del documento
@@ -44,6 +44,8 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
         nome: this.orarioOffline.nome,
         collection: this.orarioOffline.collection
       }
+    } else {
+      this.orario = of(undefined)
     }
 
     this.observableIndiceOrario.pipe(

@@ -36,7 +36,7 @@ export class RicercaComponent implements OnInit {
     // probabilmente bisogna modificare il contenuto degli indici, da valutare prima della release
 
     // Combino il valore di ricerca con gli indici degli orari, in questo modo creo la lista di risultati da presentare all'utente
-    this.indiciFiltrati = combineLatest(this.valoreRicerca, this.indici).pipe(
+    this.indiciFiltrati = combineLatest([this.valoreRicerca, this.indici]).pipe(
       map(elementiRicerca => elementiRicerca[1].filter(elemento => RegExp(elementiRicerca[0], 'i').test(elemento.nome)))
     )
   }

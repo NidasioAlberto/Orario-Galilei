@@ -5,7 +5,7 @@ import { Observable, combineLatest, concat } from 'rxjs';
 import { Orario, ProssimoImpegno } from '../utils/orario.model';
 import { FirestoreService } from '../core/firestore.service';
 import { TempoService } from '../core/tempo.service';
-import { LocalStorage } from '@ngx-pwa/local-storage';
+import { LocalStorageService } from '../core/local-storage.service';
 
 @Component({
   selector: 'app-orario',
@@ -23,7 +23,7 @@ export class OrarioComponent implements OnInit {
     private router: ActivatedRoute,
     private firestore: FirestoreService,
     private tempo: TempoService,
-    private localStorage: LocalStorage
+    private localStorage: LocalStorageService
   ) { }
 
   ngOnInit() {
@@ -31,18 +31,14 @@ export class OrarioComponent implements OnInit {
     this.orario = this.router.queryParams.pipe(
       mergeMap((params, index) => {
         return concat(
-          this.localStorage.getItem('preferiti').pipe(
-            map((preferiti: Orario[]) => {
-              if (preferiti) {
-                const preferito = preferiti.find(elemento => elemento.nome === params.document)
-                if (preferito) {
-                  this.inPreferiti = true
-                }
-                return preferito
-              } else {
-                return undefined
+          this.localStorage.ottieniOrarioDaiPreferiti(params.document).pipe(
+            tap(orario => {
+              // Se lorario che ottengo dai preferiti è valido imposto questo orario come preferito
+              // (così mostro lo stato del bottone in modo appropriato)
+              if (orario) {
+                this.inPreferiti = true
               }
-            }),
+            })
           ),
           this.firestore.ottieniOrario({collection: params.collection, nome: params.document})
         )
@@ -50,7 +46,7 @@ export class OrarioComponent implements OnInit {
       filter(orario => orario !== undefined)
     )
 
-    this.impegni = combineLatest(this.orario, this.tempo.ora, this.tempo.giorno).pipe(
+    this.impegni = combineLatest([this.orario, this.tempo.ora, this.tempo.giorno]).pipe(
       map(dati => this.firestore.trovaProssimiImpegni(dati[1], dati[2], dati[0], 2)),
     )
 
@@ -70,40 +66,13 @@ export class OrarioComponent implements OnInit {
   async aggiungiAiPreferiti() {
     const orarioPreferito = await this.orario.pipe(take(1)).toPromise()
 
-    const preferitiInMemoria = (await this.localStorage.getItem('preferiti').toPromise()) as Orario[]
-
-    let preferiti: Orario[] = []
-
-    // Recupero se possibile il vecchio orario
-    if (preferitiInMemoria) {
-      preferiti = preferitiInMemoria
-    }
-
-    // Controlo se è già presente
-    if (!preferiti.find(preferito => preferito.nome === orarioPreferito.nome)) {
-      // Aggiungo il nuovo orario alla lista
-      preferiti.push(orarioPreferito)
-
-      // Salvo i preferiti
-      await this.localStorage.setItem('preferiti', preferiti).toPromise()
-
-      this.inPreferiti = true
-    }
+    this.inPreferiti = await this.localStorage.aggiungiOrarioAiPreferiti(orarioPreferito)
   }
 
   async rimuoviDaiPreferiti() {
     // Recupero l'orario da rimuovere
     const orarioDaRimuovere = await this.orario.pipe(take(1)).toPromise()
 
-    // Recupero i preferiti
-    let preferiti = (await this.localStorage.getItem('preferiti').toPromise()) as Orario[]
-
-    // Rimuovo l'orario corrente
-    preferiti = preferiti.filter(preferito => preferito.nome !== orarioDaRimuovere.nome)
-
-    // Salvo i preferiti
-    await this.localStorage.setItem('preferiti', preferiti).toPromise()
-
-    this.inPreferiti = false
+    this.inPreferiti = !(await this.localStorage.rimuoviOrarioDaiPreferiti(orarioDaRimuovere))
   }
 }
