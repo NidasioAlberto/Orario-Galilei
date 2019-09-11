@@ -20,7 +20,7 @@
     "@angular/core": "~9.0.0-next.5",
     "@angular/fire": "^5.2.1",
     "@angular/forms": "~9.0.0-next.5",
-    "@angular/material": "^8.1.2",
+    "@angular/material": "^8.2.0",
     "@angular/platform-browser": "~9.0.0-next.5",
     "@angular/platform-browser-dynamic": "~9.0.0-next.5",
     "@angular/pwa": "^0.802.0",
