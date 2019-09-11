@@ -11,8 +11,6 @@ import { DialogInformazioniComponent } from './dialog-informazioni/dialog-inform
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  @ViewChild('barraRicerca', { static: false }) barraRicerca: ElementRef
-
   valoreRicerca: string
 
   constructor(
@@ -26,7 +24,6 @@ export class AppComponent implements OnInit {
 
     // Controllo se l'utente è per la prima volta nell'app
     this.localStorage.controllaPaginaVisualizzata().then(paginaVisualizzata => {
-      console.log(paginaVisualizzata)
       if (!paginaVisualizzata) {
         console.log('Prima volta sul sito')
 

@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { take, filter } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
@@ -9,8 +9,9 @@ import { DialogInformazioniComponent } from '../dialog-informazioni/dialog-infor
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, AfterViewInit {
   @Output() aggiornaValoreRicerca = new EventEmitter<string>();
+  @ViewChild('immagineLogo', undefined) logo: ElementRef;
   valoreRicerca: string
 
   constructor(
@@ -31,9 +32,10 @@ export class NavbarComponent implements OnInit {
         this.valoreRicerca = ''
       }
     })
+  }
 
-    // Pressioni lunge su mobile
-    window.oncontextmenu = (event: MouseEvent) => {
+  ngAfterViewInit() {
+    this.logo.nativeElement.oncontextmenu = (event: MouseEvent) => {
       this.mostraInfo()
       return false
     }

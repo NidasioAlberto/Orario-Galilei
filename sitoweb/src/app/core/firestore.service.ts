@@ -54,7 +54,6 @@ export class FirestoreService {
   ottieniOrario(indiceOrario: ElementoIndice): Observable<Orario> {
     return this.db.collection(indiceOrario.collection).doc<Orario>(indiceOrario.nome).snapshotChanges().pipe(
       map(snapshot => {
-        console.log(snapshot, snapshot.payload.data())
         const dati = snapshot.payload.data()
         if (dati !== undefined) {
           dati.collection = snapshot.payload.ref.parent.id
