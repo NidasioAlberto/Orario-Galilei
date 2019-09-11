@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, interval, observable } from 'rxjs';
-import { startWith, distinctUntilChanged, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 const intervalloAggiornamento = 5 * 1000
 
@@ -13,7 +12,7 @@ export class TempoService {
   ora: Observable<number>
 
   constructor() {
-    //Recupero il giorno e l'ora da passere ai risultati
+    // Recupero il giorno e l'ora da passere ai risultati
     /*this.giorno = interval(intervalloAggiornamento).pipe(map(() => (new Date().getDay() - 1))).pipe(
       startWith((new Date().getDay() - 1)),
       distinctUntilChanged()
