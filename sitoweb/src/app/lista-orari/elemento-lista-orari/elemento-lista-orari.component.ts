@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, SimpleChanges, OnChanges } from '@angular/core';
-import { Observable, combineLatest, of, Subject, BehaviorSubject } from 'rxjs';
-import { Orario, ProssimoImpegno } from 'src/app/utils/orario.model';
+import { Observable, of, BehaviorSubject, combineLatest } from 'rxjs';
+import { Orario } from 'src/app/utils/orario.model';
 import { FirestoreService } from 'src/app/core/firestore.service';
 import { ElementoIndice } from 'src/app/utils/indice.model';
 import { map, switchMap, filter, tap } from 'rxjs/operators';
@@ -59,7 +59,7 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
       }
     })
 
-    this.prossimiImpegni = combineLatest(this.tempo.ora, this.tempo.giorno, this.orario).pipe(
+    this.prossimiImpegni = combineLatest([this.tempo.ora, this.tempo.giorno, this.orario]).pipe(
       map(dati => {
         return this.firestore.trovaProssimiImpegni(dati[0], dati[1], dati[2], 2)
       }),
