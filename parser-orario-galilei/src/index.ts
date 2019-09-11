@@ -36,7 +36,7 @@ Change log
 
 2.0.0 - Questa versione aggiunge supporto per typescript!
 2.2.0 - Sistemato un bug, invece cha salvare il nome del professore nell'indice, veniva salvato l'oggetto professore
-2.3.0 - L'ora degli orari adesso è salvata come  numero da 0 a 7 invece che come stringa
+2.2.2 - L'ora degli orari adesso è salvata come  numero da 0 a 7 invece che come stringa
 */
 
 //Funzioni principali esportate dal modulo
