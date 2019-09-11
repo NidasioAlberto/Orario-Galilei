@@ -1,0 +1,8 @@
+<div class="card-con-bordi elemento-lista-ricerca mat-elevation-z4" (click)="apriOrario()">
+	<div *ngIf="orario | async as datiOrario">
+		{{datiOrario.tipo}}: {{datiOrario.nome}}
+	</div>
+	<div class="preview-orari">
+		<app-lista-impegni [impegni]="prossimiImpegni"></app-lista-impegni>
+	</div>
+</div>

@@ -1,10 +1,1 @@
-<cdk-virtual-scroll-viewport itemSize="84">
-    <div class="lista-ricerca contenuto">
-        <div *cdkVirtualFor="let indiceOrario of indiciFiltrati | async" class="animated zoomIn">
-            <app-elemento-ricerca
-                [indiceOrario]="indiceOrario"
-                [giorno]="giorno"
-                [ora]="ora"></app-elemento-ricerca>
-        </div>
-    </div>
-</cdk-virtual-scroll-viewport>
+<app-lista-orari [indiciFiltrati]="indiciFiltrati"></app-lista-orari>

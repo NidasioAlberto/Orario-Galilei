@@ -1,15 +1,4 @@
-<!-- Topbar -->
-<div class="main-navbar">
-    <div class="contenuto">
-        <div class="main-navbar-content card-con-bordi z-depth-1">
-            <div class="logo">
-                <img src="assets/icons/logo-72x72.png" alt="Logo">
-            </div>
-            <div class="ricerca">
-                <input #barraRicerca type="text" placeholder="Cerca">
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Navbar -->
+<app-navbar (aggiornaValoreRicerca)="aggiornaValoreRicerca($event)"></app-navbar>
 
 <router-outlet></router-outlet>

@@ -12,21 +12,28 @@ export const sincronizzaClassi = functions.runWith({
     try {
         console.time('Classi')
 
-        const orariClassi = await ottieniOrariClassi('2019', true)
-
-        await Promise.all(orariClassi.orari.map(async classe => firestore.collection('Classi').doc(classe.nome).set({
-            ...classe,
-            ultimoAggiornamento: admin.firestore.Timestamp.now()
-        })))
-
-        console.timeEnd('Classi')
-
-        await firestore.collection('Classi').doc('Indici').set({
-            lista: orariClassi.lista,
-            ultimoAggiornamento: admin.firestore.Timestamp.now()                
-        })
+        // Recupero l'anno dalle impostazioni
+        const impostazioniCloudFunction = (await firestore.collection('Impostazioni generali').doc('Cloud function').get()).data()
         
-        console.log('V' + versione +' salvate ' + orariClassi.lista.length + ' classi nel database con successo')
+        if (impostazioniCloudFunction !== undefined) {
+            const anno = impostazioniCloudFunction.anno as string
+    
+            const orariClassi = await ottieniOrariClassi(anno)
+    
+            await Promise.all(orariClassi.orari.map(async classe => firestore.collection('Classi').doc(classe.nome).set({
+                ...classe,
+                ultimoAggiornamento: admin.firestore.Timestamp.now()
+            })))
+    
+            console.timeEnd('Classi')
+    
+            await firestore.collection('Classi').doc('Indici').set({
+                lista: orariClassi.lista,
+                ultimoAggiornamento: admin.firestore.Timestamp.now()                
+            })
+            
+            console.log('salvate ' + orariClassi.lista.length + ' classi nel database con successo')
+        }
     } catch(err) {
         throw err
     }

@@ -22,7 +22,10 @@ export class TempoService {
       distinctUntilChanged()
     )*/
 
-    this.giorno = new Observable(subscriber => {
+    this.giorno = of(new Date().getDay() - 1)
+    this.ora = of(new Date().getHours() - 8)
+
+    /*this.giorno = new Observable(subscriber => {
       let giorno = new Date().getDay() - 1
 
       subscriber.next(giorno)
@@ -50,9 +53,6 @@ export class TempoService {
           ora = tmp
         }
       }, intervalloAggiornamento)
-    })
+    })*/
   }
-
-  ottieniOra = () => this.ora
-  ottieniGiorno = () => this.giorno
 }

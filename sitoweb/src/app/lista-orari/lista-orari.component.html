@@ -1,0 +1,16 @@
+<cdk-virtual-scroll-viewport itemSize="84">
+	<div class="contenitore-lista">
+		<div class="lista contenuto">
+			<ng-container *ngIf="indiciFiltrati !== undefined; else mostraOrariOffline">
+				<div *cdkVirtualFor="let indiceOrario of indiciFiltrati | async" class="animated zoomIn">
+					<app-elemento-lista-orari [indiceOrario]="indiceOrario"></app-elemento-lista-orari>
+				</div>
+			</ng-container>
+			<ng-template #mostraOrariOffline>
+				<div *cdkVirtualFor="let orario of orari" class="animated zoomIn">
+					<app-elemento-lista-orari [orarioOffline]="orario"></app-elemento-lista-orari>
+				</div>
+			</ng-template>
+		</div>
+	</div>
+</cdk-virtual-scroll-viewport>

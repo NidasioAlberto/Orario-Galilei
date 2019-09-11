@@ -1,4 +1,19 @@
-import { percorsoPrimario, percorsoListaClassi, percorsoListaAule, percorsoListaProfessori, lettereAlfabeto, RigaDati, altezzeLineeDati, ElementoTabellaPerOre, ElementoTabellaPerGiorni, altezzaGiorni, giorni, InfoOre, TabelleOrario, Orario } from "./utils"
+import {
+    percorsoPrimario,
+    percorsoListaClassi,
+    percorsoListaAule,
+    percorsoListaProfessori,
+    lettereAlfabeto,
+    RigaDati,
+    altezzeLineeDati,
+    ElementoTabellaPerOre,
+    ElementoTabellaPerGiorni,
+    altezzaGiorni,
+    giorni,
+    InfoOre,
+    TabelleOrario,
+    Orario
+} from "./utils"
 const pdfreader = require('pdfreader')
 import axios from 'axios'
 
@@ -21,7 +36,7 @@ Change log
 
 2.0.0 - Questa versione aggiunge supporto per typescript!
 2.2.0 - Sistemato un bug, invece cha salvare il nome del professore nell'indice, veniva salvato l'oggetto professore
-2.3.0 - L'ora degli orari adesso è salvata come  numero da 0 a 7 invece che come stringa
+2.2.2 - L'ora degli orari adesso è salvata come  numero da 0 a 7 invece che come stringa
 */
 
 //Funzioni principali esportate dal modulo
@@ -34,27 +49,27 @@ export async function ottieniListaClassi(urlClassi: string = percorsoPrimario + 
     try {
         //!: Recupero i dati della pagina html
         let paginaHtml: string = await axios.get(urlClassi).then(res => res.data)
-    
+
         //2: Estraggo le classi
         let classi = paginaHtml.match(/Value="(.+)"/g)
 
         //3: Controllo se ci sono dati disponibili
-        if(classi == null) throw undefined
+        if (classi == null) throw undefined
 
         //4: Recupero solo il nome e ritorno
         return classi.map(classe => {
             let match = classe.match(/"(.+)"/)
-            if(match != null) return match[1]
+            if (match != null) return match[1]
             else return null
         }).filter(classe => classe != null) as string[] //Rimuovo gli eventuali elementi nulli
-    } catch(err) {
+    } catch (err) {
         throw 'Impossibile recuperare le classi'
     }
 }
 
 /**
  * Questa funzione permette di ottenere la lista di tutte le aule
- * @param {string} urlAule 
+ * @param {string} urlAule url per raggiungere i dati delle aule
  */
 export async function ottieniListaAule(urlAule: string = percorsoPrimario + percorsoListaAule) {
     try {
@@ -65,22 +80,22 @@ export async function ottieniListaAule(urlAule: string = percorsoPrimario + perc
         let aule = paginaHtml.match(/Value="(.+)"/g)
 
         //3: Controllo se ci sono dati disponibili
-        if(aule == null) throw undefined
+        if (aule == null) throw undefined
 
         //4: Recupero solo il nome e ritorno
         return aule.map(aula => {
             let match = aula.match(/"(.+)"/)
-            if(match != null) return match[1]
+            if (match != null) return match[1]
             else return null
-        }).filter(aula => aula != null) as string[]//Rimuovo gli eventuali elementi nulli
-    } catch(err) {
+        }).filter(aula => aula != null) as string[] //Rimuovo gli eventuali elementi nulli
+    } catch (err) {
         throw 'Impossibile recuperare le aule'
     }
 }
 
 /**
  * Questra funzione permette di ottenere la lista dei professori e i link ai loro orari
- * @param {string} urlProf 
+ * @param {string} urlProf url per raggiungere i dati dei professori
  */
 export async function ottieniListaProfessori(urlProf: string = percorsoPrimario + percorsoListaProfessori) {
     try {
@@ -91,14 +106,14 @@ export async function ottieniListaProfessori(urlProf: string = percorsoPrimario 
                 let informazioni = paginaHtml.match(/<a HREF="(.*?)">(?:(.|\n|\t|\r)*?)<FONT face="Verdana" size=3>(.*?)<\/font><\/a>/g)
 
                 //3.1 Controllo se le informazioni sono presenti
-                if(informazioni == null) throw undefined
-    
+                if (informazioni == null) throw undefined
+
                 //4: Recupero tutti i link corretti ai pdf e riorganizzo le informazioni
                 return informazioni.map(match => {
                     try {
                         let info = match.match(/<a HREF="(.*?)">(?:(?:.|\n|\t|\r)*?)<FONT face="Verdana" size=3>(.*?)<\/font><\/a>/)
 
-                        if(info == null || info.length < 3) throw undefined
+                        if (info == null || info.length < 3) throw undefined
 
                         let professore = {
                             percorsoOrario: info[1],
@@ -106,30 +121,33 @@ export async function ottieniListaProfessori(urlProf: string = percorsoPrimario 
                         }
 
                         return professore
-                    } catch(err) {
+                    } catch (err) {
                         return undefined
                     }
                 }).filter(professore => professore != undefined) as {
                     percorsoOrario: string;
                     nome: string;
                 }[]
-            } catch(err) {
+            } catch (err) {
                 return undefined
             }
         })).filter(promessa => promessa != undefined)
 
         let professori = await Promise.all(promesse).then(promesseCompletate => {
             return promesseCompletate.filter(promessaCompletata => promessaCompletata != undefined).reduce((acc, val) => {
-                if(acc != undefined && val != undefined) return acc.concat(val)
-                if(val != undefined) return val
+                if (acc != undefined && val != undefined) return acc.concat(val)
+                if (val != undefined) return val
                 else return []
             }, [])
         })
 
-        if(professori == undefined) throw undefined
+        if (professori == undefined) throw undefined
 
-        return professori
-    } catch(err) {
+        return professori as {
+            percorsoOrario: string;
+            nome: string;
+        }[]
+    } catch (err) {
         throw 'Impossibile recuperare i professori'
     }
 }
@@ -140,25 +158,25 @@ export async function ottieniListaProfessori(urlProf: string = percorsoPrimario 
  * @param {number} tipo 0 per classi, 1 per aule e 2 per prof
  * @param {boolean} debug per mostrare in nella console delle informazioni
  */
-export async function ottieniOrario(urlPdf: string, tipo: number, tabellaPerGiorni: boolean = false, debug: boolean = false) {
-    if(debug) console.time(urlPdf)
+export async function ottieniOrario(urlPdf: string, tipo: 0 | 1 | 2, tabellaPerGiorni: boolean = false, debug: boolean = false) {
+    if (debug) console.time(urlPdf)
     try {
         //Controllo se urlPdf è una stringa
-        if(typeof urlPdf == 'string') {
+        if (typeof urlPdf == 'string') {
             //1: Scarico il file
             //let buffer = await fetch(urlPdf).then(res => res.arrayBuffer())
             let buffer = await axios.get(urlPdf, {
                 responseType: 'arraybuffer'
             }).then(res => res.data)
-    
+
             //2: Estraggo le informazioni
             let righe = await estraiInformazioni(buffer as Buffer)
 
             //3: cambio il formato dei dati
             let dati = analizzaDati(righe, tipo, tabellaPerGiorni)
-            
+
             //-: formatto i dati per mostrarli nella console
-            if(debug) {
+            if (debug) {
                 mostraTabella(dati.tabellaPerOre)
                 console.timeEnd(urlPdf)
             }
@@ -168,8 +186,8 @@ export async function ottieniOrario(urlPdf: string, tipo: number, tabellaPerGior
         } else {
             throw 'url non corretto'
         }
-    } catch(err) {
-        if(debug) console.log(err)
+    } catch (err) {
+        if (debug) console.log(err)
         throw 'impossibile recuperare l\'orario'
     }
 }
@@ -185,8 +203,8 @@ export async function ottieniOrariClassi(anno: string, tabellaPerGiorni: boolean
         //1: Recupero la lista delle classi
         let classi = await ottieniListaClassi()
 
-        if(debug) console.log(classi)
-    
+        if (debug) console.log(classi)
+
         //2: Recupero i loro orari
         let orari = await Promise.all(classi.map(async classe => {
             try {
@@ -194,18 +212,18 @@ export async function ottieniOrariClassi(anno: string, tabellaPerGiorni: boolean
                     nome: classe,
                     tabelleOrario: await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + classe + '.pdf', 0, tabellaPerGiorni, debug)
                 }
-            } catch(err) {
+            } catch (err) {
                 return undefined
             }
         }).filter(promessa => promessa != undefined)) as Orario[]
-    
+
         //3: Ritorno gli orari
         return {
             orari: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined),
             lista: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined).map(orario => orario.nome)
         }
-    } catch(err) {
-        if(debug) console.log(err)
+    } catch (err) {
+        if (debug) console.log(err)
         throw 'impossibile recuperare classi e orari'
     }
 }
@@ -220,7 +238,7 @@ export async function ottieniOrariAule(anno: string, tabellaPerGiorni: boolean =
     try {
         //1: Recupero la lista delle aule
         let aule = await ottieniListaAule()
-    
+
         //2: Recupero i loro orari
         let orari = await Promise.all(aule.map(async aula => {
             try {
@@ -228,17 +246,17 @@ export async function ottieniOrariAule(anno: string, tabellaPerGiorni: boolean =
                     nome: aula,
                     tabelleOrario: await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + aula + '.pdf', 1, tabellaPerGiorni, debug)
                 }
-            } catch(err) {
+            } catch (err) {
                 return undefined
             }
         }).filter(promessa => promessa != undefined)) as Orario[]
-        
+
         //3: Ritorno gli orari
         return {
             orari: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined),
             lista: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined).map(orario => orario.nome)
         }
-    } catch(err) {
+    } catch (err) {
         throw 'impossibile recuperare aule e orari'
     }
 }
@@ -252,7 +270,7 @@ export async function ottieniOrariProfessori(tabellaPerGiorni: boolean = false, 
     try {
         //1: Recupero la lista dei professori
         let professori = await ottieniListaProfessori()
-    
+
         //2: Recupero i loro orari
         let orari = await Promise.all(professori.map(async professore => {
             try {
@@ -260,17 +278,17 @@ export async function ottieniOrariProfessori(tabellaPerGiorni: boolean = false, 
                     nome: professore.nome,
                     tabelleOrario: await ottieniOrario('http://www.galileicrema.it:8080' + professore.percorsoOrario, 2, tabellaPerGiorni, debug)
                 }
-            } catch(err) {
+            } catch (err) {
                 return undefined
             }
         }).filter(promessa => promessa != undefined)) as Orario[]
-        
+
         //3: Ritorno gli orari
         return {
             orari: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined),
             lista: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined).map(orario => orario.nome)
         }
-    } catch(err) {
+    } catch (err) {
         throw 'impossibile recuperare aule e orari'
     }
 }
@@ -281,19 +299,19 @@ export async function ottieniOrariProfessori(tabellaPerGiorni: boolean = false, 
  * Permette di ottenere le informazioni presenti nel pdf
  * @param {Buffer} buffer 
  */
-async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
+async function estraiInformazioni(buffer: Buffer): Promise < RigaDati[] > {
     let righe: RigaDati[] = []
     return new Promise((resolve, reject) => {
         new pdfreader.PdfReader().parseBuffer(buffer, (err: any, item: any) => {
-            if(err) {
+            if (err) {
                 reject(err)
-            } else if(item != undefined) {
+            } else if (item != undefined) {
                 //Processo i dati
-                if(item.x != undefined && item.y != undefined) {
+                if (item.x != undefined && item.y != undefined) {
                     //1: controllo se la riga è già stata registrata
                     let trovato = false
                     righe.forEach(riga => {
-                        if(riga.y == item.y) {
+                        if (riga.y == item.y) {
                             riga.elementi.push({
                                 x: item.x,
                                 //y: item.y,
@@ -304,19 +322,17 @@ async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
                         }
                     })
                     //2: altrimenti la aggiungo
-                    if(!trovato) righe.push({
+                    if (!trovato) righe.push({
                         y: item.y,
-                        elementi: [
-                            {
-                                x: item.x,
-                                testo: item.text
-                            }
-                        ]
+                        elementi: [{
+                            x: item.x,
+                            testo: item.text
+                        }]
                     })
                 }
-            } else {
+            } else {
                 //I dati sono pronti, li ritorno se non sono vuoti
-                if(righe.length > 0) resolve(righe)
+                if (righe.length > 0) resolve(righe)
                 else reject('nessun dato trovato')
             }
         })
@@ -329,32 +345,33 @@ async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
  * @param {number} tipo 0 per classi, 1 per aule e 2 per prof 
  */
 function analizzaDati(righe: RigaDati[], tipo: number, tabellaPerGiorniRichiesta: boolean = false): TabelleOrario {
-    let min: number = 0, max: number = 0
+    let min: number = 0,
+        max: number = 0
     let divisori: number[] = []
     let tabellaPerOre: ElementoTabellaPerOre[] = []
-    
+
     //1: Trovo il minimo e il massimo valore x dei giorni della settimana che utilizzerò per capire in che giorno si trovano le magterie e le aule
     righe.forEach(riga => {
-        if(riga.y == altezzaGiorni[tipo]) {
-            riga.elementi.forEach((elemento, i) => {
-                if(i == 0) {
+        if (riga.y == altezzaGiorni[tipo]) {
+            riga.elementi.forEach((elemento, i) => {
+                if (i == 0) {
                     min = elemento.x
                     max = elemento.x
                 } else {
-                    if(elemento.x < min) min = elemento.x
-                    if(elemento.x > max) max = elemento.x
+                    if (elemento.x < min) min = elemento.x
+                    if (elemento.x > max) max = elemento.x
                 }
             })
             return false //Per interrompere il ciclo
         }
     })
-    
+
     //2: Ora divido i numeri in 6 sezioni
     let spazio = (max - min) / 5
-    for(let i = 0; i < 5; i++) {
-        divisori.push(min + spazio/2 + spazio * i)
+    for (let i = 0; i < 5; i++) {
+        divisori.push(min + spazio / 2 + spazio * i)
     }
-    
+
     //3: A questo punto trovo le informazioni (prima e seconda riga) per ciascuna ora
     altezzeLineeDati[tipo].forEach(altezzaLineaDati => {
         tabellaPerOre.push({
@@ -367,8 +384,8 @@ function analizzaDati(righe: RigaDati[], tipo: number, tabellaPerGiorniRichiesta
             }))
         })
     })
-    
-    if(tabellaPerGiorniRichiesta) {
+
+    if (tabellaPerGiorniRichiesta) {
         let tabellaPerGiorni: ElementoTabellaPerGiorni[] = []
 
         //4: Trasformo i dati della divisione per ore a una divisione per giorni
@@ -378,7 +395,7 @@ function analizzaDati(righe: RigaDati[], tipo: number, tabellaPerGiorniRichiesta
                 info1: [],
                 info2: []
             })
-    
+
             tabellaPerOre.forEach(ora => {
                 let tmp = ora.info1.find(info => info.giorno == i)
                 tabellaPerGiorni[i].info1.push({
@@ -415,7 +432,7 @@ function analizzaDati(righe: RigaDati[], tipo: number, tabellaPerGiorniRichiesta
  * @param {number[]} divisori 
  * @param {RigaDati} riga 
  */
-function dividiRiga(divisori: number[], riga?: RigaDati) {
+function dividiRiga(divisori: number[], riga ? : RigaDati) {
     let divisioni: InfoOre[] = []
     giorni.forEach(giorno => {
         divisioni.push({
@@ -424,13 +441,13 @@ function dividiRiga(divisori: number[], riga?: RigaDati) {
         })
     })
 
-    if(riga != undefined) {
+    if (riga != undefined) {
         //Lunedì - sabato
-        for(let i = -1; i < 5; i++) {
+        for (let i = -1; i < 5; i++) {
             divisioni[i + 1].nome = riga.elementi.filter(elemento => {
                 return (i != -1 ? elemento.x > divisori[i] : true) && (i != 4 ? elemento.x < divisori[i + 1] : true)
             }).map(elemento => elemento.testo.replace(/ /g, '')).join('')
-            if(divisioni[i + 1].nome == undefined) divisioni[i + 1].nome = ''
+            if (divisioni[i + 1].nome == undefined) divisioni[i + 1].nome = ''
         }
     }
 
@@ -451,7 +468,7 @@ function mostraTabella(tabellaPerOre: ElementoTabellaPerOre[]) {
     tabellaPerOre.forEach(ora => {
         tabellaPerConsole.push(ora.info1.map((info1s, i) => {
             let tmp = ora.info2.find(info2s => info2s.giorno == i)
-            if((info1s != undefined && info1s.nome != undefined) && tmp != undefined && tmp.nome != undefined)
+            if ((info1s != undefined && info1s.nome != undefined) && tmp != undefined && tmp.nome != undefined)
                 return info1s.nome + '-' + tmp.nome
             else return '*'
         }))
@@ -465,15 +482,24 @@ function mostraTabella(tabellaPerOre: ElementoTabellaPerOre[]) {
  * @param ora ora in formato stringa
  */
 function trasformaOra(ora: string) {
-    switch(ora) {
-        case '1':   return 0
-        case '2':   return 1
-        case '3':   return 2
-        case '4':   return 3
-        case '5':   return 4
-        case '6':   return 5
-        case '1p':  return 6
-        case '2p':  return 7
-        default: return NaN
+    switch (ora) {
+        case '1':
+            return 0
+        case '2':
+            return 1
+        case '3':
+            return 2
+        case '4':
+            return 3
+        case '5':
+            return 4
+        case '6':
+            return 5
+        case '1p':
+            return 6
+        case '2p':
+            return 7
+        default:
+            return NaN
     }
 }
