@@ -2,6 +2,7 @@ import { Component, OnInit, Inject, HostListener } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Aggiornamento } from '../utils/aggiornamento.model';
 import { FirestoreService } from '../core/firestore.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-dialog-informazioni',
@@ -10,8 +11,13 @@ import { FirestoreService } from '../core/firestore.service';
 })
 export class DialogInformazioniComponent implements OnInit {
 
-  versione = '0.2'
+  versione = '0.3'
   aggiornamentiApp: Aggiornamento[] = [
+    {
+      dataPubblicazione: '11/9/19',
+      descrizioneBreve: '...',
+      descrizione: '...'
+    },
     {
       dataPubblicazione: '9/9/19',
       descrizioneBreve: 'Istruzioni e benvenuto',
@@ -29,10 +35,14 @@ export class DialogInformazioniComponent implements OnInit {
   ]
   hideToggle = false
 
+  messaggio: string
+  mittente: string
+
   constructor(
     public dialogRef: MatDialogRef<DialogInformazioniComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private firestore: FirestoreService
+    private firestore: FirestoreService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
@@ -42,5 +52,22 @@ export class DialogInformazioniComponent implements OnInit {
   @HostListener('window:resize')
   onResize() {
     this.hideToggle = window.innerWidth < 600
+  }
+
+  inviaMessaggio() {
+    console.log('L\'utente vuole inviare un messaggio', this.messaggio, this.mittente)
+
+    if (this.messaggio !== undefined && this.messaggio !== '') {
+      this.firestore.inviaMessaggio(this.messaggio, this.mittente).then(() => {
+        this.snackBar.open('Messaggio inviato')
+
+        // Pulisco gli input
+        this.messaggio = ''
+        this.mittente = ''
+      }).catch(err => {
+        this.snackBar.open('Errore durante l\'invio')
+      })
+    }
+
   }
 }

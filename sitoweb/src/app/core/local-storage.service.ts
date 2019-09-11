@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { map, take } from 'rxjs/operators';
 import { Orario } from '../utils/orario.model';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -76,12 +77,12 @@ export class LocalStorageService {
   }
 
   ottieniOrariPreferiti() {
-    return this.localStorage.getItem('preferiti')
+    return this.localStorage.getItem('preferiti') as Observable<Orario[]>
   }
 
   ottieniOrarioDaiPreferiti(document: string) {
     return this.ottieniOrariPreferiti().pipe(
-      map((preferiti: Orario[]) => {
+      map((preferiti: Orario[] | undefined) => {
         if (preferiti) {
           return preferiti.find(elemento => elemento.nome === document)
         } else {

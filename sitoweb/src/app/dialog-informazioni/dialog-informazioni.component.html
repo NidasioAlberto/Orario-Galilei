@@ -2,26 +2,56 @@
     Benvenuto
 </h1>
 <div mat-dialog-content>
-    <div class="messaggio-importante">
-        Tieni premuto (o tasto destro) il logo per tornare qui!
+    Questa app ti permette di visualizzare gli orari di classi, aule e professori dell'istituto IIS Galileo Galilei Crema.
+    <div class="messaggio-importante sezione">
+        Tieni premuto (oppure usa il tasto destro) sul logo per tornare qui!
     </div>
-    <p>Questa app ti permette di visualizzare gli orari di classi, aule e professori dell'istituto IIS Galileo Galilei
-        Crema.</p>
-        <h4>Registro aggiornamenti app</h4>
-        <mat-accordion>
-            <mat-expansion-panel *ngFor="let aggiornamento of aggiornamentiApp" [hideToggle]="hideToggle">
-                <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        {{aggiornamento.dataPubblicazione}}
-                    </mat-panel-title>
-                    <mat-panel-description>
-                        {{aggiornamento.descrizioneBreve}}
-                    </mat-panel-description>
-                </mat-expansion-panel-header>
-                {{aggiornamento.descrizione}}
-            </mat-expansion-panel>
-        </mat-accordion>
-        <div class="contenitore-versione-app">
-            <div class="versione-app">v:{{versione}}</div>
-        </div>
+
+    <h4>Come usare l'app</h4>
+    Tramite la barra di ricerca è possibile trovare l'orario desiderato.
+    <br>
+    I risultati appariranno in una lista dove vengono proposti i primi due impegni.
+    <br>
+    Schiacciando su un risultato è possibile visualizzare l'intero orario.
+    <br>
+    Gli orari si possono anche salvare come preferiti, in questo modo li si troverà sempre nella pagina principale (alla quale si può tornare cliccando il logo) e saranno accessibili anche offline
+
+    <h4>Registro aggiornamenti app</h4>
+    <mat-accordion>
+        <mat-expansion-panel *ngFor="let aggiornamento of aggiornamentiApp" [hideToggle]="hideToggle">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    {{aggiornamento.dataPubblicazione}}
+                </mat-panel-title>
+                <mat-panel-description>
+                    {{aggiornamento.descrizioneBreve}}
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            {{aggiornamento.descrizione}}
+        </mat-expansion-panel>
+    </mat-accordion>
+
+    <div class="sezione">
+        <h4>Problemi e/o migliorie</h4>
+        <mat-form-field class="larghezza-completa">
+            <textarea matInput placeholder="Se riscontri problemi dillo!" [(ngModel)]="messaggio"></textarea>
+        </mat-form-field>
+        <mat-form-field class="larghezza-completa">
+            <input matInput placeholder="Se ti va dimmi chi sei" [(ngModel)]="mittente">
+        </mat-form-field>
+        <button mat-raised-button color="primary" class="larghezza-completa" (click)="inviaMessaggio()">Invia</button>
+    </div>
+
+    <div class="sezione">
+        <h4>Contatti</h4>
+        Applicazione a cura di Nidasio Alberto
+        <br>
+        Contatti: nidasioalberto@gmail.com
+        <br>
+        Se riscontrate problemi o pensate a possibli migliorie contattetemi pure via mail o inviatemi un messaggio tramite il form sopra
+    </div>
+
+    <div class="contenitore-versione-app">
+        <div class="versione-app">Versione: {{versione}}</div>
+    </div>
 </div>

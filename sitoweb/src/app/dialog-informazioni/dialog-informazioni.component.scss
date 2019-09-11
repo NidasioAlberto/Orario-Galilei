@@ -17,6 +17,7 @@
 }
 
 .contenitore-versione-app {
+  @extend .sezione;
 	margin-top: 8px;
 	width: 100%;
 	display: flex;
@@ -30,4 +31,12 @@
 
 mat-panel-description {
   white-space: nowrap;
+}
+
+.sezione {
+  margin-top: 16px;
+}
+
+.larghezza-completa {
+  width: 100%;
 }

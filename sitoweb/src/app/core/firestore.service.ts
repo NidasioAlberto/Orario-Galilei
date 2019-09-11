@@ -1,16 +1,20 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { combineLatest, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { DocumentoIndice, ElementoIndice } from '../utils/indice.model';
 import { Orario, ProssimoImpegno } from '../utils/orario.model';
+import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirestoreService {
 
-  constructor(private db: AngularFirestore) { }
+  constructor(
+    private db: AngularFirestore,
+    private localStorage: LocalStorageService
+  ) { }
 
   /**
    * Permette di ottenere gli indici di tutti: classi, aule e professori
@@ -201,6 +205,40 @@ export class FirestoreService {
       case 4: return 'Ven'
       case 5: return 'Sab'
       default: return 'Wow'
+    }
+  }
+
+  /**
+   * Permette di salvare in firestore un messaggio che l'utente vuole inviare allo sviluppatore
+   * @param messaggio Messaggio da inviare allo sviluppatore
+   * @param mittente Mittente
+   */
+  async inviaMessaggio(contenuto: string, mittente?: string) {
+    if (contenuto !== undefined) {
+      const preferiti = await this.localStorage.ottieniOrariPreferiti().pipe(take(1)).toPromise()
+
+      const messaggio = {
+        contenuto,
+        mittente,
+        preferiti: [] as string[]
+      }
+
+      if (mittente === undefined || mittente === '') {
+        delete messaggio.mittente
+      }
+      if (preferiti !== undefined) {
+        if (preferiti.length === 0) {
+          delete messaggio.preferiti
+        } else {
+          messaggio.preferiti = preferiti.map(preferito => preferito.nome)
+        }
+      }
+
+      console.log(messaggio)
+
+      return this.db.collection('Messaggi').add(messaggio)
+    } else {
+      throw new Error('Contenuto mancante')
     }
   }
 }

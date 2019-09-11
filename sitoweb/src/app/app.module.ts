@@ -21,6 +21,8 @@ import { StorageModule } from '@ngx-pwa/local-storage'
 import { MatButtonModule } from '@angular/material/button'
 import { MatDialogModule } from '@angular/material/dialog'
 import { MatExpansionModule } from '@angular/material/expansion'
+import { MatInputModule } from '@angular/material/input'
+import { MatSnackBarModule } from '@angular/material/snack-bar'
 
 import { PreferitiComponent } from './preferiti/preferiti.component'
 import { ListaOrariComponent } from './lista-orari/lista-orari.component'
@@ -54,6 +56,8 @@ import { DialogInformazioniComponent } from './dialog-informazioni/dialog-inform
     MatButtonModule,
     MatDialogModule,
     MatExpansionModule,
+    MatInputModule,
+    MatSnackBarModule,
 
     StorageModule.forRoot({ IDBNoWrap: true }),
   ],
