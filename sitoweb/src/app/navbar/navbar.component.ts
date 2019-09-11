@@ -11,7 +11,7 @@ import { DialogInformazioniComponent } from '../dialog-informazioni/dialog-infor
 })
 export class NavbarComponent implements OnInit, AfterViewInit {
   @Output() aggiornaValoreRicerca = new EventEmitter<string>();
-  @ViewChild('immagineLogo', undefined) logo: ElementRef;
+  @ViewChild('immagineLogo', { static: false }) logo: ElementRef;
   valoreRicerca: string
 
   constructor(

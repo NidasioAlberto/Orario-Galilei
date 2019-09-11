@@ -15,8 +15,8 @@ export class DialogInformazioniComponent implements OnInit {
   aggiornamentiApp: Aggiornamento[] = [
     {
       dataPubblicazione: '11/9/19',
-      descrizioneBreve: '...',
-      descrizione: '...'
+      descrizioneBreve: 'Invio messaggio',
+      descrizione: 'Ora è possibile inviare un messaggio allo sviluppatore in caso di problemi o per eventuali suggerimenti'
     },
     {
       dataPubblicazione: '9/9/19',

@@ -18,7 +18,9 @@ export class PreferitiComponent implements OnInit {
 
   ngOnInit() {
     // Recupero i preferiti
-    this.preferiti = this.localStorage.ottieniOrariPreferiti() as Observable<Orario[]>
+    this.preferiti = this.localStorage.ottieniOrariPreferiti()
+
+    this.preferiti.subscribe(console.log)
 
     // TODO: recuperare appena possibile i dati online aggiornati!
   }
