@@ -20,8 +20,6 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.localStorage.impostaPaginaVisualizzata(false)
-
     // Controllo se l'utente è per la prima volta nell'app
     this.localStorage.controllaPaginaVisualizzata().then(paginaVisualizzata => {
       if (!paginaVisualizzata) {
