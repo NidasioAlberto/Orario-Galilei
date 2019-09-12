@@ -134,18 +134,20 @@ function caricaOrarioProvvisorio() {
 }
 caricaOrarioProvvisorio().then((pagine) => __awaiter(void 0, void 0, void 0, function* () {
     let classi = [];
-    for (const pagina of pagine) {
-        const dati = analizzaDati(pagina.righe);
-        for (const dato of dati) {
-            console.log('salvo ' + dato.nome);
-            classi.push(dato.nome);
-            yield db.collection('Classi').doc(dato.nome).set(dato);
-        }
+    //for (const pagina of pagine) {
+    const pagina = pagine[4];
+    const dati = analizzaDati(pagina.righe);
+    for (const dato of dati) {
+        console.log('salvo ' + dato.nome);
+        classi.push(dato.nome);
+        yield db.collection('Classi').doc(dato.nome).set(dato);
     }
-    yield db.collection('Classi').doc('Indici').set({
+    //}
+    /*await db.collection('Classi').doc('Indici').set({
         lista: classi,
         ultimoAggiornamento: new Date()
-    });
+    })*/
+    return;
 })).then(() => {
     console.log('fine');
 }).catch(err => {
@@ -174,16 +176,16 @@ function analizzaDati(righe) {
             return false; //Per interrompere il ciclo
         }
     });
-    //2: Ora divido i numeri in 6 sezioni
-    let spazio = (max - min) / 15;
-    for (let i = 0; i < 15; i++) {
-        divisori.push(min + spazio / 2 + spazio * i);
-    }
-    //3: Recupero la riga con i nomi delle classi
+    //2: Recupero la riga con i nomi delle classi
     let datiClassi = righe.find(riga => riga.y === utils_1.altezzaNomi);
     let classi = [];
     if (datiClassi !== undefined) {
         classi = datiClassi.elementi.map(elemento => elemento.testo);
+    }
+    //3: Ora divido i numeri in 6 sezioni
+    let spazio = (max - min) / (classi.length - 1);
+    for (let i = 0; i < classi.length - 1; i++) {
+        divisori.push(min + spazio / 2 + spazio * i);
     }
     //4: A questo punto trovo le informazioni (prima e seconda riga) per ciascuna ora
     utils_1.altezzeLineeDati.forEach(altezzaLineaDati => {

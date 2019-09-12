@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { combineLatest, Observable } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { map, take, startWith } from 'rxjs/operators';
 import { DocumentoIndice, ElementoIndice } from '../utils/indice.model';
 import { Orario, ProssimoImpegno } from '../utils/orario.model';
 import { LocalStorageService } from './local-storage.service';
@@ -22,11 +22,26 @@ export class FirestoreService {
   ottieniIndici() {
     // Recupero gli indici di classi, aule e professori
     return combineLatest([
-      this.db.collection('Aule').doc<DocumentoIndice>('Indici').valueChanges(),
-      this.db.collection('Classi').doc<DocumentoIndice>('Indici').valueChanges(),
-      this.db.collection('Professori').doc<DocumentoIndice>('Indici').valueChanges(),
+      this.db.collection('Aule').doc<DocumentoIndice>('Indici').valueChanges().pipe(startWith({
+        lista: []
+      } as DocumentoIndice)),
+      this.db.collection('Classi').doc<DocumentoIndice>('Indici').valueChanges().pipe(startWith({
+        lista: []
+      } as DocumentoIndice)),
+      this.db.collection('Professori').doc<DocumentoIndice>('Indici').valueChanges().pipe(startWith({
+        lista: []
+      } as DocumentoIndice))
     ]).pipe(
       map(indici => {
+        indici = indici.map(indice => {
+          if (indice !== undefined) {
+            return indice
+          } else {
+            return {
+              lista: []
+            } as DocumentoIndice
+          }
+        }) as [DocumentoIndice, DocumentoIndice, DocumentoIndice]
         return [
           ...indici[0].lista.map(nome => {
             return {
