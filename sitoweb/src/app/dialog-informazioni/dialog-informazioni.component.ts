@@ -55,8 +55,6 @@ export class DialogInformazioniComponent implements OnInit {
   }
 
   inviaMessaggio() {
-    console.log('L\'utente vuole inviare un messaggio', this.messaggio, this.mittente)
-
     if (this.messaggio !== undefined && this.messaggio !== '') {
       this.firestore.inviaMessaggio(this.messaggio, this.mittente).then(() => {
         this.snackBar.open('Messaggio inviato')

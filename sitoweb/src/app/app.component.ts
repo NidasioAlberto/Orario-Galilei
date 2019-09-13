@@ -23,15 +23,11 @@ export class AppComponent implements OnInit {
     // Controllo se l'utente è per la prima volta nell'app
     this.localStorage.controllaPaginaVisualizzata().then(paginaVisualizzata => {
       if (!paginaVisualizzata) {
-        console.log('Prima volta sul sito')
-
         // Mostro il dialog di benvenuto
         this.dialog.open(DialogInformazioniComponent)
 
         // Imposto il sito come già visualizzato (così al prossimo avvio l'utente non  vedrà più l'avviso
         this.localStorage.impostaPaginaVisualizzata()
-      } else {
-        console.log('Sito già visualizzato')
       }
     })
   }

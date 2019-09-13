@@ -140,7 +140,7 @@ caricaOrarioProvvisorio().then((pagine) => __awaiter(void 0, void 0, void 0, fun
     for (const dato of dati) {
         console.log('salvo ' + dato.nome);
         classi.push(dato.nome);
-        yield db.collection('Classi').doc(dato.nome).set(dato);
+        //await db.collection('Classi').doc(dato.nome).set(dato)
     }
     //}
     /*await db.collection('Classi').doc('Indici').set({
@@ -182,7 +182,7 @@ function analizzaDati(righe) {
     if (datiClassi !== undefined) {
         classi = datiClassi.elementi.map(elemento => elemento.testo);
     }
-    //3: Ora divido i numeri in 6 sezioni
+    //3: Ora divido i numeri in n sezioni
     let spazio = (max - min) / (classi.length - 1);
     for (let i = 0; i < classi.length - 1; i++) {
         divisori.push(min + spazio / 2 + spazio * i);

@@ -249,8 +249,6 @@ export class FirestoreService {
         }
       }
 
-      console.log(messaggio)
-
       return this.db.collection('Messaggi').add(messaggio)
     } else {
       throw new Error('Contenuto mancante')
