@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
 import { ottieniOrariClassi, ottieniOrariAule, ottieniOrariProfessori } from 'parser-orario-galilei/lib/index'
+import { Orario } from 'parser-orario-galilei/lib/utils'
 admin.initializeApp()
 const firestore = admin.firestore()
 const versione = 1.1
@@ -12,18 +13,29 @@ export const sincronizzaClassi = functions.runWith({
     try {
         console.time('Classi')
 
-        // Recupero l'anno dalle impostazioni
+        // Recupero le impostaziono per le cloud function
         const impostazioniCloudFunction = (await firestore.collection('Impostazioni generali').doc('Cloud function').get()).data()
         
         if (impostazioniCloudFunction !== undefined) {
+            // Recuper l'anno dalle impostazioni
             const anno = impostazioniCloudFunction.anno as string
     
+            // Recupero gli orari delle classi
             const orariClassi = await ottieniOrariClassi(anno)
     
-            await Promise.all(orariClassi.orari.map(async classe => firestore.collection('Classi').doc(classe.nome).set({
-                ...classe,
-                ultimoAggiornamento: admin.firestore.Timestamp.now()
-            })))
+            // Aggiungo tutti gli orari nel database
+            await Promise.all(orariClassi.orari.map(async classe => {
+                // Recupero l'orario attualmente salvato nel database per confrontarlo con quello appena recuperato
+                const orarioSalvato = (await firestore.collection('Classi').doc(classe.nome).get()).data()
+
+                // Confronto i due orari
+
+
+                await firestore.collection('Classi').doc(classe.nome).set({
+                    ...classe,
+                    ultimoAggiornamento: admin.firestore.Timestamp.now()
+                })
+            }))
     
             console.timeEnd('Classi')
     
@@ -33,6 +45,8 @@ export const sincronizzaClassi = functions.runWith({
             })
             
             console.log('salvate ' + orariClassi.lista.length + ' classi nel database con successo')
+        } else {
+            console.error('Impostazioni cloud function mancanti')
         }
     } catch(err) {
         throw err

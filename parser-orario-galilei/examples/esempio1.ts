@@ -1,4 +1,4 @@
-import { ottieniOrariClassi, ottieniOrariAule, ottieniOrariProfessori } from "../src";
+import { ottieniOrariClassi } from "../src";
 
 const anno = '2019'
 
