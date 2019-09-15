@@ -13,6 +13,7 @@ import {
     TabelleOrario,
     Orario
 } from "./utils"
+import { confrontaOrari } from 'parser-orario-galilei'
 
 
 //Set your service account api key file
@@ -414,147 +415,9 @@ Promise.all([
     db.collection('Classi').doc('4IB').get(),
     db.collection('Classi').doc('5IB').get()
 ]).then(([orario1, orario2]) => {
-    confrontaOrari(orario1.data() as Orario, orario2.data() as Orario)
+    const risultato = confrontaOrari(orario1.data() as Orario, orario2.data() as Orario)
 
-    console.log('fine')
+    console.log('orari diversi?', risultato !== undefined)
 })
 
 // Da inserire nella libreria parser-orario-galilei
-/**
- * Questa funzione permette di confrontare due orari, nel caso sia identici ritorna undeifned
- * altrimenti ritorna gli elementi differenti in formato Orario
- * @param orario1 Primo orario da confrontare
- * @param orario2 Secondo orario da confrontare
- */
-function confrontaOrari(orario1: Orario, orario2: Orario): Orario | undefined {
-    const differenzePerOre: {
-        ora: number
-        orario1: {
-            info1: string[]
-            info2: string[]
-        }
-        orario2: {
-            info1: string[]
-            info2: string[]
-        }
-    }[] = []
-    // All'interno dell'orario potrebbe esserci salvata anche la tebella per giorni, noi utilizzeremo solamente la tabella per ore
-
-    // Recupero le tabelle per ore di entrambi gli orari
-    const tabellaPerOre1 = orario1.tabelleOrario.tabellaPerOre
-    const tabellaPerOre2 = orario2.tabelleOrario.tabellaPerOre
-
-    // Confronto ora per ora
-    for (let i = 0; i < 8 /*8 ore di lezione*/; i++) {
-        // Controllo se per quest'ora sono presenti degli impegni per i due orari
-        const impegniOra1 = tabellaPerOre1.find(elemento => elemento.ora === i)
-        const impegniOra2 = tabellaPerOre2.find(elemento => elemento.ora === i)
-
-        // Controllo se entrambi gli impegni dell'ora corrente sono mancanti
-        if (impegniOra1 !== undefined && impegniOra2 !== undefined) { // Sono entrambi avalidi
-            const differenzeOra: {
-                ora: number
-                orario1: {
-                    info1: string[]
-                    info2: string[]
-                }
-                orario2: {
-                    info1: string[]
-                    info2: string[]
-                }
-            } = {
-                ora: i,
-                orario1: {
-                    info1: [],
-                    info2: []
-                },
-                orario2: {
-                    info1: [],
-                    info2: []
-                }
-            }
-            
-            //4: Controllo ciascun giorno
-            for(let j = 0; j < 6 /*6 giorni di lezione a settimana*/; j++) {
-                //5: Recupero se è presente l'impegno per questo giorno
-
-                // Info 1
-                const imegno1info1 = impegniOra1.info1.find(elemento => elemento.giorno === j)
-                const imegno2info1 = impegniOra2.info1.find(elemento => elemento.giorno === j)
-                
-                // Info 2
-                const imegno1info2 = impegniOra1.info2.find(elemento => elemento.giorno === j)
-                const imegno2info2 = impegniOra2.info2.find(elemento => elemento.giorno === j)
-
-                if (
-                    imegno1info1 !== undefined &&
-                    imegno2info1 !== undefined &&
-                    imegno1info2 !== undefined &&
-                    imegno2info2 !== undefined
-                ) { //5.1 L'imegno è da controllare
-                    //6: Confronto gli impegni
-                    if (
-                        imegno1info1.nome !== imegno2info1.nome &&
-                        imegno1info2.nome !== imegno2info2.nome
-                    ) { // Impegni diversi
-                        differenzeOra.orario1.info1.push(imegno1info1.nome)
-                        differenzeOra.orario1.info2.push(imegno1info2.nome)
-                        differenzeOra.orario2.info1.push(imegno2info1.nome)
-                        differenzeOra.orario2.info2.push(imegno2info2.nome)
-                    }
-                } else if (
-                    imegno1info1 !== undefined &&
-                    imegno1info2 !== undefined
-                ) {
-                    differenzeOra.orario1.info1.push(imegno1info1.nome)
-                    differenzeOra.orario1.info2.push(imegno1info2.nome)
-                } else if (
-                    imegno2info1 !== undefined &&
-                    imegno2info2 !== undefined
-                ) {
-                    differenzeOra.orario2.info1.push(imegno2info1.nome)
-                    differenzeOra.orario2.info2.push(imegno2info2.nome)
-                } else {
-                    
-                }
-            }
-
-            if (
-                differenzeOra.orario1.info1.length !== 0 &&
-                differenzeOra.orario1.info2.length !== 0 &&
-                differenzeOra.orario2.info1.length !== 0 &&
-                differenzeOra.orario2.info2.length !== 0
-            ) {
-                differenzePerOre.push(differenzeOra)
-            }
-        } else if (impegniOra1 !== undefined) { // Solo gli impegni del primo orario sono validi
-            differenzePerOre.push({
-                ora: i,
-                orario1: {
-                    info1: impegniOra1.info1.map(info => info.nome),
-                    info2: impegniOra1.info2.map(info => info.nome)
-                },
-                orario2: {
-                    info1: [],
-                    info2: []
-                }
-            })
-        } else if (impegniOra2 !== undefined) { // Solo gli impegni del secondo orario sono validi
-            differenzePerOre.push({
-                ora: i,
-                orario1: {
-                    info1: [],
-                    info2: []
-                },
-                orario2: {
-                    info1: impegniOra2.info1.map(info => info.nome),
-                    info2: impegniOra2.info2.map(info => info.nome)
-                }
-            })
-        } // Gli impegni di entrambi gli orari sono mancanti, quindi sono diversi
-    }
-
-    console.log(JSON.stringify(differenzePerOre, null, 4))
-
-    return undefined
-}

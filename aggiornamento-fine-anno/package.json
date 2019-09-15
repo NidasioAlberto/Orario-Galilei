@@ -12,6 +12,7 @@
   "dependencies": {
     "@types/node": "^12.7.5",
     "firebase-admin": "^8.5.0",
+    "parser-orario-galilei": "^2.2.4",
     "pdfreader": "^1.0.4",
     "tslint": "^5.20.0",
     "typescript": "^3.6.3"
