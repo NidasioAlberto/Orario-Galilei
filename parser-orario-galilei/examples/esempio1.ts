@@ -1,10 +1,10 @@
-import { ottieniOrariClassi } from "../src";
+import { ottieniOrariProfessori } from "../src";
 
 const anno = '2019'
 
 async function sincronizzaAule() {
     try {
-        return await ottieniOrariClassi('2020', true, true)
+        return await ottieniOrariProfessori(true, true)
     } catch(err) {
         throw err
     }

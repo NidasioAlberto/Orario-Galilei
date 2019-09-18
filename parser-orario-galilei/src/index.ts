@@ -14,10 +14,21 @@ import {
     TabelleOrario,
     Orario
 } from "./utils"
-const pdfreader = require('pdfreader')
 import axios from 'axios'
+const pdfjs = require('../pdfjs-2.1.266-dist/build/pdf')
 
 /* Spiegazione:
+Questo modulo permette di recuperare la lista di classi, aule e professori dell'istituro
+Galileo Galilei.
+
+Il codice si avvale di 2 librerie:
+- axios: permette di effettuare chiamate http da node e mobile, questo ci permette di
+    utilizzare la libreria anche nel browser (molto interessante se non si dispone di un
+    server nel quale salvare le informazioni!)
+- pdfreader: si occupa di leggere un file pdf, purtroppo non funziona nel browser,
+    bisognerebbe trovare un'alternativa
+
+
 Il module pdfreader ha una funzione per analizzare le tabelle presenti nei pdf,
 ma non funziona con il pdf della scuola. Per questo motivo utilizzo la funzione
 base della libreria che permette di ottenere ogni elemento di testo presenti nel
@@ -57,7 +68,7 @@ export async function ottieniListaClassi(urlClassi: string = percorsoPrimario + 
         //3: Controllo se ci sono dati disponibili
         if (classi == null) throw undefined
 
-        //4: Recupero solo il nome e ritorno
+        //4: Reckupero solo il nome e ritorno
         return classi.map(classe => {
             let match = classe.match(/"(.+)"/)
             if (match != null) return match[1]
@@ -295,6 +306,7 @@ export async function ottieniOrariProfessori(tabellaPerGiorni: boolean = false, 
 }
 
 /**
+ * Funzione ancora in sviluppo!!
  * Questa funzione permette di confrontare due orari, nel caso sia identici ritorna undeifned
  * altrimenti ritorna gli elementi differenti in formato Orario
  * @param orario1 Primo orario da confrontare
@@ -451,7 +463,7 @@ export function confrontaOrari(orario1: Orario, orario2: Orario): {
  * Permette di ottenere le informazioni presenti nel pdf
  * @param {Buffer} buffer 
  */
-async function estraiInformazioni(buffer: Buffer): Promise < RigaDati[] > {
+/*async function estraiInformazioni(buffer: Buffer): Promise < RigaDati[] > {
     let righe: RigaDati[] = []
     return new Promise((resolve, reject) => {
         new pdfreader.PdfReader().parseBuffer(buffer, (err: any, item: any) => {
@@ -489,6 +501,45 @@ async function estraiInformazioni(buffer: Buffer): Promise < RigaDati[] > {
             }
         })
     })
+}*/
+
+async function estraiInformazioni(buffer: Buffer) {
+    const render_options = {
+        normalizeWhitespace: false,
+        disableCombineTextItems: false
+    }
+
+    const doc = await pdfjs.getDocument(buffer)
+
+    const numeroPagine = doc.numPages
+
+    console.log('numero pagine', numeroPagine)
+
+    if (numeroPagine >= 1) {
+        return doc.getPage(1)
+            .then((datiPagina: any) => datiPagina.getTextContent(render_options))
+            .then((pagina: {
+                items?: {
+                    width: number
+                    height: number
+                    str: string
+                }[]
+            }) => {
+                if (pagina.items !== undefined) {
+                    return pagina.items.map(item => {
+                        return {
+                            width: item.width,
+                            height: item.height,
+                            text: item.str
+                        }
+                    }).filter(item => item.text !== ' ')
+                } else {
+                    return []
+                }
+            })
+    } else {
+        return []
+    }
 }
 
 /**
