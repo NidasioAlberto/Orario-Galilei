@@ -4,10 +4,10 @@ const anno = '2019'
 
 async function sincronizzaAule() {
     try {
-        return await ottieniOrariClassi('2019')
+        return await ottieniOrariClassi('2020', true, true)
     } catch(err) {
         throw err
     }
 }
 
-sincronizzaAule().then(dati => console.log(JSON.stringify(dati)))
+sincronizzaAule().then(dati => console.log('end')) // JSON.stringify(dati)))

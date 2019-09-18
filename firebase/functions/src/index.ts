@@ -19,14 +19,21 @@ export const sincronizzaClassi = functions.runWith({
         if (impostazioniCloudFunction !== undefined) {
             // Recuper l'anno dalle impostazioni
             const anno = impostazioniCloudFunction.anno as string
+            const listaClassiSalvate: string[] = []
+
+            console.log('Anno: ' + anno)
     
             // Recupero gli orari delle classi
             const orariClassi = await ottieniOrariClassi(anno, true)
+
+            console.log('Orari recuperati')
     
             // Aggiungo tutti gli orari nel database
             const risultati = await Promise.all(orariClassi.orari.map(async classe => {
                 // Recupero l'orario attualmente salvato nel database per confrontarlo con quello appena recuperato
                 const orarioSalvato = (await firestore.collection('Classi').doc(classe.nome).get()).data() as Orario | undefined
+
+                console.log('Orario salvato recuperato')
 
                 // Confronto i due orari
                 let risultato = false // True se gli orari sono uguali
@@ -35,16 +42,18 @@ export const sincronizzaClassi = functions.runWith({
                 }
 
                 // Se gli orari sono diversi salvo quello precedente nello storico
-                // E salvo quello nuovo
                 if (!risultato && orarioSalvato !== undefined) {
                     await firestore.collection('Classi').doc(classe.nome).collection('Storico').add(orarioSalvato)
-
-                    await firestore.collection('Classi').doc(classe.nome).set({
-                        ...classe,
-                        ultimoAggiornamento: admin.firestore.Timestamp.now()
-                    })
                 } // Altrimenti non c'è niente da salvare, mi risparmi un'operazione di scrittura
-
+                
+                // E salvo quello nuovo
+                await firestore.collection('Classi').doc(classe.nome).set({
+                    ...classe,
+                    ultimoAggiornamento: admin.firestore.Timestamp.now()
+                })
+                
+                listaClassiSalvate.push(classe.nome)
+                
                 return risultato
             }))
     
@@ -52,7 +61,7 @@ export const sincronizzaClassi = functions.runWith({
             console.timeEnd('Classi')
     
             await firestore.collection('Classi').doc('Indici').set({
-                lista: orariClassi.lista,
+                lista: listaClassiSalvate,
                 ultimoAggiornamento: admin.firestore.Timestamp.now()                
             })
             
