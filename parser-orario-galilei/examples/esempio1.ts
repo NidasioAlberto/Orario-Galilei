@@ -1,4 +1,4 @@
-import { ottieniOrariProfessori } from "../src";
+/*import { ottieniOrariProfessori } from "../src";
 
 const anno = '2019'
 
@@ -10,4 +10,13 @@ async function sincronizzaAule() {
     }
 }
 
-sincronizzaAule().then(dati => console.log('end')) // JSON.stringify(dati)))
+sincronizzaAule().then(dati => console.log('end')) // JSON.stringify(dati)))*/
+
+import { readFileSync } from 'fs'
+import { estraiInformazioni } from "../src";
+
+
+let dataBuffer = readFileSync('/Users/albertonidasio/Documents/GitHub/Orario-Galilei/parser-orario-galilei/examples/test.pdf');
+
+
+estraiInformazioni(dataBuffer).then(console.log)

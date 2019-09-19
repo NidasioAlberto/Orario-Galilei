@@ -25,18 +25,8 @@ Il codice si avvale di 2 librerie:
 - axios: permette di effettuare chiamate http da node e mobile, questo ci permette di
     utilizzare la libreria anche nel browser (molto interessante se non si dispone di un
     server nel quale salvare le informazioni!)
-- pdfreader: si occupa di leggere un file pdf, purtroppo non funziona nel browser,
-    bisognerebbe trovare un'alternativa
-
-
-Il module pdfreader ha una funzione per analizzare le tabelle presenti nei pdf,
-ma non funziona con il pdf della scuola. Per questo motivo utilizzo la funzione
-base della libreria che permette di ottenere ogni elemento di testo presenti nel
-pdf con le rispettive coordinate. Questo ci permette di capire cosa c'è e su
-quele riga e, visto che l'altezza delle righe sono sempre le stesse possiamo
-leggerle manualmente una volta e poi utilizzare questi dati per ottenere gli orari.
-Questa libreria funziona sia con gli orari degli studenti, sia con quelli delle
-aule e sia con quelli degli insegnanti.
+- pdfjs: questa libreria sviluppata da Mozilla permette di recuperare informazioni da un
+    file pdf
 
 Change log
 
@@ -49,9 +39,10 @@ Change log
 2.2.0 - Sistemato un bug, invece cha salvare il nome del professore nell'indice, veniva salvato l'oggetto professore
 2.2.2 - L'ora degli orari adesso è salvata come  numero da 0 a 7 invece che come stringa
 2.2.3-4 - Aggiunta una funzione per confrontare gli orari, è però ancora da migliorare
+2.3.0 - Libreria pdfreader sostituita con pdfjs (su cui si basava) così da funzionare anche in un browser
 */
 
-//Funzioni principali esportate dal modulo
+// Funzioni principali esportate dal modulo
 
 /**
  * Questa funzione permette di ottenere la lista delle classi
@@ -503,7 +494,7 @@ export function confrontaOrari(orario1: Orario, orario2: Orario): {
     })
 }*/
 
-async function estraiInformazioni(buffer: Buffer) {
+export async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
     const render_options = {
         normalizeWhitespace: false,
         disableCombineTextItems: false
@@ -523,6 +514,7 @@ async function estraiInformazioni(buffer: Buffer) {
                     width: number
                     height: number
                     str: string
+                    transform: [number, number, number, number, number, number]
                 }[]
             }) => {
                 if (pagina.items !== undefined) {
@@ -530,12 +522,51 @@ async function estraiInformazioni(buffer: Buffer) {
                         return {
                             width: item.width,
                             height: item.height,
-                            text: item.str
+                            text: item.str,
+                            transform: item.transform
                         }
                     }).filter(item => item.text !== ' ')
                 } else {
                     return []
                 }
+            }).then((elementi: {
+                width: number
+                height: number
+                transform: [number, number, number, number, number, number]
+                text: string
+            }[]) => {
+                let righe: RigaDati[] = []
+
+                // Divido gli elementi in righe
+
+                elementi.forEach(elemento => {
+                    if (elemento.transform !== undefined) {
+                        //1: Controllo se la riga è già stata registrata
+                        let trovato = false
+                        righe.forEach(riga => {
+                            if (riga.y == elemento.transform[4]) {
+                                riga.elementi.push({
+                                    x: elemento.transform[5],
+                                    //y: item.y,
+                                    testo: elemento.text
+                                })
+                                trovato = true
+                                return false
+                            }
+                        })
+    
+                        //2: altrimenti la aggiungo
+                        if (!trovato) righe.push({
+                            y: elemento.transform[4],
+                            elementi: [{
+                                x: elemento.transform[5],
+                                testo: elemento.text
+                            }]
+                        })
+                    }
+                })
+
+                return righe
             })
     } else {
         return []
