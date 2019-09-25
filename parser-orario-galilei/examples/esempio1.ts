@@ -13,14 +13,20 @@ async function sincronizzaAule() {
 sincronizzaAule().then(dati => console.log('end')) // JSON.stringify(dati)))*/
 
 import { readFileSync } from 'fs'
-import { estraiInformazioni, analizzaDati, mostraTabella } from "../src";
+import { estraiInformazioni, analizzaDati, mostraTabella, ottieniOrariProfessori } from "../src";
 
 
-let dataBuffer = readFileSync('examples/aula.pdf');
+let dataBuffer = readFileSync('examples/test.pdf');
 
 
-estraiInformazioni(dataBuffer).then(righeDati => {
-    const tab = analizzaDati(righeDati, 1)
+/*estraiInformazioni(dataBuffer).then(righeDati => {
+    console.log(righeDati)
 
-    mostraTabella(tab.tabellaPerOre, 'iLEL')
+    const tab = analizzaDati(righeDati, 2)
+
+    mostraTabella(tab.tabellaPerOre)
+})*/
+
+ottieniOrariProfessori(true, true).then(() =>{
+    console.log('fine')
 })
