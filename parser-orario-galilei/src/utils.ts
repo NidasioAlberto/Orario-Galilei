@@ -7,7 +7,7 @@ In questo file sono presenti le insterfacce usate dalla libreria, assieme ad alc
 /**
  * [classi, aule, prof]
  */
-export const altezzaGiorni = [6.615, 6.885, 6.105]
+export const altezzaGiorni = [117, 122, 136];
 
 /**
  * Contiene i parametri a cui corrispondono i dati una volta elaborati dalla libreria pdfparser
@@ -15,81 +15,54 @@ export const altezzaGiorni = [6.615, 6.885, 6.105]
 export const altezzeLineeDati = [
     [
         {
-            ora: '1',
-            altezze: [7.432, 8.302]
+            ora: 0,
+            altezze: [130, 144]
         }, {
-            ora: '2',
-            altezze: [9.12, 9.99]
+            ora: 1,
+            altezze: [157, 171]
         }, {
-            ora: '3',
-            altezze: [10.8, 11.67]
+            ora: 2,
+            altezze: [184, 198]
         }, {
-            ora: '4',
-            altezze: [12.487, 13.357]
+            ora: 3,
+            altezze: [211, 225]
         }, {
-            ora: '5',
-            altezze: [14.175, 15.045]
-        }, {
-            ora: '6',
-            altezze: [15.855, 16.725]
-        }, {
-            ora: '1p',
-            altezze: [17.625, 18.495]
-        }, {
-            ora: '2p',
-            altezze: [19.312, 20.182]
+            ora: 4,
+            altezze: [238, 252]
         }
     ], [
         {
-            ora: '1',
-            altezze: [7.710000000000001, 8.58]
+            ora: 0,
+            altezze: [135, 149]
         }, {
-            ora: '2',
-            altezze: [9.39, 10.26]
+            ora: 1,
+            altezze: [162, 176]
         }, {
-            ora: '3',
-            altezze: [11.077, 11.947]
+            ora: 2,
+            altezze: [189, 203]
         }, {
-            ora: '4',
-            altezze: [12.765, 13.635]
+            ora: 3,
+            altezze: [216, 230]
         }, {
-            ora: '5',
-            altezze: [14.445, 15.315000000000001]
-        }, {
-            ora: '6',
-            altezze: [0, 0]
-        }, {
-            ora: '1p',
-            altezze: [17.812, 18.682]
-        }, {
-            ora: '2p',
-            altezze: [19.5, 20.37]
+            ora: 4,
+            altezze: [243, 257]
         }
     ], [
         {
-            ora: '1',
-            altezze: [6.922, 7.792]
+            ora: 0,
+            altezze: [149, 163]
         }, {
-            ora: '2',
-            altezze: [8.61, 9.48]
+            ora: 1,
+            altezze: [176, 190]
         }, {
-            ora: '3',
-            altezze: [10.297, 11.16]
+            ora: 2,
+            altezze: [203, 217]
         }, {
-            ora: '4',
-            altezze: [11.977, 12.847]
+            ora: 3,
+            altezze: [230, 244]
         }, {
-            ora: '5',
-            altezze: [13.665, 14.535]
-        }, {
-            ora: '6',
-            altezze: [15.344999999999999, 16.215]
-        }, {
-            ora: '1p',
-            altezze: [17.122, 17.985]
-        }, {
-            ora: '2p',
-            altezze: [18.802, 19.672]
+            ora: 4,
+            altezze: [257, 271]
         }
     ]
 ]

@@ -13,10 +13,14 @@ async function sincronizzaAule() {
 sincronizzaAule().then(dati => console.log('end')) // JSON.stringify(dati)))*/
 
 import { readFileSync } from 'fs'
-import { estraiInformazioni } from "../src";
+import { estraiInformazioni, analizzaDati, mostraTabella } from "../src";
 
 
-let dataBuffer = readFileSync('/Users/albertonidasio/Documents/GitHub/Orario-Galilei/parser-orario-galilei/examples/test.pdf');
+let dataBuffer = readFileSync('examples/aula.pdf');
 
 
-estraiInformazioni(dataBuffer).then(console.log)
+estraiInformazioni(dataBuffer).then(righeDati => {
+    const tab = analizzaDati(righeDati, 1)
+
+    mostraTabella(tab.tabellaPerOre, 'iLEL')
+})

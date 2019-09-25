@@ -161,7 +161,7 @@ export async function ottieniListaProfessori(urlProf: string = percorsoPrimario 
  * @param {number} tipo 0 per classi, 1 per aule e 2 per prof
  * @param {boolean} debug per mostrare in nella console delle informazioni
  */
-export async function ottieniOrario(urlPdf: string, tipo: 0 | 1 | 2, tabellaPerGiorni: boolean = false, debug: boolean = false) {
+export async function ottieniOrario(urlPdf: string, tipo: 0 | 1 | 2, tabellaPerGiorni: boolean = false, debug: boolean = false, nome?: string) {
     if (debug) console.time(urlPdf)
     try {
         //Controllo se urlPdf è una stringa
@@ -180,7 +180,7 @@ export async function ottieniOrario(urlPdf: string, tipo: 0 | 1 | 2, tabellaPerG
 
             //-: formatto i dati per mostrarli nella console
             if (debug) {
-                mostraTabella(dati.tabellaPerOre)
+                mostraTabella(dati.tabellaPerOre, nome)
                 console.timeEnd(urlPdf)
             }
 
@@ -199,7 +199,7 @@ export async function ottieniOrario(urlPdf: string, tipo: 0 | 1 | 2, tabellaPerG
  * Questa funzione permette di ottenere la lista delle classi e tutti i loro orari
  * @param {number} anno anno da inserire nell'url
  * @param {boolean} tabellaPerGiorni true per ottenere l'orario organizzato anche per giorni
- * @param {boolean} debug per mostrare in nella console delle informazioni
+ * @param {boolean} debug debug per mostrare nella console delle informazioni
  */
 export async function ottieniOrariClassi(anno: string, tabellaPerGiorni: boolean = false, debug: boolean = false) {
     try {
@@ -213,7 +213,7 @@ export async function ottieniOrariClassi(anno: string, tabellaPerGiorni: boolean
             try {
                 return {
                     nome: classe,
-                    tabelleOrario: await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + classe + '.pdf', 0, tabellaPerGiorni, debug)
+                    tabelleOrario: await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + classe + '.pdf', 0, tabellaPerGiorni, debug, classe)
                 }
             } catch (err) {
                 return undefined
@@ -247,7 +247,7 @@ export async function ottieniOrariAule(anno: string, tabellaPerGiorni: boolean =
             try {
                 return {
                     nome: aula,
-                    tabelleOrario: await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + aula + '.pdf', 1, tabellaPerGiorni, debug)
+                    tabelleOrario: await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + aula + '.pdf', 1, tabellaPerGiorni, debug, aula)
                 }
             } catch (err) {
                 return undefined
@@ -279,7 +279,7 @@ export async function ottieniOrariProfessori(tabellaPerGiorni: boolean = false, 
             try {
                 return {
                     nome: professore.nome,
-                    tabelleOrario: await ottieniOrario('http://www.galileicrema.it:8080' + professore.percorsoOrario, 2, tabellaPerGiorni, debug)
+                    tabelleOrario: await ottieniOrario('http://www.galileicrema.it:8080' + professore.percorsoOrario, 2, tabellaPerGiorni, debug, professore.nome)
                 }
             } catch (err) {
                 return undefined
@@ -298,7 +298,7 @@ export async function ottieniOrariProfessori(tabellaPerGiorni: boolean = false, 
 
 /**
  * Funzione ancora in sviluppo!!
- * Questa funzione permette di confrontare due orari, nel caso sia identici ritorna undeifned
+ * Questa funzione permette di confrontare due orari, nel caso siano identici ritorna undeifned
  * altrimenti ritorna gli elementi differenti in formato Orario
  * @param orario1 Primo orario da confrontare
  * @param orario2 Secondo orario da confrontare
@@ -454,46 +454,6 @@ export function confrontaOrari(orario1: Orario, orario2: Orario): {
  * Permette di ottenere le informazioni presenti nel pdf
  * @param {Buffer} buffer 
  */
-/*async function estraiInformazioni(buffer: Buffer): Promise < RigaDati[] > {
-    let righe: RigaDati[] = []
-    return new Promise((resolve, reject) => {
-        new pdfreader.PdfReader().parseBuffer(buffer, (err: any, item: any) => {
-            if (err) {
-                reject(err)
-            } else if (item != undefined) {
-                //Processo i dati
-                if (item.x != undefined && item.y != undefined) {
-                    //1: controllo se la riga è già stata registrata
-                    let trovato = false
-                    righe.forEach(riga => {
-                        if (riga.y == item.y) {
-                            riga.elementi.push({
-                                x: item.x,
-                                //y: item.y,
-                                testo: item.text
-                            })
-                            trovato = true
-                            return false
-                        }
-                    })
-                    //2: altrimenti la aggiungo
-                    if (!trovato) righe.push({
-                        y: item.y,
-                        elementi: [{
-                            x: item.x,
-                            testo: item.text
-                        }]
-                    })
-                }
-            } else {
-                //I dati sono pronti, li ritorno se non sono vuoti
-                if (righe.length > 0) resolve(righe)
-                else reject('nessun dato trovato')
-            }
-        })
-    })
-}*/
-
 export async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
     const render_options = {
         normalizeWhitespace: false,
@@ -503,8 +463,6 @@ export async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
     const doc = await pdfjs.getDocument(buffer)
 
     const numeroPagine = doc.numPages
-
-    console.log('numero pagine', numeroPagine)
 
     if (numeroPagine >= 1) {
         return doc.getPage(1)
@@ -544,7 +502,7 @@ export async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
                         //1: Controllo se la riga è già stata registrata
                         let trovato = false
                         righe.forEach(riga => {
-                            if (riga.y == elemento.transform[4]) {
+                            if (Math.abs(riga.y - elemento.transform[4]) <= 1) {
                                 riga.elementi.push({
                                     x: elemento.transform[5],
                                     //y: item.y,
@@ -578,7 +536,7 @@ export async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
  * @param {RigaDati[]} righe le righe del pdf
  * @param {number} tipo 0 per classi, 1 per aule e 2 per prof 
  */
-function analizzaDati(righe: RigaDati[], tipo: number, tabellaPerGiorniRichiesta: boolean = false): TabelleOrario {
+export function analizzaDati(righe: RigaDati[], tipo: number, tabellaPerGiorniRichiesta: boolean = false): TabelleOrario {
     let min: number = 0,
         max: number = 0
     let divisori: number[] = []
@@ -586,7 +544,7 @@ function analizzaDati(righe: RigaDati[], tipo: number, tabellaPerGiorniRichiesta
 
     //1: Trovo il minimo e il massimo valore x dei giorni della settimana che utilizzerò per capire in che giorno si trovano le magterie e le aule
     righe.forEach(riga => {
-        if (riga.y == altezzaGiorni[tipo]) {
+        if (Math.abs(riga.y - altezzaGiorni[tipo]) <= 5) {
             riga.elementi.forEach((elemento, i) => {
                 if (i == 0) {
                     min = elemento.x
@@ -609,12 +567,12 @@ function analizzaDati(righe: RigaDati[], tipo: number, tabellaPerGiorniRichiesta
     //3: A questo punto trovo le informazioni (prima e seconda riga) per ciascuna ora
     altezzeLineeDati[tipo].forEach(altezzaLineaDati => {
         tabellaPerOre.push({
-            ora: trasformaOra(altezzaLineaDati.ora),
+            ora: altezzaLineaDati.ora,
             info1: dividiRiga(divisori, righe.find(riga => {
-                return riga.y == altezzaLineaDati.altezze[0]
+                return Math.abs(riga.y - altezzaLineaDati.altezze[0]) <= 1;
             })),
             info2: dividiRiga(divisori, righe.find(riga => {
-                return riga.y == altezzaLineaDati.altezze[1]
+                return Math.abs(riga.y - altezzaLineaDati.altezze[1]) <= 1;
             }))
         })
     })
@@ -694,46 +652,32 @@ function dividiRiga(divisori: number[], riga ? : RigaDati) {
  * Questa funzione permette di mostrare l'orario in un fomato comprensibile nella console
  * @param {*} tabellaPerOre l'orario diviso per ore
  */
-function mostraTabella(tabellaPerOre: ElementoTabellaPerOre[]) {
+export function mostraTabella(tabellaPerOre: ElementoTabellaPerOre[], nome?: string) {
     //once the table has been parse comletely we can show it in the console nicely
 
     let tabellaPerConsole: string[][] = []
-
+    
     tabellaPerOre.forEach(ora => {
-        tabellaPerConsole.push(ora.info1.map((info1s, i) => {
-            let tmp = ora.info2.find(info2s => info2s.giorno == i)
-            if ((info1s != undefined && info1s.nome != undefined) && tmp != undefined && tmp.nome != undefined)
-                return info1s.nome + '-' + tmp.nome
-            else return '*'
-        }))
-    })
-
+        tabellaPerConsole.push(giorni.map((giorno, i) => {
+            let info1 = ora.info1.find(info => info.giorno == i);
+            let info2 = ora.info2.find(info => info.giorno == i);
+            let messaggio = '';
+            if (info1 !== undefined) {
+                messaggio += info1.nome;
+            }		
+            if (info1 !== undefined && info2 !== undefined) {		
+                messaggio += '-';		
+            }		
+            if (info2 !== undefined) {		
+                messaggio += info2.nome;		
+            }		
+            if (info1 === undefined && info2 === undefined) {		
+                messaggio = '*';		
+            }		
+            return messaggio;		
+        }));
+    });
+    
+    console.log(nome);
     console.table(tabellaPerConsole)
-}
-
-/**
- * Permette di convertire la dicitura dell'ora in un valore da 0 a 7
- * @param ora ora in formato stringa
- */
-function trasformaOra(ora: string) {
-    switch (ora) {
-        case '1':
-            return 0
-        case '2':
-            return 1
-        case '3':
-            return 2
-        case '4':
-            return 3
-        case '5':
-            return 4
-        case '6':
-            return 5
-        case '1p':
-            return 6
-        case '2p':
-            return 7
-        default:
-            return NaN
-    }
 }
