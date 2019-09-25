@@ -89,7 +89,7 @@ export const sincronizzaAule = functions.runWith({
 
             console.log('Anno: ' + anno)
 
-            const orariAule = await ottieniOrariAule('2019', true)
+            const orariAule = await ottieniOrariAule(anno, true)
 
             console.log('Orari recuperati')
 
