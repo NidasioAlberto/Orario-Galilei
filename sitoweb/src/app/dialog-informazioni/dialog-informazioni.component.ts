@@ -11,7 +11,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class DialogInformazioniComponent implements OnInit {
 
-  versione = '0.3'
+  versione = '0.4'
   aggiornamentiApp: Aggiornamento[] = [
     {
       dataPubblicazione: '11/9/19',
@@ -57,15 +57,15 @@ export class DialogInformazioniComponent implements OnInit {
   inviaMessaggio() {
     if (this.messaggio !== undefined && this.messaggio !== '') {
       this.firestore.inviaMessaggio(this.messaggio, this.mittente).then(() => {
-        this.snackBar.open('Messaggio inviato')
+        this.snackBar.open('Messaggio inviato', undefined, { duration: 2000 })
 
         // Pulisco gli input
         this.messaggio = ''
         this.mittente = ''
       }).catch(err => {
-        this.snackBar.open('Errore durante l\'invio')
+        this.snackBar.open('Errore durante l\'invio', undefined, { duration: 2000 })
+        console.log(err)
       })
     }
-
   }
 }

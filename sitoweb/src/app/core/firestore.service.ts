@@ -241,12 +241,14 @@ export class FirestoreService {
       if (mittente === undefined || mittente === '') {
         delete messaggio.mittente
       }
-      if (preferiti !== undefined) {
+      if (preferiti) {
         if (preferiti.length === 0) {
           delete messaggio.preferiti
         } else {
           messaggio.preferiti = preferiti.map(preferito => preferito.nome)
         }
+      } else {
+        delete messaggio.preferiti
       }
 
       return this.db.collection('Messaggi').add(messaggio)
