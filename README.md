@@ -8,7 +8,7 @@ E' suddiviso in:
 
 - Una modulo npm per recuperare e tradurre gli orari da pdf a json
 - Un sito web ([PWA](https://developers.google.com/web/progressive-web-apps/)) che presenta le informazioni agli utenti
-- Un progetto Firebase per memoprizzare le informazioni e servire il sito
+- Un progetto Firebase per memorizzare le informazioni e servire il sito
 
 ## Modulo NPM ```parser-orario-galilei```
 
