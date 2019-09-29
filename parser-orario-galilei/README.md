@@ -26,49 +26,19 @@ Il codice si avvale di 2 librerie:
 
 **2.3.0-5** Libreria pdfreader sostituita con pdfjs (su cui si basava) così da funzionare anche in un browser
 
-**3.0.0** (In sviluppo) Ora non è più necessario specificare la posizione degli elementi nel pdf per poter ottenere l'orario
+**3.0.0** Questa versione permette di recuperare l'orario in modo più flessibile (è possibile farlo su qualsiasi pdf), riorganizza i dati dell'orario eliminando l'oranizzazione della tabella per giorni, implementa in modo completo il confronto tra due orari ed è più efficiente
 
 ## Esempio
 
 Codice:
 
 ```Typescript
-const anno = '2019'
+const anno = '2020'
 
 //Classi
-console.time('classi')
-ottieniOrariClassi(anno).then((dati) => {
-    console.timeEnd('classi')
-    console.log(JSON.stringify(dati[0]))
+console.time('Classi')
+ottieniOrariClassi('2020').then((risultato) =>{
+    risultato.orari.forEach(orario => mostraOrario(orario))
+    console.timeEnd('Classi')
 }).catch(console.log)
-```
-
-Output:
-
-```JSON
-{
-    "classe":"1CA",
-    "orario":{
-        "tabellaPerOre":[
-            {
-                "ora":"1",
-                "info1":[
-                    {
-                        "giorno":0,
-                        "nome":"Disegno"
-                    },
-                    ...
-                ],
-                "info2":[
-                    {
-                        "giorno":0,
-                        "nome":"iLCB"
-                    },
-                    ...
-                ]
-            },
-            ...
-        ]
-    }
-}
 ```

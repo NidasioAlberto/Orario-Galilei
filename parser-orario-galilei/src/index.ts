@@ -11,6 +11,7 @@ import {
     numeroMinimoEtichette,
     ElementoTabella,
     Info,
+    RisultatoConfronto,
 } from "./utils"
 import axios from 'axios'
 const pdfjs = require('../pdfjs-2.1.266-dist/build/pdf')
@@ -264,39 +265,18 @@ export async function ottieniOrariProfessori() {
 }
 
 /**
- * Funzione ancora in sviluppo!!
- * Questa funzione permette di confrontare due orari, nel caso siano identici ritorna undeifned
- * altrimenti ritorna gli elementi differenti in formato Orario
+ * Questa funzione permette di confrontare due orari, nel caso siano identici ritorna undefined
+ * altrimenti ritorna le coordinate degli elementi differenti (ora, giorno)
  * @param orario1 Primo orario da confrontare
  * @param orario2 Secondo orario da confrontare
  */
-/*export function confrontaOrari(orario1: Orario, orario2: Orario): {
-    ora: number
-    orario1: {
-        info1: string[]
-        info2: string[]
-    }
-    orario2: {
-        info1: string[]
-        info2: string[]
-    }
-}[] | undefined {
-    const differenzePerOre: {
-        ora: number
-        orario1: {
-            info1: string[]
-            info2: string[]
-        }
-        orario2: {
-            info1: string[]
-            info2: string[]
-        }
-    }[] = []
+export function confrontaOrari(orario1: Orario, orario2: Orario): RisultatoConfronto[] | undefined {
+    const differenze: RisultatoConfronto[] = []
     // All'interno dell'orario potrebbe esserci salvata anche la tebella per giorni, noi utilizzeremo solamente la tabella per ore
 
     // Recupero le tabelle per ore di entrambi gli orari
-    const tabellaPerOre1 = orario1.tabelleOrario.tabellaPerOre
-    const tabellaPerOre2 = orario2.tabelleOrario.tabellaPerOre
+    const tabellaPerOre1 = orario1.tabella
+    const tabellaPerOre2 = orario2.tabella
 
     // Confronto ora per ora
     for (let i = 0; i < 8; i++) {
@@ -305,115 +285,74 @@ export async function ottieniOrariProfessori() {
         const impegniOra2 = tabellaPerOre2.find(elemento => elemento.ora === i)
 
         // Controllo se entrambi gli impegni dell'ora corrente sono mancanti
-        if (impegniOra1 !== undefined && impegniOra2 !== undefined) { // Sono entrambi avalidi
-            const differenzeOra: {
-                ora: number
-                orario1: {
-                    info1: string[]
-                    info2: string[]
-                }
-                orario2: {
-                    info1: string[]
-                    info2: string[]
-                }
-            } = {
-                ora: i,
-                orario1: {
-                    info1: [],
-                    info2: []
-                },
-                orario2: {
-                    info1: [],
-                    info2: []
-                }
-            }
-
-            //4: Controllo ciascun giorno
+        if (impegniOra1 !== undefined && impegniOra2 !== undefined) { // Sono entrambi validi
+            // 1: Controllo ciascun giorno
             for (let j = 0; j < 6; j++) {
-                //5: Recupero se è presente l'impegno per questo giorno
+                // 2: Recupero se è presente l'impegno per questo giorno
+                const orario1InfoGiorno = impegniOra1.info.find(elemento => elemento.giorno === j)
+                const orario2InfoGiorno = impegniOra2.info.find(elemento => elemento.giorno === j)
 
-                // Info 1
-                const imegno1info1 = impegniOra1.info1.find(elemento => elemento.giorno === j)
-                const imegno2info1 = impegniOra2.info1.find(elemento => elemento.giorno === j)
-
-                // Info 2
-                const imegno1info2 = impegniOra1.info2.find(elemento => elemento.giorno === j)
-                const imegno2info2 = impegniOra2.info2.find(elemento => elemento.giorno === j)
-
-                if (
-                    imegno1info1 !== undefined &&
-                    imegno2info1 !== undefined &&
-                    imegno1info2 !== undefined &&
-                    imegno2info2 !== undefined
-                ) { //5.1 L'imegno è da controllare
+                if (orario1InfoGiorno !== undefined && orario2InfoGiorno !== undefined) { //5.1 L'imegno è da controllare
                     //6: Confronto gli impegni
-                    if (
-                        imegno1info1.nome !== imegno2info1.nome &&
-                        imegno1info2.nome !== imegno2info2.nome
-                    ) { // Impegni diversi
-                        differenzeOra.orario1.info1.push(imegno1info1.nome)
-                        differenzeOra.orario1.info2.push(imegno1info2.nome)
-                        differenzeOra.orario2.info1.push(imegno2info1.nome)
-                        differenzeOra.orario2.info2.push(imegno2info2.nome)
+                    if (orario1InfoGiorno.elementi.length !== orario2InfoGiorno.elementi.length) { // Impegni diversi
+                        differenze.push({
+                            ora: i,
+                            giorno: j
+                        })
+                    } else {
+                        // Controllo il contetnuto degli elementi
+                        const diversi = orario1InfoGiorno.elementi.reduce((acc, elemento1, k) => {
+                            if (elemento1 !== orario2InfoGiorno.elementi[k]) {
+                                return true
+                            } else {
+                                return acc
+                            }
+                        }, false) // Parto supponendo che non siano diversi
+
+                        if (diversi) {
+                            differenze.push({
+                                ora: i,
+                                giorno: j
+                            })
+                        }
                     }
-                } else if (
-                    imegno1info1 !== undefined &&
-                    imegno1info2 !== undefined
-                ) {
-                    differenzeOra.orario1.info1.push(imegno1info1.nome)
-                    differenzeOra.orario1.info2.push(imegno1info2.nome)
-                } else if (
-                    imegno2info1 !== undefined &&
-                    imegno2info2 !== undefined
-                ) {
-                    differenzeOra.orario2.info1.push(imegno2info1.nome)
-                    differenzeOra.orario2.info2.push(imegno2info2.nome)
+                } else if (orario1InfoGiorno !== undefined) {
+                    differenze.push({
+                        ora: i,
+                        giorno: j
+                    })
+                } else if (orario2InfoGiorno !== undefined) {
+                    differenze.push({
+                        ora: i,
+                        giorno: j
+                    })
                 } else {
-
+                    // Se sono entrambi undefined allora sono identici
                 }
-            }
-
-            if (
-                differenzeOra.orario1.info1.length !== 0 &&
-                differenzeOra.orario1.info2.length !== 0 &&
-                differenzeOra.orario2.info1.length !== 0 &&
-                differenzeOra.orario2.info2.length !== 0
-            ) {
-                differenzePerOre.push(differenzeOra)
             }
         } else if (impegniOra1 !== undefined) { // Solo gli impegni del primo orario sono validi
-            differenzePerOre.push({
-                ora: i,
-                orario1: {
-                    info1: impegniOra1.info1.map(info => info.nome),
-                    info2: impegniOra1.info2.map(info => info.nome)
-                },
-                orario2: {
-                    info1: [],
-                    info2: []
-                }
-            })
+            differenze.concat(impegniOra1.info.map(inf => {
+                return {
+                    ora: i,
+                    giorno: inf.giorno
+                } as RisultatoConfronto
+            }))
         } else if (impegniOra2 !== undefined) { // Solo gli impegni del secondo orario sono validi
-            differenzePerOre.push({
-                ora: i,
-                orario1: {
-                    info1: [],
-                    info2: []
-                },
-                orario2: {
-                    info1: impegniOra2.info1.map(info => info.nome),
-                    info2: impegniOra2.info2.map(info => info.nome)
-                }
-            })
-        } // Gli impegni di entrambi gli orari sono mancanti, quindi sono diversi
+            differenze.concat(impegniOra2.info.map(inf => {
+                return {
+                    ora: i,
+                    giorno: inf.giorno
+                } as RisultatoConfronto
+            }))
+        } // Gli impegni di entrambi gli orari sono mancanti, quindi sono uguali
     }
 
-    if (differenzePerOre.length > 0) {
-        return differenzePerOre
+    if (differenze.length > 0) {
+        return differenze
     } else {
         return undefined
     }
-}*/
+}
 
 //Funzioni secondarie
 
@@ -628,14 +567,13 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
     const spazioOre = (max - min) / (righeEtichetteOre.length - 1)
     const minYOre = min - (spazioOre / 2)
     const maxYOre = max + (spazioOre / 2)
-    for(let i = 0; i <= righeEtichetteOre.length; i++) { // Parto dall'estremo sinistro e arrivo a quello destro passando per i divisori
+    for (let i = 0; i <= righeEtichetteOre.length; i++) { // Parto dall'estremo sinistro e arrivo a quello destro passando per i divisori
         divisoriOre.push(min - (spazioOre / 2) + (spazioOre * i))
     }
 
     // 7: Ora trovo le righe all'interno dei divisori ore
     let righeOre: RigaDati[][] = [] // [ora][righe]
-    for(let i = 0; i < righeEtichetteOre.length; i++) righeOre.push([])
-    //console.log('Righe ore valore iniziale', righeOre, righeOre.length)
+    for (let i = 0; i < righeEtichetteOre.length; i++) righeOre.push([])
     righe.forEach(riga => {
         if (minYOre < riga.y && riga.y <= maxYOre) {
             const oraCorrente = Math.floor((riga.y - minYOre) / spazioOre)
@@ -648,22 +586,23 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
     let tabella: ElementoTabella[] = righeOre.map((righeOra, i) => { // righe dell'ora i
         const info: Info[] = []
 
-        for(let i = 0; i < divisoriGiorni.length - 1; i++) {
+        for (let i = 0; i < divisoriGiorni.length - 1; i++) {
             info.push({
                 giorno: i,
                 elementi: righeOra.map(riga => {
                     const elementiGiorno = riga.elementi.filter(elemento => elemento.x > divisoriGiorni[i] && elemento.x <= divisoriGiorni[i + 1])
-                    const info = elementiGiorno.reduce((acc, elemento) => acc += elemento.testo, '').replace(/ /g, '')
+                    const info = elementiGiorno.reduce((acc, elemento) => acc += elemento.testo, '').replace(/ /g, '') // Concateno tutto quello che si strova sulla stessa riga
                     return info
-                }).filter(elemento => elemento !== '')
+                }).filter(elemento => elemento !== '') as string[]
             })
         }
 
         return {
             ora: i,
-            info
+            // Rimuovo le info con nessun elemento
+            info: info.filter(inf => inf.elementi.length > 0)
         } as ElementoTabella
-    })
+    }).filter(elemento => elemento.info.length > 0) // Rimuovo gli elementi senza info
 
     // 9: Recupero le altre informazioni come versione, data, ecc...
     const testoRigaInformazioni = righe.map(riga => {
@@ -692,7 +631,7 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
                 Number(match[6])
             )
 
-            const versione = Number(match[4]) +  Number(match[5])/100
+            const versione = Number(match[4]) + Number(match[5]) / 100
 
             return {
                 nome,
@@ -724,7 +663,7 @@ export function mostraOrario(orario: Orario) {
             let info: string[] = []
             if (ora.info !== undefined) {
                 const infoGiorno = ora.info.find(info => info.giorno == i)
-                if(infoGiorno !== undefined && infoGiorno.elementi !== undefined) info = infoGiorno.elementi
+                if (infoGiorno !== undefined && infoGiorno.elementi !== undefined) info = infoGiorno.elementi
             }
             let messaggio = '';
             if (info.length === 0) {

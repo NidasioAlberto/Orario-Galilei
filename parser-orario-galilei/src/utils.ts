@@ -1,3 +1,5 @@
+import { inflate } from "zlib"
+
 /* Spiegazione:
 In questo file sono presenti le insterfacce usate dalla libreria, assieme ad alcune costanti
 */
@@ -57,12 +59,12 @@ export interface RigaDati {
 
 export interface ElementoTabella {
     ora: number
-    info?: Info[]
+    info: Info[]
 }
 
 export interface Info {
     giorno: number
-    elementi?: string[]
+    elementi: string[]
 }
 
 export interface Orario {
@@ -71,4 +73,9 @@ export interface Orario {
     dataAggiornamento?: Date
     dataValidita?: Date
     versione?: number
+}
+
+export interface RisultatoConfronto {
+    ora: number
+    giorno: number
 }
