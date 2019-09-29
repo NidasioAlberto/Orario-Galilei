@@ -28,6 +28,8 @@ Il codice si avvale di 2 librerie:
 
 **3.0.0** Questa versione permette di recuperare l'orario in modo più flessibile (è possibile farlo su qualsiasi pdf), riorganizza i dati dell'orario eliminando l'oranizzazione della tabella per giorni, implementa in modo completo il confronto tra due orari ed è più efficiente
 
+**3.0.1** Ora vengono eliminati gli spazi nei nomi degli orari di aule e classi
+
 ## Esempio
 
 Codice:

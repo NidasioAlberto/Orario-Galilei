@@ -4,6 +4,9 @@
 			<div class="titolo-orario">
 				<ng-container *ngIf="orario | async as datiOrario">
 					{{datiOrario.tipo}}: {{datiOrario.nome}}
+					<ng-container *ngIf="datiOrario.versione !== undefined">
+						v{{datiOrario.versione}}
+					</ng-container>
 				</ng-container>
 			</div>
 
@@ -12,6 +15,14 @@
 			</div>
 
 			<app-grafico-orario [orario]="orario" [impegni]="impegni"></app-grafico-orario>
+
+			<div *ngIf="orario | async as datiOrario" class="extra-info">
+				Aggiornato il: {{datiOrario.dataAggiornamento | date:'dd/MM/yyyy'}}
+				<br>
+				Valido dal: {{datiOrario.dataValidita | date:'dd/MM/yyyy'}}
+				<br>
+				Controllato il: {{datiOrario.ultimoAggiornamento | date:'dd/MM/yyyy hh:mm:ss'}}
+			</div>
 
 			<div class="contenitore-bottome-preferito">
 				<ng-container *ngIf="!inPreferiti; else mostraRimuovi">

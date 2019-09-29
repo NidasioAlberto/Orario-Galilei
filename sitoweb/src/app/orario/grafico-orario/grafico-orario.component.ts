@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Observable, combineLatest } from 'rxjs';
-import { Orario, InfoOre, ProssimoImpegno } from 'src/app/utils/orario.model';
+import { Orario, ProssimoImpegno, Info } from 'src/app/utils/orario.model';
 import { map } from 'rxjs/operators';
 
 @Component({
@@ -54,30 +54,25 @@ export class GraficoOrarioComponent implements OnInit {
     }
 
     // Controllo se i dati dell'orario sono presenti
-    if (orario === undefined || !(info  === 1 || info === 2)) {
+    if (orario === undefined) {
       return ''
     }
 
     // Cerco i dati dell'ora e li controllo
-    const datiOra = orario.tabelleOrario.tabellaPerOre.find(datoOra => datoOra.ora === ora)
+    const datiOra = orario.tabella.find(datoOra => datoOra.ora === ora)
     if (datiOra === undefined) {
       return ''
     }
 
     // Cerco i dati del giorno
-    let datiInfo: InfoOre[]
-    if (info === 1) {
-      datiInfo = datiOra.info1
-    } else {
-      datiInfo = datiOra.info2
-    }
+    let datiInfo: Info[] = datiOra.info
 
     const datiGiorno = datiInfo.find(infoOra => infoOra.giorno === giorno)
-    if (datiGiorno === undefined) {
+    if (datiGiorno === undefined || datiGiorno.elementi[info] === undefined) {
       return ''
     }
 
-    return datiGiorno.nome
+    return datiGiorno.elementi[info]
   }
 
   preparaStileCella(ora: number, giorno: number) {

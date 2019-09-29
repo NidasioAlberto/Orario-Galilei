@@ -175,7 +175,10 @@ export async function ottieniOrariClassi(anno: string) {
                 return undefined
             }
         }).filter(promessa => promessa != undefined)) as Orario[]
-        orari = orari.filter(orario => orario != undefined && orario.tabella != undefined)
+        orari = orari.filter(orario => orario != undefined && orario.tabella != undefined).map(orario => {
+            orario.nome = orario.nome.replace(/ /g, '')
+            return orario
+        })
 
         //3: Ritorno gli orari
         return {
@@ -206,7 +209,10 @@ export async function ottieniOrariAule(anno: string) {
                 return undefined
             }
         }).filter(promessa => promessa != undefined)) as Orario[]
-        orari = orari.filter(orario => orario != undefined && orario.tabella != undefined)
+        orari = orari.filter(orario => orario != undefined && orario.tabella != undefined).map(orario => {
+            orario.nome = orario.nome.replace(/ /g, '')
+            return orario
+        })
 
         //3: Ritorno gli orari
         return {
@@ -228,11 +234,14 @@ export async function ottieniOrariProfessori() {
         // 1: Recupero la lista dei professori
         let professori = await ottieniListaProfessori()
 
+        console.table(professori)
+
         // 2: Recupero i loro orari
         let orari = await Promise.all(professori.map(async professore => {
             try {
                 return await ottieniOrario('http://www.galileicrema.it:8080' + professore.percorsoOrario, professore.nome)
             } catch (err) {
+                console.log(professore.nome, err)
                 return undefined
             }
         }).filter(promessa => promessa != undefined)) as Orario[]
@@ -274,15 +283,11 @@ export function confrontaOrari(orario1: Orario, orario2: Orario): RisultatoConfr
     const differenze: RisultatoConfronto[] = []
     // All'interno dell'orario potrebbe esserci salvata anche la tebella per giorni, noi utilizzeremo solamente la tabella per ore
 
-    // Recupero le tabelle per ore di entrambi gli orari
-    const tabellaPerOre1 = orario1.tabella
-    const tabellaPerOre2 = orario2.tabella
-
     // Confronto ora per ora
     for (let i = 0; i < 8; i++) {
         // Controllo se per quest'ora sono presenti degli impegni per i due orari
-        const impegniOra1 = tabellaPerOre1.find(elemento => elemento.ora === i)
-        const impegniOra2 = tabellaPerOre2.find(elemento => elemento.ora === i)
+        const impegniOra1 = orario1.tabella.find(elemento => elemento.ora === i);
+        const impegniOra2 = orario2.tabella.find(elemento => elemento.ora === i);
 
         // Controllo se entrambi gli impegni dell'ora corrente sono mancanti
         if (impegniOra1 !== undefined && impegniOra2 !== undefined) { // Sono entrambi validi
@@ -658,10 +663,11 @@ export function mostraOrario(orario: Orario) {
 
     let tabellaPerConsole: string[][] = []
 
-    orario.tabella.forEach(ora => {
+    etichetteOre.map((etichettaOra, i) => {
+        const ora = orario.tabella.find(elemento => elemento.ora === i)
         tabellaPerConsole.push(giorni.map((giorno, i) => {
             let info: string[] = []
-            if (ora.info !== undefined) {
+            if (ora !== undefined && ora.info !== undefined) {
                 const infoGiorno = ora.info.find(info => info.giorno == i)
                 if (infoGiorno !== undefined && infoGiorno.elementi !== undefined) info = infoGiorno.elementi
             }
@@ -677,7 +683,7 @@ export function mostraOrario(orario: Orario) {
             }
             return messaggio;
         }));
-    });
+    })
 
     console.log(orario.nome);
     if (orario.versione !== undefined) console.log('Versione: ', orario.versione)

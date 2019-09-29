@@ -11,8 +11,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class DialogInformazioniComponent implements OnInit {
 
-  versione = '0.4'
+  versione = '0.5'
   aggiornamentiApp: Aggiornamento[] = [
+    {
+      dataPubblicazione: '29/9/19',
+      descrizioneBreve: 'Info complete',
+      descrizione: 'La pagina degll\'orario ora mostra anche la versione dell\'orario, la data di aggiornamento, valido dal e mostra l\'ultima volta che l\'orario è stato sincronizzato'
+    },
     {
       dataPubblicazione: '11/9/19',
       descrizioneBreve: 'Invio messaggio',

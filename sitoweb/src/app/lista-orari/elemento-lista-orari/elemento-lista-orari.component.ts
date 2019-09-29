@@ -65,15 +65,15 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
       map(dati => {
         return this.firestore.trovaProssimiImpegni(dati[0], dati[1], dati[2], 2)
       }),
-      map(impegni => impegni.map(impegno => {
-        return impegno.giornoLable +
+      map(impegni => impegni.map(impegno =>
+        impegno.giornoLable +
         ' ' +
         impegno.oraLable +
         ': ' +
-        (impegno.info1 !== undefined ? impegno.info1 : '') +
-        (impegno.info1 !== undefined && impegno.info2 !== undefined ? ' ' : '') +
-        (impegno.info2 !== undefined ? impegno.info2 : '')
-      }))
+        (impegno.elementi[0] !== undefined ? impegno.elementi[0] : '') +
+        (impegno.elementi[0] !== undefined && impegno.elementi[1] !== undefined ? ' ' : '') +
+        (impegno.elementi[1] !== undefined ? impegno.elementi[1] : '')
+      ))
     )
   }
 

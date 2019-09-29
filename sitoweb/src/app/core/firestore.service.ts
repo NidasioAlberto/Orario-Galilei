@@ -3,8 +3,9 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { combineLatest, Observable } from 'rxjs';
 import { map, take, startWith } from 'rxjs/operators';
 import { DocumentoIndice, ElementoIndice } from '../utils/indice.model';
-import { Orario, ProssimoImpegno } from '../utils/orario.model';
+import { Orario, ProssimoImpegno, Info } from '../utils/orario.model';
 import { LocalStorageService } from './local-storage.service';
+import { firestore } from 'firebase';
 
 @Injectable({
   providedIn: 'root'
@@ -73,7 +74,7 @@ export class FirestoreService {
   ottieniOrario(indiceOrario: ElementoIndice): Observable<Orario> {
     return this.db.collection(indiceOrario.collection).doc<Orario>(indiceOrario.nome).snapshotChanges().pipe(
       map(snapshot => {
-        const dati = snapshot.payload.data()
+        let dati = snapshot.payload.data()
         if (dati !== undefined) {
           dati.collection = snapshot.payload.ref.parent.id
           switch (dati.collection) {
@@ -87,6 +88,17 @@ export class FirestoreService {
               dati.tipo = 'Professore'
               break
           }
+
+          if (dati.dataAggiornamento !== undefined) {
+            dati.dataAggiornamento = (dati.dataAggiornamento as firebase.firestore.Timestamp).toDate()
+          }
+          if (dati.dataValidita !== undefined) {
+            dati.dataValidita = (dati.dataValidita as firebase.firestore.Timestamp).toDate()
+          }
+          if (dati.ultimoAggiornamento !== undefined) {
+            dati.ultimoAggiornamento = (dati.ultimoAggiornamento as firebase.firestore.Timestamp).toDate()
+          }
+
           return dati
         } else {
           return undefined
@@ -146,36 +158,47 @@ export class FirestoreService {
       oraFine--
     }
 
-    if (orario === undefined || orario.tabelleOrario.tabellaPerGiorni === undefined) {
+    if (orario === undefined || orario.tabella === undefined) {
       return undefined
     } else {
       let giornoControllo = giornoPartenza
       let oraPartenzaControllo = (oraPartenza < 0 ? 0 : oraPartenza)
 
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 6; i++) { // Per ogni giorno
         // Cerco i dati del giorno corrente
-        const datiGiornoCorrente = orario.tabelleOrario.tabellaPerGiorni.find(orarioGiorno => orarioGiorno.giorno === giornoControllo)
+        const datiGiornoCorrente = orario.tabella.map(ora => {
+          const info: Info | undefined = ora.info.find(info => info.giorno === giornoControllo)
+
+          if (info !== undefined) {
+            return {
+              ora: ora.ora,
+              elementi: info.elementi
+            } 
+          } else {
+            return undefined
+          }
+        }).filter(giorno => giorno !== undefined)
+        
+        //orario.tabelleOrario.tabellaPerGiorni.find(orarioGiorno => orarioGiorno.giorno === giornoControllo)
 
         if (datiGiornoCorrente !== undefined) {
-          for (let k = oraPartenzaControllo; k < 8; k++) {
+          for (let k = oraPartenzaControllo; k < 8; k++) { // Per ogni ora
             // Controllo se siamo arrivata alla fine
             if (k === oraFine && giornoControllo === giornoFine) {
               return undefined
             }
 
             // Cerco i dati dell'ora corrente
-            const datiOraCorrenteInfo1 = datiGiornoCorrente.info1.find(orarioOra => orarioOra.ora === k)
-            const datiOraCorrenteInfo2 = datiGiornoCorrente.info2.find(orarioOra => orarioOra.ora === k)
+            const datiOraCorrenteInfo = datiGiornoCorrente.find(orarioOra => orarioOra.ora === k)
 
-            if (datiOraCorrenteInfo1 !== undefined || datiOraCorrenteInfo2 !== undefined) {
+            if (datiOraCorrenteInfo !== undefined) {
               // In questo caso abbiamo trovato il prossimo impegno!
               return {
                 ora: k,
                 oraLable: this.ottieniLableOra(k),
                 giorno: giornoControllo,
                 giornoLable: this.ottieniLableGiorno(giornoControllo),
-                info1: (datiOraCorrenteInfo1 !== undefined ? datiOraCorrenteInfo1.nome : undefined),
-                info2: (datiOraCorrenteInfo2 !== undefined ? datiOraCorrenteInfo2.nome : undefined)
+                elementi: (datiOraCorrenteInfo !== undefined ? datiOraCorrenteInfo.elementi : []),
               }
             }
             // Altrimenti se i dati dell'ora corrente sono undefined vuol dire che non c'è alcuna attvitià in quest'ora,
@@ -195,6 +218,7 @@ export class FirestoreService {
         oraPartenzaControllo = 0
       }
     }
+    return undefined
   }
 
   ottieniLableOra(ora: number) {
@@ -219,7 +243,7 @@ export class FirestoreService {
       case 3: return 'Gio'
       case 4: return 'Ven'
       case 5: return 'Sab'
-      default: return 'Wow'
+      default: return 'Err'
     }
   }
 

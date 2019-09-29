@@ -19,6 +19,8 @@ export class OrarioComponent implements OnInit {
   impegniLable: Observable<string[]>
   inPreferiti = false
 
+  test = new Date()
+
   constructor(
     private router: ActivatedRoute,
     private firestore: FirestoreService,
@@ -56,11 +58,17 @@ export class OrarioComponent implements OnInit {
         ' ' +
         impegno.oraLable +
         ': ' +
-        (impegno.info1 !== undefined ? impegno.info1 : '') +
-        (impegno.info1 !== undefined && impegno.info2 !== undefined ? ' ' : '') +
-        (impegno.info2 !== undefined ? impegno.info2 : '')
+        (impegno.elementi[0] !== undefined ? impegno.elementi[0] : '') +
+        (impegno.elementi[0] !== undefined && impegno.elementi[1] !== undefined ? ' ' : '') +
+        (impegno.elementi[1] !== undefined ? impegno.elementi[1] : '')
       ))
     )
+
+    this.orario.subscribe(datiOrario => {
+      console.log('Data aggiornamento', datiOrario.dataAggiornamento)
+      console.log('Ultimo aggiornamento', datiOrario.ultimoAggiornamento)
+      console.log(new Date())
+    })
   }
 
   async aggiungiAiPreferiti() {

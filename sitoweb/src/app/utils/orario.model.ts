@@ -1,35 +1,28 @@
-export interface ElementoTabellaPerOre {
+export interface ElementoTabella {
     ora: number
-    info1: InfoOre[]
-    info2: InfoOre[]
+    info: Info[]
 }
 
-export interface ElementoTabellaPerGiorni {
+export interface Info {
     giorno: number
-    info1: InfoGiorni[]
-    info2: InfoGiorni[]
-}
-
-export interface InfoOre {
-    giorno: number
-    nome: string
-}
-
-export interface InfoGiorni {
-    ora: number
-    nome: string
-}
-
-export interface TabelleOrario {
-    tabellaPerOre: ElementoTabellaPerOre[]
-    tabellaPerGiorni?: ElementoTabellaPerGiorni[]
+    elementi: string[]
 }
 
 export interface Orario {
     nome: string
-    tabelleOrario: TabelleOrario
+    tabella: ElementoTabella[]
+    dataAggiornamento?: Date | firebase.firestore.Timestamp
+    dataValidita?: Date | firebase.firestore.Timestamp
+    versione?: number
+
     collection?: string
     tipo?: string
+    ultimoAggiornamento: Date | firebase.firestore.Timestamp
+}
+
+export interface RisultatoConfronto {
+    ora: number
+    giorno: number
 }
 
 export interface ProssimoImpegno {
@@ -37,6 +30,5 @@ export interface ProssimoImpegno {
     oraLable: string
     giorno: number
     giornoLable: string
-    info1: string
-    info2: string
+    elementi: string[]
 }
