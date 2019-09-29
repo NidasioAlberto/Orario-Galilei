@@ -5,42 +5,15 @@ import {
     percorsoListaProfessori,
     lettereAlfabeto,
     RigaDati,
-    altezzeLineeDati,
-    ElementoTabellaPerOre,
-    ElementoTabellaPerGiorni,
-    altezzaGiorni,
     giorni,
-    InfoOre,
-    TabelleOrario,
-    Orario
+    Orario,
+    etichetteOre,
+    numeroMinimoEtichette,
+    ElementoTabella,
+    Info,
 } from "./utils"
 import axios from 'axios'
 const pdfjs = require('../pdfjs-2.1.266-dist/build/pdf')
-
-/* Spiegazione:
-Questo modulo permette di recuperare la lista di classi, aule e professori dell'istituro
-Galileo Galilei.
-
-Il codice si avvale di 2 librerie:
-- axios: permette di effettuare chiamate http da node e mobile, questo ci permette di
-    utilizzare la libreria anche nel browser (molto interessante se non si dispone di un
-    server nel quale salvare le informazioni!)
-- pdfjs: questa libreria sviluppata da Mozilla permette di recuperare informazioni da un
-    file pdf
-
-Change log
-
-1.0.0 - Versione completa.
-
-1.1.0 - L'obbiettivo di questa versione è quello di rielaborare il codice, risolvendo
-    errori e bug e migliorare le performance del codice.
-
-2.0.0 - Questa versione aggiunge supporto per typescript!
-2.2.0 - Sistemato un bug, invece cha salvare il nome del professore nell'indice, veniva salvato l'oggetto professore
-2.2.2 - L'ora degli orari adesso è salvata come  numero da 0 a 7 invece che come stringa
-2.2.3-4 - Aggiunta una funzione per confrontare gli orari, è però ancora da migliorare
-2.3.0 - Libreria pdfreader sostituita con pdfjs (su cui si basava) così da funzionare anche in un browser
-*/
 
 // Funzioni principali esportate dal modulo
 
@@ -161,37 +134,24 @@ export async function ottieniListaProfessori(urlProf: string = percorsoPrimario 
  * @param {number} tipo 0 per classi, 1 per aule e 2 per prof
  * @param {boolean} debug per mostrare in nella console delle informazioni
  */
-export async function ottieniOrario(urlPdf: string, tipo: 0 | 1 | 2, tabellaPerGiorni: boolean = false, debug: boolean = false, nome?: string) {
-    if (debug) console.time(urlPdf)
+export async function ottieniOrario(urlPdf: string, nome: string): Promise<Orario> {
     try {
-        //Controllo se urlPdf è una stringa
-        if (typeof urlPdf == 'string') {
-            //1: Scarico il file
-            //let buffer = await fetch(urlPdf).then(res => res.arrayBuffer())
-            let buffer = await axios.get(urlPdf, {
-                responseType: 'arraybuffer'
-            }).then(res => res.data)
+        //1: Scarico il file
+        //let buffer = await fetch(urlPdf).then(res => res.arrayBuffer())
+        let buffer = await axios.get(urlPdf, {
+            responseType: 'arraybuffer'
+        }).then(res => res.data)
 
-            //2: Estraggo le informazioni
-            let righe = await estraiInformazioni(buffer as Buffer)
+        //2: Estraggo le informazioni
+        let righe = await estraiInformazioni(buffer as Buffer)
 
-            //3: cambio il formato dei dati
-            let dati = analizzaDati(righe, tipo, tabellaPerGiorni)
+        //3: cambio il formato dei dati
+        let orario = analizzaDati(righe, nome)
 
-            //-: formatto i dati per mostrarli nella console
-            if (debug) {
-                mostraTabella(dati.tabellaPerOre, nome)
-                console.timeEnd(urlPdf)
-            }
-
-            //4: fine! ritorno i dati
-            return dati
-        } else {
-            throw 'url non corretto'
-        }
+        //4: fine! ritorno i dati
+        return orario
     } catch (err) {
-        if (debug) console.log(err)
-        throw 'impossibile recuperare l\'orario'
+        throw 'Impossibile recuperare l\'orario, ' + err
     }
 }
 
@@ -201,33 +161,28 @@ export async function ottieniOrario(urlPdf: string, tipo: 0 | 1 | 2, tabellaPerG
  * @param {boolean} tabellaPerGiorni true per ottenere l'orario organizzato anche per giorni
  * @param {boolean} debug debug per mostrare nella console delle informazioni
  */
-export async function ottieniOrariClassi(anno: string, tabellaPerGiorni: boolean = false, debug: boolean = false) {
+export async function ottieniOrariClassi(anno: string) {
     try {
         //1: Recupero la lista delle classi
         let classi = await ottieniListaClassi()
 
-        if (debug) console.log(classi)
-
         //2: Recupero i loro orari
         let orari = await Promise.all(classi.map(async classe => {
             try {
-                return {
-                    nome: classe,
-                    tabelleOrario: await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + classe + '.pdf', 0, tabellaPerGiorni, debug, classe)
-                }
+                return await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + classe + '.pdf', classe)
             } catch (err) {
                 return undefined
             }
         }).filter(promessa => promessa != undefined)) as Orario[]
+        orari = orari.filter(orario => orario != undefined && orario.tabella != undefined)
 
         //3: Ritorno gli orari
         return {
-            orari: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined),
-            lista: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined).map(orario => orario.nome)
+            orari: orari,
+            lista: orari.map(orario => orario.nome)
         }
     } catch (err) {
-        if (debug) console.log(err)
-        throw 'impossibile recuperare classi e orari'
+        throw 'impossibile recuperare classi e orari, ' + err
     }
 }
 
@@ -237,7 +192,7 @@ export async function ottieniOrariClassi(anno: string, tabellaPerGiorni: boolean
  * @param {boolean} tabellaPerGiorni true per ottenere l'orario organizzato anche per giorni
  * @param {boolean} debug per mostrare in nella console delle informazioni
  */
-export async function ottieniOrariAule(anno: string, tabellaPerGiorni: boolean = false, debug = false) {
+export async function ottieniOrariAule(anno: string) {
     try {
         //1: Recupero la lista delle aule
         let aule = await ottieniListaAule()
@@ -245,22 +200,20 @@ export async function ottieniOrariAule(anno: string, tabellaPerGiorni: boolean =
         //2: Recupero i loro orari
         let orari = await Promise.all(aule.map(async aula => {
             try {
-                return {
-                    nome: aula,
-                    tabelleOrario: await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + aula + '.pdf', 1, tabellaPerGiorni, debug, aula)
-                }
+                return await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + aula + '.pdf', aula)
             } catch (err) {
                 return undefined
             }
         }).filter(promessa => promessa != undefined)) as Orario[]
+        orari = orari.filter(orario => orario != undefined && orario.tabella != undefined)
 
         //3: Ritorno gli orari
         return {
-            orari: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined),
-            lista: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined).map(orario => orario.nome)
+            orari: orari,
+            lista: orari.map(orario => orario.nome)
         }
     } catch (err) {
-        throw 'impossibile recuperare aule e orari'
+        throw 'impossibile recuperare aule e orari, ' + err
     }
 }
 
@@ -269,30 +222,44 @@ export async function ottieniOrariAule(anno: string, tabellaPerGiorni: boolean =
  * @param {boolean} tabellaPerGiorni true per ottenere l'orario organizzato anche per giorni
  * @param {boolean} debug per mostrare in nella console delle informazioni
  */
-export async function ottieniOrariProfessori(tabellaPerGiorni: boolean = false, debug = false) {
+export async function ottieniOrariProfessori() {
     try {
-        //1: Recupero la lista dei professori
+        // 1: Recupero la lista dei professori
         let professori = await ottieniListaProfessori()
 
-        //2: Recupero i loro orari
+        // 2: Recupero i loro orari
         let orari = await Promise.all(professori.map(async professore => {
             try {
-                return {
-                    nome: professore.nome,
-                    tabelleOrario: await ottieniOrario('http://www.galileicrema.it:8080' + professore.percorsoOrario, 2, tabellaPerGiorni, debug, professore.nome)
-                }
+                return await ottieniOrario('http://www.galileicrema.it:8080' + professore.percorsoOrario, professore.nome)
             } catch (err) {
                 return undefined
             }
         }).filter(promessa => promessa != undefined)) as Orario[]
+        orari = orari.filter(orario => orario != undefined && orario.tabella != undefined)
 
-        //3: Ritorno gli orari
+        // 3: Sistemo le lettere dei nomi a tutte minuscole e solo le iniziali maiuscole
+        orari.map(orario => {
+            const nomi = orario.nome.split(' ')
+
+            orario.nome = nomi.map(nome => {
+                nome = nome.toLowerCase()
+                return nome.charAt(0).toUpperCase() + nome.slice(1)
+            }).reduce((acc, nome, i) => {
+                acc += nome
+                if (i < nomi.length - 1) acc += ' '
+                return acc
+            }, '')
+
+            return orario
+        })
+
+        // 4: Ritorno gli orari
         return {
-            orari: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined),
-            lista: orari.filter(orario => orario != undefined && orario.tabelleOrario != undefined).map(orario => orario.nome)
+            orari: orari,
+            lista: orari.map(orario => orario.nome)
         }
     } catch (err) {
-        throw 'impossibile recuperare aule e orari'
+        throw 'impossibile recuperare aule e orari, ' + err
     }
 }
 
@@ -303,7 +270,7 @@ export async function ottieniOrariProfessori(tabellaPerGiorni: boolean = false, 
  * @param orario1 Primo orario da confrontare
  * @param orario2 Secondo orario da confrontare
  */
-export function confrontaOrari(orario1: Orario, orario2: Orario): {
+/*export function confrontaOrari(orario1: Orario, orario2: Orario): {
     ora: number
     orario1: {
         info1: string[]
@@ -332,7 +299,7 @@ export function confrontaOrari(orario1: Orario, orario2: Orario): {
     const tabellaPerOre2 = orario2.tabelleOrario.tabellaPerOre
 
     // Confronto ora per ora
-    for (let i = 0; i < 8 /*8 ore di lezione*/; i++) {
+    for (let i = 0; i < 8; i++) {
         // Controllo se per quest'ora sono presenti degli impegni per i due orari
         const impegniOra1 = tabellaPerOre1.find(elemento => elemento.ora === i)
         const impegniOra2 = tabellaPerOre2.find(elemento => elemento.ora === i)
@@ -360,15 +327,15 @@ export function confrontaOrari(orario1: Orario, orario2: Orario): {
                     info2: []
                 }
             }
-            
+
             //4: Controllo ciascun giorno
-            for(let j = 0; j < 6 /*6 giorni di lezione a settimana*/; j++) {
+            for (let j = 0; j < 6; j++) {
                 //5: Recupero se è presente l'impegno per questo giorno
 
                 // Info 1
                 const imegno1info1 = impegniOra1.info1.find(elemento => elemento.giorno === j)
                 const imegno2info1 = impegniOra2.info1.find(elemento => elemento.giorno === j)
-                
+
                 // Info 2
                 const imegno1info2 = impegniOra1.info2.find(elemento => elemento.giorno === j)
                 const imegno2info2 = impegniOra2.info2.find(elemento => elemento.giorno === j)
@@ -402,7 +369,7 @@ export function confrontaOrari(orario1: Orario, orario2: Orario): {
                     differenzeOra.orario2.info1.push(imegno2info1.nome)
                     differenzeOra.orario2.info2.push(imegno2info2.nome)
                 } else {
-                    
+
                 }
             }
 
@@ -446,12 +413,12 @@ export function confrontaOrari(orario1: Orario, orario2: Orario): {
     } else {
         return undefined
     }
-}
+}*/
 
 //Funzioni secondarie
 
 /**
- * Permette di ottenere le informazioni presenti nel pdf
+ * Permette di ottenere le informazioni presenti nel pdf, lascia le stringhe come le trova
  * @param {Buffer} buffer 
  */
 export async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
@@ -460,7 +427,7 @@ export async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
         disableCombineTextItems: false
     }
 
-    const doc = await pdfjs.getDocument(buffer)
+    const doc = await pdfjs.getDocument(buffer).promise
 
     const numeroPagine = doc.numPages
 
@@ -512,7 +479,7 @@ export async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
                                 return false
                             }
                         })
-    
+
                         //2: altrimenti la aggiungo
                         if (!trovato) righe.push({
                             y: elemento.transform[4],
@@ -536,148 +503,246 @@ export async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
  * @param {RigaDati[]} righe le righe del pdf
  * @param {number} tipo 0 per classi, 1 per aule e 2 per prof 
  */
-export function analizzaDati(righe: RigaDati[], tipo: number, tabellaPerGiorniRichiesta: boolean = false): TabelleOrario {
-    let min: number = 0,
-        max: number = 0
-    let divisori: number[] = []
-    let tabellaPerOre: ElementoTabellaPerOre[] = []
+export function analizzaDati(righe: RigaDati[], nome: string): Orario {
+    // 1: Trovo la riga con SOLO i giorni della settimana
+    const rigaGiorni = righe.find(riga => {
+        // N.B. Questo questa parte richiede che i giorni nella tabella del pdf siano per forza quelli impostati come giorni
+        // si potrebbe modificare per renderlo più flessibile
 
-    //1: Trovo il minimo e il massimo valore x dei giorni della settimana che utilizzerò per capire in che giorno si trovano le magterie e le aule
-    righe.forEach(riga => {
-        if (Math.abs(riga.y - altezzaGiorni[tipo]) <= 5) {
-            riga.elementi.forEach((elemento, i) => {
-                if (i == 0) {
-                    min = elemento.x
-                    max = elemento.x
-                } else {
-                    if (elemento.x < min) min = elemento.x
-                    if (elemento.x > max) max = elemento.x
+        // Controllo innanzi tutto se gli elementi della riga sono uguali ai giorni della settimana
+        if (riga.elementi.length === giorni.length) {
+            // Continuo controllando quali giorni sono presenti come elementi
+            const giorniPresenti = giorni.map(giorno => {
+                return riga.elementi.find(elemento => {
+                    return elemento.testo === giorno
+                })
+            }).filter(giorno => giorno !== undefined)
+
+            if (giorniPresenti.length !== giorni.length) {
+                return false
+            }
+
+            return true
+        } else {
+            // Se non sono lo stesso numero non è sicuramente questa la linea
+            return false
+        }
+    })
+
+    // 2: Contorollo il risultato della scorsa operazione
+    if (rigaGiorni === undefined) {
+        // La riga giorni non è stata trovata la riga con i giorni all'interno del pdf, ritorno un errore
+        throw 'Riga giorni non trovata'
+    }
+
+    // 3: Trovo le righe con le etichette delle ore
+    const righeEtichetteOre = righe.map(riga => {
+        // Parto dalla riga successiva a quella dei giorni
+        if (riga.y > rigaGiorni.y) { // Questo funziona anche nel caso le righe non siano ordinate per y
+            // Controllo se la riga contiene l'etichetta di un'ora
+            const elementoEtichetta = riga.elementi.find(elemento => {
+                const etichetta = elemento.testo.replace(/ /g, '') // Elimino tutti gli spazi
+
+                return etichetteOre.includes(etichetta)
+            })
+
+            if (elementoEtichetta !== undefined) {
+                return {
+                    x: elementoEtichetta.x,
+                    y: riga.y,
+                    testo: elementoEtichetta.testo
                 }
-            })
-            return false //Per interrompere il ciclo
+            }
+        }
+        return undefined
+    }).filter(etichetta => etichetta !== undefined) as {
+        x: number;
+        y: number;
+        testo: string;
+    }[]
+
+    // 4: Controllo che il numero di etichette trovare sia maggiore o uguale del limite minimo e non superiore al numero delle etichette
+    if (righeEtichetteOre === undefined || righeEtichetteOre.length === 0) {
+        // La riga giorni non è stata trovata la riga con i giorni all'interno del pdf, ritorno un errore
+        throw Error('Etichette ore non trovate')
+    } else if (righeEtichetteOre.length < numeroMinimoEtichette || righeEtichetteOre.length > etichetteOre.length) {
+        // Altrimenti o ne sono state trovate poche o troppe
+        throw Error('Errore nella ricerca delle etichette ore, trovate ' + righeEtichetteOre.length + ' etichette')
+    }
+
+    // 3.2: Trovo il valore massimo x delle etichette
+    const maxXEtichetteOre = righeEtichetteOre.reduce((acc, elem) => {
+        if (acc < elem.x) {
+            return elem.x
+        } else {
+            return acc
+        }
+    }, 0)
+
+    // N.B. Se arriviamo a questo punto abbiamo la riga dei giorni e le righe dove si trovano le etichette delle ore
+    let min: number = 0
+    let max: number = 0
+
+    // 5: Calcolo la divisione delle colonne
+    let divisoriGiorni: number[] = []
+
+    // 5.1: Trovo il minimo e il massimo valore x dei giorni della settimana che utilizzerò per capire in che giorno si trovano le info
+    rigaGiorni.elementi.forEach((elemento, i) => {
+        if (i == 0) {
+            min = elemento.x
+            max = elemento.x
+        } else {
+            if (elemento.x < min) min = elemento.x
+            if (elemento.x > max) max = elemento.x
         }
     })
 
-    //2: Ora divido i numeri in 6 sezioni
-    let spazio = (max - min) / 5
-    for (let i = 0; i < 5; i++) {
-        divisori.push(min + spazio / 2 + spazio * i)
+    // 5.2: Ora divido i numeri per il numero di giorni
+    const spazioGiorni = (max - min) / (giorni.length - 1)
+    for (let i = 0; i <= giorni.length; i++) {
+        if (i === 0) {
+            divisoriGiorni.push(maxXEtichetteOre) // Parto dalla posizione massima delle etichette, le info non potranno essere prima di loro
+        } else {
+            divisoriGiorni.push(min - spazioGiorni / 2 + spazioGiorni * i)
+        }
     }
 
-    //3: A questo punto trovo le informazioni (prima e seconda riga) per ciascuna ora
-    altezzeLineeDati[tipo].forEach(altezzaLineaDati => {
-        tabellaPerOre.push({
-            ora: altezzaLineaDati.ora,
-            info1: dividiRiga(divisori, righe.find(riga => {
-                return Math.abs(riga.y - altezzaLineaDati.altezze[0]) <= 1;
-            })),
-            info2: dividiRiga(divisori, righe.find(riga => {
-                return Math.abs(riga.y - altezzaLineaDati.altezze[1]) <= 1;
-            }))
-        })
+    // 6: Calcolo la divisione delle righe
+    let divisoriOre: number[] = []
+
+    // 6.1: Trovo il massimo e il minimo dei valori y delle righe con le etichette (ovviamente il minimo sarà la riga con la prima ora
+    // e il massimo quella con l'ultima ora)
+    righeEtichetteOre.forEach((riga, i) => {
+        if (i == 0) {
+            min = riga.y
+            max = riga.y
+        } else {
+            if (riga.y < min) min = riga.y
+            if (riga.y > max) max = riga.y
+        }
     })
 
-    if (tabellaPerGiorniRichiesta) {
-        let tabellaPerGiorni: ElementoTabellaPerGiorni[] = []
+    // 6.2: Creo i divisori
+    // N.B. Questi divisori saranno diversi da quelli dei giorni, per come è fatta la tabella devo avere anche gli estremi esterni,
+    //      non solo i divisori interni
+    const spazioOre = (max - min) / (righeEtichetteOre.length - 1)
+    const minYOre = min - (spazioOre / 2)
+    const maxYOre = max + (spazioOre / 2)
+    for(let i = 0; i <= righeEtichetteOre.length; i++) { // Parto dall'estremo sinistro e arrivo a quello destro passando per i divisori
+        divisoriOre.push(min - (spazioOre / 2) + (spazioOre * i))
+    }
 
-        //4: Trasformo i dati della divisione per ore a una divisione per giorni
-        giorni.forEach((giorno, i) => {
-            tabellaPerGiorni.push({
-                giorno: giorni.indexOf(giorno),
-                info1: [],
-                info2: []
+    // 7: Ora trovo le righe all'interno dei divisori ore
+    let righeOre: RigaDati[][] = [] // [ora][righe]
+    for(let i = 0; i < righeEtichetteOre.length; i++) righeOre.push([])
+    //console.log('Righe ore valore iniziale', righeOre, righeOre.length)
+    righe.forEach(riga => {
+        if (minYOre < riga.y && riga.y <= maxYOre) {
+            const oraCorrente = Math.floor((riga.y - minYOre) / spazioOre)
+
+            righeOre[oraCorrente].push(riga)
+        }
+    })
+
+    // 8: Per ciascuna riga di ciascuna ora trovo le info di ciscun giorno
+    let tabella: ElementoTabella[] = righeOre.map((righeOra, i) => { // righe dell'ora i
+        const info: Info[] = []
+
+        for(let i = 0; i < divisoriGiorni.length - 1; i++) {
+            info.push({
+                giorno: i,
+                elementi: righeOra.map(riga => {
+                    const elementiGiorno = riga.elementi.filter(elemento => elemento.x > divisoriGiorni[i] && elemento.x <= divisoriGiorni[i + 1])
+                    const info = elementiGiorno.reduce((acc, elemento) => acc += elemento.testo, '').replace(/ /g, '')
+                    return info
+                }).filter(elemento => elemento !== '')
             })
-
-            tabellaPerOre.forEach(ora => {
-                let tmp = ora.info1.find(info => info.giorno == i)
-                tabellaPerGiorni[i].info1.push({
-                    nome: (tmp != undefined ? tmp.nome : ''),
-                    //nome: (ora.info1[i].nome != undefined ? ora.info1[i].nome : ''),
-                    ora: ora.ora
-                })
-
-                tmp = ora.info2.find(info => info.giorno == i)
-                tabellaPerGiorni[i].info2.push({
-                    nome: (tmp != undefined ? tmp.nome : ''),
-                    //nome: (ora.info2[i].nome != undefined ? ora.info2[i].nome : ''),
-                    ora: ora.ora
-                })
-            })
-
-            tabellaPerGiorni[i].info1 = tabellaPerGiorni[i].info1.filter(info => info.nome != '')
-            tabellaPerGiorni[i].info2 = tabellaPerGiorni[i].info2.filter(info => info.nome != '')
-        })
+        }
 
         return {
-            tabellaPerOre,
-            tabellaPerGiorni
-        }
-    } else {
-        return {
-            tabellaPerOre
-        }
-    }
-}
-
-/**
- * Permette di suddividere le rige delle materie e delle aule in base ai dati dei divisori
- * @param {number[]} divisori 
- * @param {RigaDati} riga 
- */
-function dividiRiga(divisori: number[], riga ? : RigaDati) {
-    let divisioni: InfoOre[] = []
-    giorni.forEach(giorno => {
-        divisioni.push({
-            giorno: giorni.indexOf(giorno),
-            nome: ''
-        })
+            ora: i,
+            info
+        } as ElementoTabella
     })
 
-    if (riga != undefined) {
-        //Lunedì - sabato
-        for (let i = -1; i < 5; i++) {
-            divisioni[i + 1].nome = riga.elementi.filter(elemento => {
-                return (i != -1 ? elemento.x > divisori[i] : true) && (i != 4 ? elemento.x < divisori[i + 1] : true)
-            }).map(elemento => elemento.testo.replace(/ /g, '')).join('')
-            if (divisioni[i + 1].nome == undefined) divisioni[i + 1].nome = ''
+    // 9: Recupero le altre informazioni come versione, data, ecc...
+    const testoRigaInformazioni = righe.map(riga => {
+        // Concateno tutto il contenuto della riga
+        return riga.elementi.reduce((acc, elemento) => acc += elemento.testo, '')
+    }).find(testoRiga => {
+        // Controllo se contine gli elementi
+        return testoRiga.match(/Aggiornamento/)
+    })
+
+    if (testoRigaInformazioni) {
+        // Recupero le informazioni dal testo
+        const match = testoRigaInformazioni.match(/Aggiornamento.+(\d\d)[\/\.](\d\d)[\/\.](\d+).+v.+(\d+).+(\d+).+Valido.+dal.+(\d\d)[\/\.](\d\d)[\/\.](\d+)/)
+
+        if (match) {
+            // Se le informazioni sono presenti le salvo
+            const dataAggiornamento = new Date(
+                (Number(match[3]) < 2000 ? Number(match[3]) + 2000 : Number(match[3])),
+                Number(match[2]) - 1,
+                Number(match[1])
+            )
+
+            const dataValidita = new Date(
+                (Number(match[8]) < 2000 ? Number(match[8]) + 2000 : Number(match[8])),
+                Number(match[7]) - 1,
+                Number(match[6])
+            )
+
+            const versione = Number(match[4]) +  Number(match[5])/100
+
+            return {
+                nome,
+                tabella,
+                dataAggiornamento,
+                dataValidita,
+                versione
+            }
         }
     }
 
-    //TODO: rimuovere tutte le divisioni dove il nome è nullo
-
-    return divisioni.filter(divisione => divisione.nome != '')
+    return {
+        nome,
+        tabella
+    }
 }
 
 /**
  * Questa funzione permette di mostrare l'orario in un fomato comprensibile nella console
  * @param {*} tabellaPerOre l'orario diviso per ore
  */
-export function mostraTabella(tabellaPerOre: ElementoTabellaPerOre[], nome?: string) {
+export function mostraOrario(orario: Orario) {
     //once the table has been parse comletely we can show it in the console nicely
 
     let tabellaPerConsole: string[][] = []
-    
-    tabellaPerOre.forEach(ora => {
+
+    orario.tabella.forEach(ora => {
         tabellaPerConsole.push(giorni.map((giorno, i) => {
-            let info1 = ora.info1.find(info => info.giorno == i);
-            let info2 = ora.info2.find(info => info.giorno == i);
+            let info: string[] = []
+            if (ora.info !== undefined) {
+                const infoGiorno = ora.info.find(info => info.giorno == i)
+                if(infoGiorno !== undefined && infoGiorno.elementi !== undefined) info = infoGiorno.elementi
+            }
             let messaggio = '';
-            if (info1 !== undefined) {
-                messaggio += info1.nome;
-            }		
-            if (info1 !== undefined && info2 !== undefined) {		
-                messaggio += '-';		
-            }		
-            if (info2 !== undefined) {		
-                messaggio += info2.nome;		
-            }		
-            if (info1 === undefined && info2 === undefined) {		
-                messaggio = '*';		
-            }		
-            return messaggio;		
+            if (info.length === 0) {
+                messaggio = '*'
+            } else {
+                messaggio = info.reduce((acc, inf, i) => {
+                    acc += inf
+                    if (i < info.length - 1) acc += '-'
+                    return acc
+                }, '')
+            }
+            return messaggio;
         }));
     });
-    
-    console.log(nome);
+
+    console.log(orario.nome);
+    if (orario.versione !== undefined) console.log('Versione: ', orario.versione)
+    if (orario.dataAggiornamento !== undefined) console.log('Data aggiornamento: ', orario.dataAggiornamento.toDateString())
+    if (orario.dataValidita !== undefined) console.log('Data validità: ', orario.dataValidita.toDateString())
     console.table(tabellaPerConsole)
 }

@@ -13,20 +13,38 @@ async function sincronizzaAule() {
 sincronizzaAule().then(dati => console.log('end')) // JSON.stringify(dati)))*/
 
 import { readFileSync } from 'fs'
-import { estraiInformazioni, analizzaDati, mostraTabella, ottieniOrariProfessori, ottieniOrariAule } from "../src";
+import { estraiInformazioni, analizzaDati, mostraOrario, ottieniOrariAule, ottieniOrariClassi, ottieniOrariProfessori } from "../src";
 
 
-let dataBuffer = readFileSync('examples/test.pdf');
+let dataBuffer = readFileSync('examples/4EA.pdf');
 
+estraiInformazioni(dataBuffer).then(righeDati => {
+    //console.log(righeDati.map(elemento => elemento.elementi))
 
-/*estraiInformazioni(dataBuffer).then(righeDati => {
-    console.log(righeDati)
+    const orario = analizzaDati(righeDati, 'Questo è un test')
 
-    const tab = analizzaDati(righeDati, 2)
+    //console.log(tab)
 
-    mostraTabella(tab.tabellaPerOre)
-})*/
+    mostraOrario(orario)
 
-ottieniOrariAule('2020', true, true).then(() =>{
-    console.log('fine')
+    console.log(JSON.stringify(orario))
+    console.log(JSON.stringify(orario).length)
 })
+
+/*console.time('Aule')
+ottieniOrariAule('2020').then((risultato) =>{
+    risultato.orari.forEach(orario => mostraOrario(orario))
+    console.timeEnd('Aule')
+}).catch(console.log)*/
+
+/*console.time('Classi')
+ottieniOrariClassi('2020').then((risultato) =>{
+    risultato.orari.forEach(orario => mostraOrario(orario))
+    console.timeEnd('Classi')
+}).catch(console.log)*/
+
+/*console.time('Prof')
+ottieniOrariProfessori().then((risultato) =>{
+    risultato.orari.forEach(orario => mostraOrario(orario))
+    console.timeEnd('Prof')
+}).catch(console.log)*/
