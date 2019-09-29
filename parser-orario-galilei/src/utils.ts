@@ -1,3 +1,5 @@
+import { inflate } from "zlib"
+
 /* Spiegazione:
 In questo file sono presenti le insterfacce usate dalla libreria, assieme ad alcune costanti
 */
@@ -5,72 +7,20 @@ In questo file sono presenti le insterfacce usate dalla libreria, assieme ad alc
 // Costanti
 
 /**
- * [classi, aule, prof]
- */
-export const altezzaGiorni = [117, 122, 136];
-
-/**
- * Contiene i parametri a cui corrispondono i dati una volta elaborati dalla libreria pdfparser
- */
-export const altezzeLineeDati = [
-    [
-        {
-            ora: 0,
-            altezze: [130, 144]
-        }, {
-            ora: 1,
-            altezze: [157, 171]
-        }, {
-            ora: 2,
-            altezze: [184, 198]
-        }, {
-            ora: 3,
-            altezze: [211, 225]
-        }, {
-            ora: 4,
-            altezze: [238, 252]
-        }
-    ], [
-        {
-            ora: 0,
-            altezze: [135, 149]
-        }, {
-            ora: 1,
-            altezze: [162, 176]
-        }, {
-            ora: 2,
-            altezze: [189, 203]
-        }, {
-            ora: 3,
-            altezze: [216, 230]
-        }, {
-            ora: 4,
-            altezze: [243, 257]
-        }
-    ], [
-        {
-            ora: 0,
-            altezze: [149, 163]
-        }, {
-            ora: 1,
-            altezze: [176, 190]
-        }, {
-            ora: 2,
-            altezze: [203, 217]
-        }, {
-            ora: 3,
-            altezze: [230, 244]
-        }, {
-            ora: 4,
-            altezze: [257, 271]
-        }
-    ]
-]
-
-/**
  * Lista dei giorni della settimana
  */
 export const giorni = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato']
+
+/**
+ * Etichette delle ore
+ */
+export const etichetteOre = ['1', '2', '3', '4', '5', '6', '1p', '2p']
+
+/**
+ * Numero etichette minime
+ * Il numero di etichette massime si può ricavare da etichetteOre
+ */
+export const numeroMinimoEtichette = 5
 
 /**
  * Lettere dell'alfabeto
@@ -107,34 +57,25 @@ export interface RigaDati {
     }[]
 }
 
-export interface ElementoTabellaPerOre {
+export interface ElementoTabella {
     ora: number
-    info1: InfoOre[]
-    info2: InfoOre[]
+    info: Info[]
 }
 
-export interface ElementoTabellaPerGiorni {
+export interface Info {
     giorno: number
-    info1: InfoGiorni[]
-    info2: InfoGiorni[]
-}
-
-export interface InfoOre {
-    giorno: number
-    nome: string
-}
-
-export interface InfoGiorni {
-    ora: number
-    nome: string
-}
-
-export interface TabelleOrario {
-    tabellaPerOre: ElementoTabellaPerOre[];
-    tabellaPerGiorni?: ElementoTabellaPerGiorni[];
+    elementi: string[]
 }
 
 export interface Orario {
-    nome: string,
-    tabelleOrario: TabelleOrario
+    nome: string
+    tabella: ElementoTabella[]
+    dataAggiornamento?: Date
+    dataValidita?: Date
+    versione?: number
+}
+
+export interface RisultatoConfronto {
+    ora: number
+    giorno: number
 }
