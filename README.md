@@ -28,7 +28,7 @@ Visitate la [pagina del modulo](https://www.npmjs.com/package/parser-orario-gali
 
 Il sito web [orario-galilei.web.app](https://orario-galilei.web.app/) mette a disposizione gli orari in modo semplice e veloce.
 
-In più il sito web è una [PWA](https://developers.google.com/web/progressive-web-apps/)! È quindi possibile "installare" il direttamente dal browser ed utilizzarlo come un'app nativa.
+In più il sito web è una [PWA](https://developers.google.com/web/progressive-web-apps/)! È quindi possibile "installare" il sito direttamente dal browser ed utilizzarlo come un'app nativa.
 
 ## Progetto Firebase
 
