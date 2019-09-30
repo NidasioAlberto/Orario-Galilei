@@ -9,5 +9,8 @@ service cloud.firestore {
     match /Professori/{aula} {
       allow read;
     }
+    match /Messaggi/{messaggio} {
+      allow write;
+    }
   }
 }
