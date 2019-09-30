@@ -54,4 +54,10 @@
     <div class="contenitore-versione-app">
         <div class="versione-app">Versione: {{versione}}</div>
     </div>
+
+    <ng-container *ngIf="swUpdate.isEnabled">
+        <ng-container *ngIf="swUpdate.available | async as available">
+            <button mat-raised-button (click)="aggiornaPagina()" color="accent" class="bottone-aggiornamento">Aggiorna alla nuova versione!</button>
+        </ng-container>
+    </ng-container>
 </div>

@@ -1,6 +1,5 @@
-import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { LocalStorage } from '@ngx-pwa/local-storage';
 import { LocalStorageService } from './core/local-storage.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogInformazioniComponent } from './dialog-informazioni/dialog-informazioni.component';

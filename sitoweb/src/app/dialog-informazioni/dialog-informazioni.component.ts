@@ -3,6 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Aggiornamento } from '../utils/aggiornamento.model';
 import { FirestoreService } from '../core/firestore.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { SwUpdate } from '@angular/service-worker';
 
 @Component({
   selector: 'app-dialog-informazioni',
@@ -47,7 +48,8 @@ export class DialogInformazioniComponent implements OnInit {
     public dialogRef: MatDialogRef<DialogInformazioniComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private firestore: FirestoreService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    public swUpdate: SwUpdate
   ) {}
 
   ngOnInit() {
@@ -72,5 +74,9 @@ export class DialogInformazioniComponent implements OnInit {
         console.log(err)
       })
     }
+  }
+
+  aggiornaPagina() {
+    window.location.reload()
   }
 }
