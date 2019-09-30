@@ -4,6 +4,8 @@ import { LocalStorage } from '@ngx-pwa/local-storage';
 import { LocalStorageService } from './core/local-storage.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogInformazioniComponent } from './dialog-informazioni/dialog-informazioni.component';
+import { SwUpdate } from '@angular/service-worker';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +18,9 @@ export class AppComponent implements OnInit {
   constructor(
     private router: Router,
     private localStorage: LocalStorageService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private swUpdate: SwUpdate,
+    private snakBar: MatSnackBar
   ) { }
 
   ngOnInit() {
@@ -30,6 +34,16 @@ export class AppComponent implements OnInit {
         this.localStorage.impostaPaginaVisualizzata()
       }
     })
+
+    // Notifico l'utente quando una nuova versione dell'app è disponibile
+    if (this.swUpdate.isEnabled) {
+      this.swUpdate.available.subscribe((event) => {
+        this.snakBar.open('Nuova versione disponibile', 'Aggiorna', { duration: 3000 }).onAction().subscribe(() => {
+          // L'utente vuole aggiornare la pagina, la ricarico
+          window.location.reload()
+        })
+      })
+    }
   }
 
   aggiornaValoreRicerca(valoreRicerca: string) {
