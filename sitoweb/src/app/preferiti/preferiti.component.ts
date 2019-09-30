@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Orario } from '../utils/orario.model';
+import { Observable, from } from 'rxjs';
+import { ElementoIndice } from '../utils/indice.model';
 import { LocalStorageService } from '../core/local-storage.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-preferiti',
@@ -9,8 +10,7 @@ import { LocalStorageService } from '../core/local-storage.service';
   styleUrls: ['./preferiti.component.scss']
 })
 export class PreferitiComponent implements OnInit {
-
-  preferiti: Observable<Orario[]>
+  indicePreferiti: Observable<ElementoIndice[]>
 
   constructor(
     private localStorage: LocalStorageService
@@ -18,7 +18,13 @@ export class PreferitiComponent implements OnInit {
 
   ngOnInit() {
     // Recupero i preferiti
-    this.preferiti = this.localStorage.ottieniOrariPreferiti()
-    // TODO: recuperare appena possibile i dati online aggiornati!
+    this.indicePreferiti = from(this.localStorage.ottieniOrariPreferiti().then(preferiti => {
+      return preferiti.map(preferito => {
+        return {
+          nome: preferito.nome,
+          collection: preferito.collection
+        } as ElementoIndice
+      })
+    }))
   }
 }

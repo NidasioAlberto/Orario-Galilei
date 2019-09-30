@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { combineLatest, Observable } from 'rxjs';
-import { map, take, startWith } from 'rxjs/operators';
+import { map, take, startWith, tap } from 'rxjs/operators';
 import { DocumentoIndice, ElementoIndice } from '../utils/indice.model';
 import { Orario, ProssimoImpegno, Info } from '../utils/orario.model';
 import { LocalStorageService } from './local-storage.service';
-import { firestore } from 'firebase';
 
 @Injectable({
   providedIn: 'root'
@@ -73,7 +72,7 @@ export class FirestoreService {
    */
   ottieniOrario(indiceOrario: ElementoIndice): Observable<Orario> {
     return this.db.collection(indiceOrario.collection).doc<Orario>(indiceOrario.nome).snapshotChanges().pipe(
-      map(snapshot => {
+      map(snapshot => { // Converto alcuni valori
         let dati = snapshot.payload.data()
         if (dati !== undefined) {
           dati.collection = snapshot.payload.ref.parent.id
@@ -103,6 +102,24 @@ export class FirestoreService {
         } else {
           return undefined
         }
+      }),
+      tap(orario => { // Provo ad aggiornare i preferiti
+        // Controllo se l'orario è nei preferiti, se si lo aggiorno
+        this.localStorage.ottieniOrariPreferiti().then((preferiti: Orario[]) => {
+          // Sostituisco l'orario con quello nuovo se presente
+          if (preferiti.find(pref => pref.nome === orario.nome)) {
+            return this.localStorage.salvaPreferiti(preferiti.map(preferito => {
+              if (preferito.nome === orario.nome) {
+                return orario
+              } else {
+                return preferito
+              }
+            }))
+          } else {
+            return false
+          }
+        })
+        //TODO: Controllare se è cambiato?
       })
     )
   }
@@ -254,24 +271,18 @@ export class FirestoreService {
    */
   async inviaMessaggio(contenuto: string, mittente?: string) {
     if (contenuto !== undefined) {
-      const preferiti = await this.localStorage.ottieniOrariPreferiti().pipe(take(1)).toPromise()
+      const preferiti = await this.localStorage.ottieniOrariPreferiti()
 
       const messaggio = {
         contenuto,
         mittente,
-        preferiti: [] as string[]
+        preferiti: preferiti.map(preferito => preferito.nome)
       }
 
       if (mittente === undefined || mittente === '') {
         delete messaggio.mittente
       }
-      if (preferiti) {
-        if (preferiti.length === 0) {
-          delete messaggio.preferiti
-        } else {
-          messaggio.preferiti = preferiti.map(preferito => preferito.nome)
-        }
-      } else {
+      if (preferiti.length === 0) {
         delete messaggio.preferiti
       }
 

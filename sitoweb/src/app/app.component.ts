@@ -37,12 +37,19 @@ export class AppComponent implements OnInit {
     // Notifico l'utente quando una nuova versione dell'app è disponibile
     if (this.swUpdate.isEnabled) {
       this.swUpdate.available.subscribe((event) => {
-        this.snakBar.open('Nuova versione disponibile', 'Aggiorna', { duration: 3000 }).onAction().subscribe(() => {
+        this.snakBar.open('Nuova versione disponibile', 'Aggiorna', { duration: 5000 }).onAction().subscribe(() => {
           // L'utente vuole aggiornare la pagina, la ricarico
           window.location.reload()
         })
       })
     }
+
+    // Provo ad aggiornare i preferiti all'ultima verisone disponibile
+    /*this.localStorage.aggiornaPreferiti().then((nOrariAggiornati) => {
+      console.log('Aggiornati', nOrariAggiornati, 'orari')
+      if (nOrariAggiornati == 1) this.snakBar.open('Aggiornato un orario preferito', undefined, { duration: 2000 })
+      if (nOrariAggiornati > 1) this.snakBar.open('Aggiornati ' + nOrariAggiornati + ' orari preferiti', undefined, { duration: 2000 })
+    })*/
   }
 
   aggiornaValoreRicerca(valoreRicerca: string) {

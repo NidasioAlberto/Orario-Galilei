@@ -20,6 +20,7 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
   prossimiImpegni: Observable<string[]>
 
   observableIndiceOrario = new BehaviorSubject<ElementoIndice>(this.indiceOrario);
+  observableOrarioOffline = new BehaviorSubject<Orario>(this.orarioOffline);
 
   tipo: string
 
@@ -32,7 +33,10 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
   ngOnInit() {
     // Controllo i dati ricevuti
     if (this.indiceOrario !== undefined) {
-      this.recuperaOrario()
+      // Recupero il documento dell'orario
+      this.orario = this.observableIndiceOrario.pipe(
+        switchMap(indiceOrario => this.firestore.ottieniOrario(indiceOrario))
+      )
     } else if (this.orarioOffline !== undefined) {
       this.orario = of(this.orarioOffline)
 
@@ -79,13 +83,6 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     this.observableIndiceOrario.next(this.indiceOrario)
-  }
-
-  recuperaOrario() {
-    // Recupero il documento dell'orario
-    this.orario = this.observableIndiceOrario.pipe(
-      switchMap(indiceOrario => this.firestore.ottieniOrario(indiceOrario))
-    )
   }
 
   apriOrario() {

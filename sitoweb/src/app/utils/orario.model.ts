@@ -32,3 +32,8 @@ export interface ProssimoImpegno {
     giornoLable: string
     elementi: string[]
 }
+
+export interface RisultatoConfronto {
+    ora: number
+    giorno: number
+}

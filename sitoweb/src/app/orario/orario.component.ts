@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { map, mergeMap, take, tap, filter } from 'rxjs/operators';
-import { Observable, combineLatest, concat } from 'rxjs';
+import { Observable, combineLatest, concat, from } from 'rxjs';
 import { Orario, ProssimoImpegno } from '../utils/orario.model';
 import { FirestoreService } from '../core/firestore.service';
 import { TempoService } from '../core/tempo.service';
@@ -31,9 +31,9 @@ export class OrarioComponent implements OnInit {
   ngOnInit() {
     // Recupero l'orario prima dal database offline e poi da firestore
     this.orario = this.router.queryParams.pipe(
-      mergeMap((params, index) => {
+      mergeMap(params => {
         return concat(
-          this.localStorage.ottieniOrarioDaiPreferiti(params.document).pipe(
+          from(this.localStorage.ottieniOrarioDaiPreferiti(params.document)).pipe(
             tap(orario => {
               // Se lorario che ottengo dai preferiti è valido imposto questo orario come preferito
               // (così mostro lo stato del bottone in modo appropriato)
@@ -42,7 +42,7 @@ export class OrarioComponent implements OnInit {
               }
             })
           ),
-          this.firestore.ottieniOrario({collection: params.collection, nome: params.document})
+          this.firestore.ottieniOrario({ collection: params.collection, nome: params.document })
         )
       }),
       filter(orario => orario !== undefined)
@@ -63,12 +63,6 @@ export class OrarioComponent implements OnInit {
         (impegno.elementi[1] !== undefined ? impegno.elementi[1] : '')
       ))
     )
-
-    this.orario.subscribe(datiOrario => {
-      console.log('Data aggiornamento', datiOrario.dataAggiornamento)
-      console.log('Ultimo aggiornamento', datiOrario.ultimoAggiornamento)
-      console.log(new Date())
-    })
   }
 
   async aggiungiAiPreferiti() {
