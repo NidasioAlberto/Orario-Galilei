@@ -23,6 +23,7 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+
     // Controllo se l'utente è per la prima volta nell'app
     this.localStorage.controllaPaginaVisualizzata().then(paginaVisualizzata => {
       if (!paginaVisualizzata) {
@@ -43,13 +44,6 @@ export class AppComponent implements OnInit {
         })
       })
     }
-
-    // Provo ad aggiornare i preferiti all'ultima verisone disponibile
-    /*this.localStorage.aggiornaPreferiti().then((nOrariAggiornati) => {
-      console.log('Aggiornati', nOrariAggiornati, 'orari')
-      if (nOrariAggiornati == 1) this.snakBar.open('Aggiornato un orario preferito', undefined, { duration: 2000 })
-      if (nOrariAggiornati > 1) this.snakBar.open('Aggiornati ' + nOrariAggiornati + ' orari preferiti', undefined, { duration: 2000 })
-    })*/
   }
 
   aggiornaValoreRicerca(valoreRicerca: string) {

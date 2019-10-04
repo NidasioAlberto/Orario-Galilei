@@ -44,6 +44,8 @@ export class DialogInformazioniComponent implements OnInit {
   messaggio: string
   mittente: string
 
+  updateAvailable = false
+
   constructor(
     public dialogRef: MatDialogRef<DialogInformazioniComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -54,6 +56,13 @@ export class DialogInformazioniComponent implements OnInit {
 
   ngOnInit() {
     this.hideToggle = window.innerWidth < 600
+
+    // Notifico l'utente quando una nuova versione dell'app è disponibile
+    if (this.swUpdate.isEnabled) {
+      this.swUpdate.available.subscribe((event) => {
+        this.updateAvailable = true
+      })
+    }
   }
 
   @HostListener('window:resize')

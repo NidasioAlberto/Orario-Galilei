@@ -186,7 +186,7 @@ export class FirestoreService {
         const datiGiornoCorrente = orario.tabella.map(ora => {
           const info: Info | undefined = ora.info.find(info => info.giorno === giornoControllo)
 
-          if (info !== undefined) {
+          if (info !== undefined) { // Controllo che sia diverso da undefined perchè assumo che se le info sono definite allora contengono anche dei dati
             return {
               ora: ora.ora,
               elementi: info.elementi

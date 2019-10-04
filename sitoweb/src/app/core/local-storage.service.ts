@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
 import { LocalStorage } from '@ngx-pwa/local-storage';
-import { map, take, filter } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { Orario, RisultatoConfronto } from '../utils/orario.model';
 import { Observable } from 'rxjs';
-import { AngularFirestore } from '@angular/fire/firestore';
-import { ElementoIndice } from '../utils/indice.model';
-import { FirestoreService } from './firestore.service';
 
 @Injectable({
   providedIn: 'root'
@@ -33,65 +30,6 @@ export class LocalStorageService {
   async impostaPaginaVisualizzata(valore: boolean = true) {
     return this.localStorage.setItem('paginaVisualizzata', valore).toPromise()
   }
-
-  /**
-   * Contorolla se ci sono aggiornamenti negli orario salvati come preferiti
-   */
-  /*async aggiornaPreferiti() {
-    // Recupero i preferiti
-    let preferiti = await (this.localStorage.getItem('preferiti') as Observable<Orario[]>).pipe(take(1)).toPromise()
-
-    // Controllo se gli orari preferiti sono definiti
-    if (preferiti && preferiti.length > 0) {
-      console.log('Provo ad aggiornare')
-
-      // Recupero ciascun orario dal database e lo aggiorno
-      const preferitiAggiornati = await this.ottieniPreferitiAggiornati(preferiti)
-  
-      // Per ogni preferito confronto il nuovo corrispettivo
-      const orariDaAggiornare = preferiti.map(preferito => {
-        const corrispettivoAggiornato = preferitiAggiornati.find(pref => pref.nome === preferito.nome)
-  
-        if (corrispettivoAggiornato !== undefined) {
-          // Confronto gli orari
-          const risultatoConfronto = this.confrontaOrari(preferito, corrispettivoAggiornato)
-  
-          console.log('Risultato confronto', risultatoConfronto)
-  
-          if (risultatoConfronto !== undefined) {
-            return corrispettivoAggiornato
-          }
-        }
-  
-        return undefined
-      }).filter(orario => orario !== undefined)
-  
-      // Se gli orari sono diversi sovrascrivo quello vecchio con quello nuovo
-      // e' più efficiente salvarli tutti, tanto sono stati già letti dal database
-      console.log('Preferiti', await this.localStorage.setItem('preferiti', preferitiAggiornati).toPromise())
-  
-      return orariDaAggiornare.length // Ritorno il numero di orari effettivamente cambiati
-    } else {
-      return 0
-    }
-  }*/
-
-  /**
-   * Permette di recuperare gli orari da firestore
-   * @param preferiti 
-   */
-  /*ottieniPreferitiAggiornati(preferiti: Orario[]) {
-    return Promise.all(preferiti.map(preferito => {
-      if (preferito.collection !== undefined && preferito.nome !== undefined) {
-        return this.firebase.ottieniOrario({
-          nome: preferito.nome,
-          collection: preferito.collection
-        }).pipe(take(1)).toPromise()
-      } else {
-        return undefined
-      }
-    }).filter(preferito => preferito !== undefined))
-  }*/
 
   /**
    * Questa funzione permette di confrontare due orari, nel caso siano identici ritorna undefined
