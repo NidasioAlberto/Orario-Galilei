@@ -11,7 +11,8 @@ export const environment = {
     projectId: "orario-galilei",
     storageBucket: "orario-galilei.appspot.com",
     messagingSenderId: "127857059419",
-    appId: "1:127857059419:web:c63252e82c8bf1d3"
+    appId: "1:127857059419:web:c63252e82c8bf1d3",
+    measurementId: "G-DQXJK525C5"
   }
 };
 

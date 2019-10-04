@@ -12,7 +12,7 @@ import { SwUpdate } from '@angular/service-worker';
 })
 export class DialogInformazioniComponent implements OnInit {
 
-  versione = '0.5'
+  versione = '0.6'
   aggiornamentiApp: Aggiornamento[] = [
     {
       dataPubblicazione: '29/9/19',
