@@ -16,7 +16,7 @@
   "dependencies": {
     "firebase-admin": "^8.6.0",
     "firebase-functions": "^3.2.0",
-    "parser-orario-galilei": "^2.3.6"
+    "parser-orario-galilei": "^3.0.2"
   },
   "devDependencies": {
     "tslint": "^5.20.0",

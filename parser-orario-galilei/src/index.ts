@@ -636,7 +636,7 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
                 Number(match[6])
             )
 
-            const versione = Number(match[4]) + Number(match[5]) / 100
+            const versione = Number(match[4]) + Number(match[5]) / ((Math.floor(Math.log10(Number(match[5]))) + 1) * 10)
 
             return {
                 nome,

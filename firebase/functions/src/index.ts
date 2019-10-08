@@ -21,19 +21,20 @@ export const sincronizzaClassi = functions.runWith({
 
             console.log('Anno: ' + anno)
     
-            // Recupero gli orari delle classi
-            const orariClassi = await ottieniOrariClassi(anno, true)
+            const orariClassi = await ottieniOrariClassi(anno)
 
             console.log('Orari recuperati')
     
             // Aggiungo tutti gli orari nel database
             let risultati = await Promise.all(orariClassi.orari.map(async classe => {
                 // Recupero l'orario attualmente salvato nel database per confrontarlo con quello appena recuperato
-                const orarioSalvato = (await firestore.collection('Classi').doc(classe.nome).get()).data() as Orario | undefined
+                const docRef = firestore.collection('Classi').doc(classe.nome)
+                const doc = await docRef.get()
+                const orarioSalvato = doc.data() as Orario | undefined
 
                 // Confronto i due orari
                 let uguali = false // True se gli orari sono uguali
-                if (orarioSalvato !== undefined) {
+                if (orarioSalvato !== undefined && orarioSalvato.tabella !== undefined) {
                     uguali = confrontaOrari(orarioSalvato, classe) === undefined
                 }
 
@@ -43,10 +44,17 @@ export const sincronizzaClassi = functions.runWith({
                 } // Altrimenti non c'è niente da salvare, mi risparmi un'operazione di scrittura
                 
                 // E salvo quello nuovo
-                await firestore.collection('Classi').doc(classe.nome).set({
-                    ...classe,
-                    ultimoAggiornamento: admin.firestore.Timestamp.now()
-                })
+                if (doc.exists) {
+                    await docRef.update({
+                        ...classe,
+                        ultimoAggiornamento: admin.firestore.Timestamp.now()
+                    })
+                } else {
+                    await docRef.set({
+                        ...classe,
+                        ultimoAggiornamento: admin.firestore.Timestamp.now()
+                    })
+                }
                 
                 return {
                     classe: classe.nome,
@@ -89,18 +97,20 @@ export const sincronizzaAule = functions.runWith({
 
             console.log('Anno: ' + anno)
 
-            const orariAule = await ottieniOrariAule(anno, true)
+            const orariAule = await ottieniOrariAule(anno)
 
             console.log('Orari recuperati')
 
             // Aggiungo tutti gli orari nel database
             let risultati = await Promise.all(orariAule.orari.map(async aula => {
                 // Recupero l'orario attualmente salvato nel database per confrontarlo con quello appena recuperato
-                const orarioSalvato = (await firestore.collection('Classi').doc(aula.nome).get()).data() as Orario | undefined
+                const docRef = firestore.collection('Aule').doc(aula.nome)
+                const doc = await docRef.get()
+                const orarioSalvato = doc.data() as Orario | undefined
 
                 // Confronto i due orari
                 let uguali = false // True se gli orari sono uguali
-                if (orarioSalvato !== undefined) {
+                if (orarioSalvato !== undefined && orarioSalvato.tabella !== undefined) {
                     uguali = confrontaOrari(orarioSalvato, aula) === undefined
                 }
 
@@ -110,10 +120,17 @@ export const sincronizzaAule = functions.runWith({
                 } // Altrimenti non c'è niente da salvare, mi risparmi un'operazione di scrittura
 
                 // E salvo quello nuovo
-                await firestore.collection('Aule').doc(aula.nome).set({
-                    ...aula,
-                    ultimoAggiornamento: admin.firestore.Timestamp.now()
-                })
+                if (doc.exists) {
+                    await docRef.update({
+                        ...aula,
+                        ultimoAggiornamento: admin.firestore.Timestamp.now()
+                    })
+                } else {
+                    await docRef.set({
+                        ...aula,
+                        ultimoAggiornamento: admin.firestore.Timestamp.now()
+                    })
+                }
                 
                 return {
                     classe: aula.nome,
@@ -147,17 +164,20 @@ export const sincronizzaProfessori = functions.runWith({
     try {
         console.time('Professori')
 
-        const orariProfessori = await ottieniOrariProfessori(true)
+        const orariProfessori = await ottieniOrariProfessori()
 
         console.log('Orari recuperati')
 
+        // Aggiungo tutti gli orari nel database
         let risultati = await Promise.all(orariProfessori.orari.map(async professore => {
             // Recupero l'orario attualmente salvato nel database per confrontarlo con quello appena recuperato
-            const orarioSalvato = (await firestore.collection('Professori').doc(professore.nome).get()).data() as Orario | undefined
+            const docRef = firestore.collection('Professori').doc(professore.nome)
+            const doc = await docRef.get()
+            const orarioSalvato = doc.data() as Orario | undefined
 
             // Confronto i due orari
             let uguali = false // True se gli orari sono uguali
-            if (orarioSalvato !== undefined) {
+            if (orarioSalvato !== undefined && orarioSalvato.tabella !== undefined) {
                 uguali = confrontaOrari(orarioSalvato, professore) === undefined
             }
 
@@ -167,10 +187,17 @@ export const sincronizzaProfessori = functions.runWith({
             } // Altrimenti non c'è niente da salvare, mi risparmi un'operazione di scrittura
 
             // E salvo quello nuovo
-            await firestore.collection('Professori').doc(professore.nome).set({
-                ...professore,
-                ultimoAggiornamento: admin.firestore.Timestamp.now()
-            })
+            if (doc.exists) {
+                await docRef.update({
+                    ...professore,
+                    ultimoAggiornamento: admin.firestore.Timestamp.now()
+                })
+            } else {
+                await docRef.set({
+                    ...professore,
+                    ultimoAggiornamento: admin.firestore.Timestamp.now()
+                })
+            }
             
             return {
                 classe: professore.nome,
@@ -188,7 +215,7 @@ export const sincronizzaProfessori = functions.runWith({
             ultimoAggiornamento: admin.firestore.Timestamp.now()                
         })
             
-        console.log('Aggiornati ' + orariProfessori.lista.length + ' professorij nel database con successo')
+        console.log('Aggiornati ' + orariProfessori.lista.length + ' professori nel database con successo')
     } catch(err) {
         throw err
     }

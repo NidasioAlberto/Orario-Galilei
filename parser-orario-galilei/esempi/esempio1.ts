@@ -6,15 +6,16 @@ ottieniOrariAule('2020').then((risultato) =>{
     console.timeEnd('Aule')
 }).catch(console.log)*/
 
-/*console.time('Classi')
+console.time('Classi')
 ottieniOrariClassi('2020').then((risultato) =>{
     risultato.orari.forEach(orario => mostraOrario(orario))
+    console.table(risultato.lista)
     console.timeEnd('Classi')
-}).catch(console.log)*/
+}).catch(console.log)
 
-console.time('Prof')
+/*console.time('Prof')
 ottieniOrariProfessori().then((risultato) =>{
-    //risultato.orari.forEach(orario => mostraOrario(orario))
+    risultato.orari.forEach(orario => mostraOrario(orario))
     console.table(risultato.lista)
     console.timeEnd('Prof')
-}).catch(console.log)
+}).catch(console.log)*/
