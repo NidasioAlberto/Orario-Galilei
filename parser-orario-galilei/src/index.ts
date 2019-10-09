@@ -480,6 +480,7 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
     }
 
     // 3: Trovo le righe con le etichette delle ore
+    let etichetteOreDaTrovare = [...etichetteOre]
     const righeEtichetteOre = righe.map(riga => {
         // Parto dalla riga successiva a quella dei giorni
         if (riga.y > rigaGiorni.y) { // Questo funziona anche nel caso le righe non siano ordinate per y
@@ -487,10 +488,13 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
             const elementoEtichetta = riga.elementi.find(elemento => {
                 const etichetta = elemento.testo.replace(/ /g, '') // Elimino tutti gli spazi
 
-                return etichetteOre.includes(etichetta)
+                return etichetteOreDaTrovare.includes(etichetta)
             })
 
             if (elementoEtichetta !== undefined) {
+                // Rimuovo l'etichetta da quelle ancora da trovare
+                etichetteOreDaTrovare.splice(etichetteOreDaTrovare.indexOf(elementoEtichetta.testo.replace(/ /g, '')), 1)
+
                 return {
                     x: elementoEtichetta.x,
                     y: riga.y,
@@ -504,6 +508,8 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
         y: number;
         testo: string;
     }[]
+
+    console.log(righeEtichetteOre)
 
     // 4: Controllo che il numero di etichette trovare sia maggiore o uguale del limite minimo e non superiore al numero delle etichette
     if (righeEtichetteOre === undefined || righeEtichetteOre.length === 0) {
