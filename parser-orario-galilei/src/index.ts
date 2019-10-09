@@ -509,8 +509,6 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
         testo: string;
     }[]
 
-    console.log(righeEtichetteOre)
-
     // 4: Controllo che il numero di etichette trovare sia maggiore o uguale del limite minimo e non superiore al numero delle etichette
     if (righeEtichetteOre === undefined || righeEtichetteOre.length === 0) {
         // La riga giorni non è stata trovata la riga con i giorni all'interno del pdf, ritorno un errore

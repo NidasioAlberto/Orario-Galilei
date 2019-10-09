@@ -1,6 +1,6 @@
 {
   "name": "parser-orario-galilei",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Questa libreria permette di ottenere gli orari delle classi, aule e professori del Galilei di Crema",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
