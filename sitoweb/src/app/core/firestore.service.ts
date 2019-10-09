@@ -276,7 +276,8 @@ export class FirestoreService {
       const messaggio = {
         contenuto,
         mittente,
-        preferiti: preferiti.map(preferito => preferito.nome)
+        preferiti: preferiti.map(preferito => preferito.nome),
+        data: new Date()
       }
 
       if (mittente === undefined || mittente === '') {
