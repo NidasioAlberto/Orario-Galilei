@@ -5,8 +5,11 @@ import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { ServiceWorkerModule } from '@angular/service-worker'
 import { environment } from '../environments/environment'
+
 import { AngularFireModule } from '@angular/fire'
 import { AngularFirestoreModule } from '@angular/fire/firestore'
+import { AngularFirePerformanceModule } from '@angular/fire/performance'
+
 import { RicercaComponent } from './ricerca/ricerca.component'
 import { ScrollingModule } from '@angular/cdk/scrolling'
 import { OrarioComponent } from './orario/orario.component'
@@ -48,6 +51,7 @@ import { DialogInformazioniComponent } from './dialog-informazioni/dialog-inform
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule.enablePersistence(),
+    AngularFirePerformanceModule,
     ScrollingModule,
     BrowserAnimationsModule,
     FormsModule,
