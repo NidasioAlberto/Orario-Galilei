@@ -1,16 +1,33 @@
+rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
     match /Aule/{aula} {
       allow read;
+      allow update: if request.method == 'update' && controllaSoloAggiornamentoCounter(resource.data, request.resource.data);
     }
     match /Classi/{aula} {
       allow read;
+      allow update: if request.method == 'update' && controllaSoloAggiornamentoCounter(resource.data, request.resource.data);
     }
     match /Professori/{aula} {
       allow read;
+      allow update: if request.method == 'update' && controllaSoloAggiornamentoCounter(resource.data, request.resource.data);
     }
     match /Messaggi/{messaggio} {
       allow write;
     }
+  }
+
+  function controllaSoloAggiornamentoCounter(datiCorrenti, datiDaModificare) {
+    // Controllo se solo i counter vengono aggiornati
+    return datiDaModificare.preferiti != null
+    // E quindi non sono presenti gli altri valori
+        && datiDaModificare.datiAggiornamento == null
+        && datiDaModificare.dataValidita == null
+        && datiDaModificare.nome == null
+        && datiDaModificare.tabella == null
+        && datiDaModificare.ultimoAggiornamento == null
+        && datiDaModificare.versione == null
   }
 }
