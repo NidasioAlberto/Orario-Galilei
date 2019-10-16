@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { combineLatest, Observable } from 'rxjs';
-import { map, take, startWith, tap } from 'rxjs/operators';
+import { map, startWith, tap } from 'rxjs/operators';
 import { DocumentoIndice, ElementoIndice } from '../utils/indice.model';
 import { Orario, ProssimoImpegno, Info } from '../utils/orario.model';
 import { LocalStorageService } from './local-storage.service';
+import * as firebase from 'firebase/app';
+import 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -291,5 +293,17 @@ export class FirestoreService {
     } else {
       throw new Error('Contenuto mancante')
     }
+  }
+
+  incrementaPreferito(orario: Orario) {
+    this.db.collection(orario.collection).doc(orario.nome).update({
+      preferiti: firebase.firestore.FieldValue.increment(1)
+    })
+  }
+
+  decrementaPreferito(orario: Orario) {
+    this.db.collection(orario.collection).doc(orario.nome).update({
+      preferiti: firebase.firestore.FieldValue.increment(-1)
+    })
   }
 }

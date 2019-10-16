@@ -68,12 +68,18 @@ export class OrarioComponent implements OnInit {
   async aggiungiAiPreferiti() {
     const orarioPreferito = await this.orario.pipe(take(1)).toPromise()
 
+    //Agggiorni in firestore il numero di preferiti dell'orario selezionato
+    this.firestore.incrementaPreferito(orarioPreferito)
+
     this.inPreferiti = await this.localStorage.aggiungiOrarioAiPreferiti(orarioPreferito)
   }
 
   async rimuoviDaiPreferiti() {
     // Recupero l'orario da rimuovere
     const orarioDaRimuovere = await this.orario.pipe(take(1)).toPromise()
+
+    //Agggiorni in firestore il numero di preferiti dell'orario selezionato
+    this.firestore.decrementaPreferito(orarioDaRimuovere)
 
     this.inPreferiti = !(await this.localStorage.rimuoviOrarioDaiPreferiti(orarioDaRimuovere))
   }
