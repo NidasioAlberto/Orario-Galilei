@@ -10,11 +10,8 @@ import { AngularFireModule } from '@angular/fire'
 import { AngularFirestoreModule } from '@angular/fire/firestore'
 import { AngularFirePerformanceModule } from '@angular/fire/performance'
 
-import { RicercaComponent } from './ricerca/ricerca.component'
-import { ScrollingModule } from '@angular/cdk/scrolling'
 import { OrarioComponent } from './orario/orario.component'
 import { GraficoOrarioComponent } from './orario/grafico-orario/grafico-orario.component'
-import { ListaImpegniComponent } from './lista-impegni/lista-impegni.component'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { NavbarComponent } from './navbar/navbar.component'
 import { FormsModule } from '@angular/forms'
@@ -28,22 +25,25 @@ import { MatInputModule } from '@angular/material/input'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 
 import { PreferitiComponent } from './preferiti/preferiti.component'
+import { DialogInformazioniComponent } from './dialog-informazioni/dialog-informazioni.component'
+import { RicercaComponent } from './ricerca/ricerca.component'
+import { ListaImpegniComponent } from './lista-impegni/lista-impegni.component'
 import { ListaOrariComponent } from './lista-orari/lista-orari.component'
 import { ElementoListaOrariComponent } from './lista-orari/elemento-lista-orari/elemento-lista-orari.component'
-import { DialogInformazioniComponent } from './dialog-informazioni/dialog-informazioni.component'
+import { ScrollingModule } from '@angular/cdk/scrolling'
 
 @NgModule({
   declarations: [
     AppComponent,
-    RicercaComponent,
+    NavbarComponent,
     OrarioComponent,
     GraficoOrarioComponent,
-    ListaImpegniComponent,
-    NavbarComponent,
     PreferitiComponent,
+    DialogInformazioniComponent,
+    RicercaComponent,
+    ListaImpegniComponent,
     ListaOrariComponent,
-    ElementoListaOrariComponent,
-    DialogInformazioniComponent
+    ElementoListaOrariComponent
   ],
   imports: [
     BrowserModule,
@@ -52,9 +52,9 @@ import { DialogInformazioniComponent } from './dialog-informazioni/dialog-inform
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule.enablePersistence(),
     AngularFirePerformanceModule,
-    ScrollingModule,
     BrowserAnimationsModule,
     FormsModule,
+    ScrollingModule,
 
     // Angular material components
     MatButtonModule,

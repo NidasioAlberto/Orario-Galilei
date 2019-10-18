@@ -49,7 +49,6 @@ export class DialogInformazioniComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<DialogInformazioniComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private firestore: FirestoreService,
     private snackBar: MatSnackBar,
     public swUpdate: SwUpdate
   ) {}
@@ -68,21 +67,6 @@ export class DialogInformazioniComponent implements OnInit {
   @HostListener('window:resize')
   onResize() {
     this.hideToggle = window.innerWidth < 600
-  }
-
-  inviaMessaggio() {
-    if (this.messaggio !== undefined && this.messaggio !== '') {
-      this.firestore.inviaMessaggio(this.messaggio, this.mittente).then(() => {
-        this.snackBar.open('Messaggio inviato', undefined, { duration: 2000 })
-
-        // Pulisco gli input
-        this.messaggio = ''
-        this.mittente = ''
-      }).catch(err => {
-        this.snackBar.open('Errore durante l\'invio', undefined, { duration: 2000 })
-        console.log(err)
-      })
-    }
   }
 
   aggiornaPagina() {

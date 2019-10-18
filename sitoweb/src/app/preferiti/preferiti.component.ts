@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Observable, from } from 'rxjs';
 import { ElementoIndice } from '../utils/indice.model';
 import { LocalStorageService } from '../core/local-storage.service';
-import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-preferiti',

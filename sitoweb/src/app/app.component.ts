@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { LocalStorageService } from './core/local-storage.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogInformazioniComponent } from './dialog-informazioni/dialog-informazioni.component';
@@ -12,10 +11,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  valoreRicerca: string
-
+  
   constructor(
-    private router: Router,
     private localStorage: LocalStorageService,
     private dialog: MatDialog,
     private swUpdate: SwUpdate,
@@ -43,19 +40,6 @@ export class AppComponent implements OnInit {
           window.location.reload()
         })
       })
-    }
-  }
-
-  aggiornaValoreRicerca(valoreRicerca: string) {
-    // Ogni volta che il valore di ricerca è valido mostro la pagina di ricerca
-    if (valoreRicerca !== '') {
-      // Se è valido mostro la pagina ricerca
-      this.router.navigate(['/ricerca'], {
-        queryParams: { valore: valoreRicerca }
-      })
-    } else {
-      // Altrimenti la pagina principale
-      this.router.navigate(['/'])
     }
   }
 }
