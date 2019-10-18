@@ -6,7 +6,7 @@
 			</div>
 			<div class="ricerca">
 				<input #ricerca type="text" name="Ricerca" placeholder="Cerca classi, prof o aule"
-					(keyup)="aggiornaValoreRicerca.emit(ricerca.value)"
+					(keyup)="aggiornaValoreRicerca(ricerca.value)"
 					[(ngModel)]="valoreRicerca">
 			</div>
 		</div>

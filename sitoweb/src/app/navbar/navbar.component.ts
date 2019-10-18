@@ -10,7 +10,6 @@ import { DialogInformazioniComponent } from '../dialog-informazioni/dialog-infor
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit, AfterViewInit {
-  @Output() aggiornaValoreRicerca = new EventEmitter<string>();
   @ViewChild('immagineLogo', { static: false }) logo: ElementRef;
   valoreRicerca: string
 
@@ -42,10 +41,23 @@ export class NavbarComponent implements OnInit, AfterViewInit {
   }
 
   tornaAllaHome() {
-    this.router.navigate(['/'])
+    this.aggiornaValoreRicerca('')
   }
 
   mostraInfo() {
     this.dialog.open(DialogInformazioniComponent)
+  }
+
+  aggiornaValoreRicerca(valoreRicerca: string) {
+    // Ogni volta che il valore di ricerca è valido mostro la pagina di ricerca
+    if (valoreRicerca !== '') {
+      // Se è valido mostro la pagina ricerca
+      this.router.navigate(['/ricerca'], {
+        queryParams: { valore: valoreRicerca }
+      })
+    } else {
+      // Altrimenti la pagina principale
+      this.router.navigate(['/'])
+    }
   }
 }
