@@ -10,6 +10,7 @@ import { ElementoIndice } from '../utils/indice.model';
 export class ListaOrariComponent  {
 
   @Input() indici: Observable<ElementoIndice[]>
+  @Input() informazioni: boolean = false
 
   constructor() { }
 }

@@ -1,15 +1,14 @@
-import { Component, Output, EventEmitter, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { take, filter } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
-import { DialogInformazioniComponent } from '../dialog-informazioni/dialog-informazioni.component';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
-export class NavbarComponent implements OnInit, AfterViewInit {
+export class NavbarComponent implements OnInit {
   @ViewChild('immagineLogo', { static: false }) logo: ElementRef;
   valoreRicerca: string
 
@@ -33,19 +32,8 @@ export class NavbarComponent implements OnInit, AfterViewInit {
     })
   }
 
-  ngAfterViewInit() {
-    this.logo.nativeElement.oncontextmenu = (event: MouseEvent) => {
-      this.mostraInfo()
-      return false
-    }
-  }
-
   tornaAllaHome() {
     this.aggiornaValoreRicerca('')
-  }
-
-  mostraInfo() {
-    this.dialog.open(DialogInformazioniComponent)
   }
 
   aggiornaValoreRicerca(valoreRicerca: string) {

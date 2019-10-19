@@ -1,23 +1,29 @@
-import { Component, OnInit, Inject, HostListener } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { Aggiornamento } from '../utils/aggiornamento.model';
-import { FirestoreService } from '../core/firestore.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SwUpdate } from '@angular/service-worker';
+import { FirestoreService } from '../core/firestore.service';
 
 @Component({
-  selector: 'app-dialog-informazioni',
-  templateUrl: './dialog-informazioni.component.html',
-  styleUrls: ['./dialog-informazioni.component.scss']
+  selector: 'app-informazioni',
+  templateUrl: './informazioni.component.html',
+  styleUrls: ['./informazioni.component.scss']
 })
-export class DialogInformazioniComponent implements OnInit {
+export class InformazioniComponent implements OnInit {
 
-  versione = '0.6'
+  versione = '0.7'
   aggiornamentiApp: Aggiornamento[] = [
+    {
+      dataPubblicazione: '19/10/19',
+      descrizioneBreve: 'Dialog informazioni',
+      descrizione: 'Il messaggio iniziale viene ora mostrato nella home sotto i preferiti '
+    },
     {
       dataPubblicazione: '29/9/19',
       descrizioneBreve: 'Info complete',
-      descrizione: 'La pagina degll\'orario ora mostra anche la versione dell\'orario, la data di aggiornamento, valido dal e mostra l\'ultima volta che l\'orario è stato sincronizzato'
+      descrizione:
+        'La pagina degll\'orario ora mostra anche la versione dell\'orario, la data di aggiornamento, valido dal e mostra l\'ultima ' +
+        'volta che l\'orario è stato sincronizzato'
     },
     {
       dataPubblicazione: '11/9/19',
@@ -26,14 +32,14 @@ export class DialogInformazioniComponent implements OnInit {
     },
     {
       dataPubblicazione: '9/9/19',
-      descrizioneBreve: 'Istruzioni e benvenuto',
+      descrizioneBreve: 'Informazioni',
       descrizione:
         'Se premuto il logo viene mostrato un dialog con un messaggio di benvenuto e una breve spiegazione dell\'app. Inoltre ' +
         'si visualizzerà la lista di tutti gli aggiornamenti che verranno pubblicati insieme alla versione dell\'app'
     },
     {
       dataPubblicazione: '10/8/19',
-      descrizioneBreve: 'Preferiti e logo che riporta alla home',
+      descrizioneBreve: 'Preferiti e home',
       descrizione:
         'Ora è possibile segnare un orario come preferito e visualizzarlo nella pagina principale. Schiacciando sul logo è possibile ' +
         'tornare alla pagina principale'
@@ -47,10 +53,9 @@ export class DialogInformazioniComponent implements OnInit {
   updateAvailable = false
 
   constructor(
-    public dialogRef: MatDialogRef<DialogInformazioniComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
     private snackBar: MatSnackBar,
-    public swUpdate: SwUpdate
+    public swUpdate: SwUpdate,
+    private firestore: FirestoreService
   ) {}
 
   ngOnInit() {
@@ -71,5 +76,20 @@ export class DialogInformazioniComponent implements OnInit {
 
   aggiornaPagina() {
     window.location.reload()
+  }
+
+  inviaMessaggio() {
+    if (this.messaggio !== undefined && this.messaggio !== '') {
+      this.firestore.inviaMessaggio(this.messaggio, this.mittente).then(() => {
+        this.snackBar.open('Messaggio inviato', undefined, { duration: 2000 })
+
+        // Pulisco gli input
+        this.messaggio = ''
+        this.mittente = ''
+      }).catch(err => {
+        this.snackBar.open('Errore durante l\'invio', undefined, { duration: 2000 })
+        console.log(err)
+      })
+    }
   }
 }

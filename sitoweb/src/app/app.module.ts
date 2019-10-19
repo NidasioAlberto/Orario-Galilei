@@ -25,12 +25,12 @@ import { MatInputModule } from '@angular/material/input'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 
 import { PreferitiComponent } from './preferiti/preferiti.component'
-import { DialogInformazioniComponent } from './dialog-informazioni/dialog-informazioni.component'
 import { RicercaComponent } from './ricerca/ricerca.component'
 import { ListaImpegniComponent } from './lista-impegni/lista-impegni.component'
 import { ListaOrariComponent } from './lista-orari/lista-orari.component'
 import { ElementoListaOrariComponent } from './lista-orari/elemento-lista-orari/elemento-lista-orari.component'
-import { ScrollingModule } from '@angular/cdk/scrolling'
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { InformazioniComponent } from './informazioni/informazioni.component'
 
 @NgModule({
   declarations: [
@@ -39,11 +39,11 @@ import { ScrollingModule } from '@angular/cdk/scrolling'
     OrarioComponent,
     GraficoOrarioComponent,
     PreferitiComponent,
-    DialogInformazioniComponent,
     RicercaComponent,
     ListaImpegniComponent,
     ListaOrariComponent,
-    ElementoListaOrariComponent
+    ElementoListaOrariComponent,
+    InformazioniComponent
   ],
   imports: [
     BrowserModule,
@@ -67,6 +67,5 @@ import { ScrollingModule } from '@angular/cdk/scrolling'
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [DialogInformazioniComponent]
 })
 export class AppModule { }
