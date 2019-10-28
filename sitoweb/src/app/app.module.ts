@@ -23,6 +23,7 @@ import { MatDialogModule } from '@angular/material/dialog'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { MatInputModule } from '@angular/material/input'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
+import { MatIconModule } from '@angular/material/icon'
 
 import { PreferitiComponent } from './preferiti/preferiti.component'
 import { RicercaComponent } from './ricerca/ricerca.component'
@@ -30,7 +31,8 @@ import { ListaImpegniComponent } from './lista-impegni/lista-impegni.component'
 import { ListaOrariComponent } from './lista-orari/lista-orari.component'
 import { ElementoListaOrariComponent } from './lista-orari/elemento-lista-orari/elemento-lista-orari.component'
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { InformazioniComponent } from './informazioni/informazioni.component'
+import { InformazioniComponent } from './informazioni/informazioni.component';
+import { ThemePickerComponent } from './theme-picker/theme-picker.component'
 
 @NgModule({
   declarations: [
@@ -43,7 +45,8 @@ import { InformazioniComponent } from './informazioni/informazioni.component'
     ListaImpegniComponent,
     ListaOrariComponent,
     ElementoListaOrariComponent,
-    InformazioniComponent
+    InformazioniComponent,
+    ThemePickerComponent
   ],
   imports: [
     BrowserModule,
@@ -62,6 +65,7 @@ import { InformazioniComponent } from './informazioni/informazioni.component'
     MatExpansionModule,
     MatInputModule,
     MatSnackBarModule,
+    MatIconModule,
 
     StorageModule.forRoot({ IDBNoWrap: true }),
   ],

@@ -4,6 +4,9 @@
 			<div class="logo" (click)="tornaAllaHome()">
 				<img #immagineLogo src="assets/icons/logo-72x72.png" alt="Logo">
 			</div>
+			<div class="icona">
+				<app-theme-picker></app-theme-picker>
+			</div>
 			<div class="ricerca">
 				<input #ricerca type="text" name="Ricerca" placeholder="Cerca classi, prof o aule"
 					(keyup)="aggiornaValoreRicerca(ricerca.value)"

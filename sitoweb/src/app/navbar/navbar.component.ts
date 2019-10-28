@@ -1,7 +1,6 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { take, filter } from 'rxjs/operators';
-import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-navbar',
@@ -9,13 +8,13 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
-  @ViewChild('immagineLogo', { static: false }) logo: ElementRef;
+
+  @Output() cambiaTema = new EventEmitter();
   valoreRicerca: string
 
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
