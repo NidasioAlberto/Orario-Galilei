@@ -6,11 +6,25 @@ import { Orario, ProssimoImpegno } from '../utils/orario.model';
 import { FirestoreService } from '../core/firestore.service';
 import { TempoService } from '../core/tempo.service';
 import { LocalStorageService } from '../core/local-storage.service';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-orario',
   templateUrl: './orario.component.html',
-  styleUrls: ['./orario.component.scss']
+  styleUrls: ['./orario.component.scss'],
+  animations: [
+    trigger('animazioneContenitoreLista', [
+      state('strumentiChiusi', style({
+        'padding-top': '72px'
+      })),
+      state('strumentiAperti', style({
+        'padding-top': '112px'        
+      })),
+      transition('* => *', [
+        animate('0.2s ease-in'),
+      ])
+    ])
+  ]
 })
 export class OrarioComponent implements OnInit {
 
@@ -21,14 +35,22 @@ export class OrarioComponent implements OnInit {
 
   test = new Date()
 
+  statoContenitoreLista: 'strumentiAperti' | 'strumentiChiusi' = 'strumentiChiusi'
+
   constructor(
     private router: ActivatedRoute,
     private firestore: FirestoreService,
     private tempo: TempoService,
-    private localStorage: LocalStorageService
+    private localStorage: LocalStorageService,
+    private activatedRoute: ActivatedRoute
   ) { }
 
   ngOnInit() {
+    this.activatedRoute.queryParams.subscribe(queryParams => {
+      if(queryParams.strumenti === 'aperto') this.cambiaStato('strumentiAperti')
+      else this.cambiaStato('strumentiChiusi')
+    })
+
     // Recupero l'orario prima dal database offline e poi da firestore
     this.orario = this.router.queryParams.pipe(
       mergeMap(params => {
@@ -82,5 +104,9 @@ export class OrarioComponent implements OnInit {
     this.firestore.decrementaPreferito(orarioDaRimuovere)
 
     this.inPreferiti = !(await this.localStorage.rimuoviOrarioDaiPreferiti(orarioDaRimuovere))
+  }
+
+  cambiaStato(stato: 'strumentiAperti' | 'strumentiChiusi') {
+    this.statoContenitoreLista = stato
   }
 }

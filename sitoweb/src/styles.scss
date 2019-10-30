@@ -68,14 +68,9 @@ $sitoweb-arancione: (
 
 $sitoweb-primary: mat-palette($sitoweb-blue, 100, 50, 200);
 $sitoweb-accent: mat-palette($sitoweb-arancione, 100, 50, 200);
-
 $sitoweb-warn: mat-palette($mat-red);
 
-$sitoweb-theme: mat-light-theme(
-  $sitoweb-primary,
-  $sitoweb-accent,
-  $sitoweb-warn
-);
+$sitoweb-theme: mat-light-theme($sitoweb-primary, $sitoweb-accent, $sitoweb-warn);
 
 @include angular-material-theme($sitoweb-theme);
 
@@ -86,20 +81,13 @@ $accent-color: #ffc107;
 
 html {
   min-width: $app-min-width;
+  height: 100%;
 }
 
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-}
-
-html,
-body {
   height: 100%;
-}
-
-.min-width {
-  min-width: $app-min-width;
 }
 
 // Stile classe contenuto, cambia la larghezza in base alla dimensione dello schermo

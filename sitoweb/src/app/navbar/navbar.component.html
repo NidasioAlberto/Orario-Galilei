@@ -1,16 +1,37 @@
-<div class="main-navbar min-width">
+<div class="contenitore-navbar">
 	<div class="contenuto">
-		<div class="main-navbar-content card-con-bordi mat-elevation-z4">
-			<div class="logo" (click)="tornaAllaHome()">
-				<img #immagineLogo src="assets/icons/logo-72x72.png" alt="Logo">
+		<div class="contenuto-navbar card-con-bordi mat-elevation-z4" [@animazioneNavBar]="stato">
+			<!-- Contenuto principale, sempre in mostra-->
+			<div class="contenuto-principale">
+				<div class="logo">
+					<button mat-icon-button (click)="tornaAllaHome()">
+						<img #immagineLogo src="assets/icons/logo-72x72.png" alt="Logo">
+					</button>
+				</div>
+				<div class="ricerca">
+					<input #ricerca type="text" name="Ricerca" placeholder="Cerca classi, prof o aule"
+						(focus)="mostraFiltri(true)"
+						(keyup)="aggiornaValoriRicerca(ricerca.value, filtroSelezionato)"
+						[(ngModel)]="valoreRicerca">
+				</div>
+				<div class="bottone">
+					<button mat-icon-button (click)="mostraFiltri()">
+						<mat-icon>menu</mat-icon>
+					</button>
+				</div>
 			</div>
-			<div class="icona">
-				<app-theme-picker></app-theme-picker>
-			</div>
-			<div class="ricerca">
-				<input #ricerca type="text" name="Ricerca" placeholder="Cerca classi, prof o aule"
-					(keyup)="aggiornaValoreRicerca(ricerca.value)"
-					[(ngModel)]="valoreRicerca">
+
+			<!-- Strumenti -->
+			<div class="strumenti" [@animazioneStrumenti]="stato">
+				<mat-chip-list aria-label="Fish selection">
+					<mat-chip color="accent" (click)="cambiaFiltro('tutti')" [selected]="filtroSelezionato == 'tutti'">
+						Tutti</mat-chip>
+					<mat-chip (click)="cambiaFiltro('Classi')" [selected]="filtroSelezionato == 'Classi'">Classi
+					</mat-chip>
+					<mat-chip (click)="cambiaFiltro('Aule')" [selected]="filtroSelezionato == 'Aule'">Aule</mat-chip>
+					<mat-chip (click)="cambiaFiltro('Professori')" [selected]="filtroSelezionato == 'Professori'">Professori
+					</mat-chip>
+				</mat-chip-list>
 			</div>
 		</div>
 	</div>

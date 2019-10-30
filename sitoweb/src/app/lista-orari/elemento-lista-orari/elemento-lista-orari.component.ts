@@ -90,7 +90,7 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
       queryParams: {
         collection: this.indiceOrario.collection,
         document: this.indiceOrario.nome,
-      }
+      },
     })
   }
 }
