@@ -4,6 +4,7 @@
   },
   "targets": {
     "orario-galilei": {
+      "hosting": {
         "test": [
           "test-orario-galilei"
         ],
