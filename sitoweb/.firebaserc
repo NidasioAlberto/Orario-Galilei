@@ -1,5 +1,16 @@
 {
   "projects": {
     "default": "orario-galilei"
+  },
+  "targets": {
+    "orario-galilei": {
+        "test": [
+          "test-orario-galilei"
+        ],
+        "production": [
+          "orario-galilei"
+        ]
+      }
+    }
   }
 }
