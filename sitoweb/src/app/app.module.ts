@@ -1,38 +1,38 @@
 import { BrowserModule } from '@angular/platform-browser'
 import { NgModule } from '@angular/core'
-
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { ServiceWorkerModule } from '@angular/service-worker'
 import { environment } from '../environments/environment'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { NavbarComponent } from './navbar/navbar.component'
+import { FormsModule } from '@angular/forms'
 
+// Moduli firebase e storage
+import { StorageModule } from '@ngx-pwa/local-storage'
 import { AngularFireModule } from '@angular/fire'
 import { AngularFirestoreModule } from '@angular/fire/firestore'
 import { AngularFirePerformanceModule } from '@angular/fire/performance'
 
-import { OrarioComponent } from './orario/orario.component'
-import { GraficoOrarioComponent } from './orario/grafico-orario/grafico-orario.component'
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { NavbarComponent } from './navbar/navbar.component'
-import { FormsModule } from '@angular/forms'
-import { StorageModule } from '@ngx-pwa/local-storage'
-
-// Angular material components
+// Componenti angular material
 import { MatButtonModule } from '@angular/material/button'
 import { MatDialogModule } from '@angular/material/dialog'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { MatInputModule } from '@angular/material/input'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { MatIconModule } from '@angular/material/icon'
+import { MatChipsModule } from '@angular/material/chips'
 
+// Componenti app
+import { OrarioComponent } from './orario/orario.component'
+import { GraficoOrarioComponent } from './orario/grafico-orario/grafico-orario.component'
 import { PreferitiComponent } from './preferiti/preferiti.component'
 import { RicercaComponent } from './ricerca/ricerca.component'
 import { ListaImpegniComponent } from './lista-impegni/lista-impegni.component'
 import { ListaOrariComponent } from './lista-orari/lista-orari.component'
 import { ElementoListaOrariComponent } from './lista-orari/elemento-lista-orari/elemento-lista-orari.component'
-import { ScrollingModule } from '@angular/cdk/scrolling';
-import { InformazioniComponent } from './informazioni/informazioni.component';
-import { ThemePickerComponent } from './theme-picker/theme-picker.component'
+import { ScrollingModule } from '@angular/cdk/scrolling'
+import { InformazioniComponent } from './informazioni/informazioni.component'
 
 @NgModule({
   declarations: [
@@ -45,8 +45,7 @@ import { ThemePickerComponent } from './theme-picker/theme-picker.component'
     ListaImpegniComponent,
     ListaOrariComponent,
     ElementoListaOrariComponent,
-    InformazioniComponent,
-    ThemePickerComponent
+    InformazioniComponent
   ],
   imports: [
     BrowserModule,
@@ -66,6 +65,7 @@ import { ThemePickerComponent } from './theme-picker/theme-picker.component'
     MatInputModule,
     MatSnackBarModule,
     MatIconModule,
+    MatChipsModule,
 
     StorageModule.forRoot({ IDBNoWrap: true }),
   ],

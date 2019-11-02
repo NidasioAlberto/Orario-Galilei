@@ -11,12 +11,17 @@ import { FirestoreService } from '../core/firestore.service';
 })
 export class InformazioniComponent implements OnInit {
 
-  versione = '0.7'
+  versione = '0.8'
   aggiornamentiApp: Aggiornamento[] = [
+    {
+      dataPubblicazione: '30/10/19',
+      descrizioneBreve: 'Filtri',
+      descrizione: 'Aggiunto un menù per filtrare la ricerca'
+    },
     {
       dataPubblicazione: '19/10/19',
       descrizioneBreve: 'Dialog informazioni',
-      descrizione: 'Il messaggio iniziale viene ora mostrato nella home sotto i preferiti '
+      descrizione: 'Il messaggio iniziale viene ora mostrato nella home sotto i preferiti'
     },
     {
       dataPubblicazione: '29/9/19',

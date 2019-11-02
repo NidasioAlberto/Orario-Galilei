@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FirestoreService } from '../core/firestore.service';
 import { Observable, combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, distinctUntilChanged } from 'rxjs/operators';
 import { ElementoIndice } from '../utils/indice.model';
 
 @Component({
@@ -15,6 +15,7 @@ export class RicercaComponent implements OnInit {
   // o per lo meno i documenti visualizzati e viene rieseguita laricerca del valore
   indici: Observable<ElementoIndice[]>
   valoreRicerca: Observable<string>
+  filtroRicerca: Observable<'Classi' | 'Aule' | 'Professori'>
   indiciFiltrati: Observable<ElementoIndice[]>
 
   constructor(
@@ -23,14 +24,19 @@ export class RicercaComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    // Recupero gli indici da database
-    this.indici = this.firestore.ottieniIndici()
-
-    // Ottengo il valore di ricerca dai parametri url
+    // Ottengo il valore di ricerca e il filtro dai parametri url
     this.valoreRicerca = this.router.queryParams.pipe(
       map(params => params.valore),
       map(valore => (valore === '*' || valore === 'Tutti' ? '.' : valore))
     )
+    this.filtroRicerca = this.router.queryParams.pipe(
+      map(params => params.filtro),
+      distinctUntilChanged()
+    )
+    this.filtroRicerca.subscribe(console.log)
+
+    // Recupero gli indici da database
+    this.indici = this.firestore.ottieniIndici(this.filtroRicerca)
 
     // TODO: Aggiungere nelle opzioni di ricerca la possibilità di visualizzare soltanto una delle tre tipologie di orari
     // probabilmente bisogna modificare il contenuto degli indici, da valutare prima della release

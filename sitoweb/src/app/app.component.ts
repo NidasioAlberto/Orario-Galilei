@@ -1,4 +1,4 @@
-import { Component, OnInit, HostBinding, Renderer2 } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -9,12 +9,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class AppComponent implements OnInit {
 
-  temaCorrente: string = 'light-theme'
-
   constructor(
     private swUpdate: SwUpdate,
     private snakBar: MatSnackBar,
-    private rendered: Renderer2
   ) { }
 
   ngOnInit() {
@@ -27,15 +24,5 @@ export class AppComponent implements OnInit {
         })
       })
     }
-  }
-
-  cambiaTema() {
-    this.rendered.removeClass(document.body, this.temaCorrente);
-    if(this.temaCorrente === 'light-theme') {
-      this.temaCorrente = 'dark-theme'
-    } else {
-      this.temaCorrente = 'light-theme'
-    }
-    this.rendered.addClass(document.body, this.temaCorrente);
   }
 }

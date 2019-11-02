@@ -1,5 +1,5 @@
 <cdk-virtual-scroll-viewport itemSize="84">
-	<div class="contenitore-lista">
+	<div class="contenitore-lista" [@animazioneContenitoreLista]="statoContenitoreLista">
 		<div class="contenuto">
 			<ng-container *ngIf="indici !== undefined">
 				<div *cdkVirtualFor="let indiceOrario of indici | async" class="animated zoomIn">

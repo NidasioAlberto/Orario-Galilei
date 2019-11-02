@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { combineLatest, Observable } from 'rxjs';
-import { map, startWith, tap } from 'rxjs/operators';
+import { map, startWith, tap, switchMap } from 'rxjs/operators';
 import { DocumentoIndice, ElementoIndice } from '../utils/indice.model';
 import { Orario, ProssimoImpegno, Info } from '../utils/orario.model';
 import { LocalStorageService } from './local-storage.service';
@@ -21,8 +21,63 @@ export class FirestoreService {
   /**
    * Permette di ottenere gli indici di tutti: classi, aule e professori
    */
-  ottieniIndici() {
-    // Recupero gli indici di classi, aule e professori
+  ottieniIndici(filtroRicerca?: Observable<'Classi' | 'Aule' | 'Professori'>) {
+    if(filtroRicerca === undefined) {
+      // Recupero gli indici di classi, aule e professori
+      return this.ottieniIndiciCompleti()
+    } else {
+      // In base al filtro recupero una delle tre collection
+      return filtroRicerca.pipe(
+        switchMap(filtro => {
+          console.log('Filtro ricerca', filtro)
+          if(filtro === 'Classi') {
+            return this.db.collection('Classi').doc<DocumentoIndice>('Indici').valueChanges().pipe(startWith({
+              lista: []
+            } as DocumentoIndice)).pipe(
+              map(dati => {
+                return dati.lista.map(nome => {
+                  return {
+                    nome,
+                    collection: 'Classi'
+                  } as ElementoIndice
+                })
+              })
+            )
+          } if(filtro === 'Aule') {
+            return this.db.collection('Aule').doc<DocumentoIndice>('Indici').valueChanges().pipe(startWith({
+              lista: []
+            } as DocumentoIndice)).pipe(
+              map(dati => {
+                return dati.lista.map(nome => {
+                  return {
+                    nome,
+                    collection: 'Aule'
+                  } as ElementoIndice
+                })
+              })
+            )
+          } else if(filtro === 'Professori') {
+            return this.db.collection('Professori').doc<DocumentoIndice>('Indici').valueChanges().pipe(startWith({
+              lista: []
+            } as DocumentoIndice)).pipe(
+              map(dati => {
+                return dati.lista.map(nome => {
+                  return {
+                    nome,
+                    collection: 'Professori'
+                  } as ElementoIndice
+                })
+              })
+            )
+          } else {
+            return this.ottieniIndiciCompleti()
+          }
+        })
+      )
+    }
+  }
+
+  ottieniIndiciCompleti() {
     return combineLatest([
       this.db.collection('Aule').doc<DocumentoIndice>('Indici').valueChanges().pipe(startWith({
         lista: []
