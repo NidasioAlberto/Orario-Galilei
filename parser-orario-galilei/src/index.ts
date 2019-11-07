@@ -12,6 +12,7 @@ import {
     ElementoTabella,
     Info,
     RisultatoConfronto,
+    regexInformazioni,
 } from "./utils"
 import axios from 'axios'
 const pdfjs = require('../pdfjs-2.1.266-dist/build/pdf')
@@ -76,7 +77,7 @@ export async function ottieniListaAule(urlAule: string = percorsoPrimario + perc
  */
 export async function ottieniListaProfessori(urlProf: string = percorsoPrimario + percorsoListaProfessori) {
     try {
-        //             1: Per ogni lettera             2: Ottengo la pagina web
+        //             1: Per ogni lettera            2: Ottengo la pagina web
         let promesse = lettereAlfabeto.map(lettera => axios.get(urlProf + lettera).then(res => res.data).then((paginaHtml: string) => {
             try {
                 //3: Estraggo le informazioni dei professori, quindi nomi e link ai link dei pdf ;)
@@ -163,30 +164,26 @@ export async function ottieniOrario(urlPdf: string, nome: string): Promise<Orari
  * @param {boolean} debug debug per mostrare nella console delle informazioni
  */
 export async function ottieniOrariClassi(anno: string) {
-    try {
-        //1: Recupero la lista delle classi
-        let classi = await ottieniListaClassi()
+    //1: Recupero la lista delle classi
+    let classi = await ottieniListaClassi()
 
-        //2: Recupero i loro orari
-        let orari = await Promise.all(classi.map(async classe => {
-            try {
-                return await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + classe + '.pdf', classe)
-            } catch (err) {
-                return undefined
-            }
-        }).filter(promessa => promessa != undefined)) as Orario[]
-        orari = orari.filter(orario => orario != undefined && orario.tabella != undefined).map(orario => {
-            orario.nome = orario.nome.replace(/ /g, '')
-            return orario
-        })
-
-        //3: Ritorno gli orari
-        return {
-            orari: orari,
-            lista: orari.map(orario => orario.nome)
+    //2: Recupero i loro orari
+    let orari = await Promise.all(classi.map(async classe => {
+        try {
+            return await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + classe + '.pdf', classe)
+        } catch (err) {
+            return undefined
         }
-    } catch (err) {
-        throw 'impossibile recuperare classi e orari, ' + err
+    }).filter(promessa => promessa != undefined)) as Orario[]
+    orari = orari.filter(orario => orario != undefined && orario.tabella != undefined).map(orario => {
+        orario.nome = orario.nome.replace(/ /g, '')
+        return orario
+    })
+
+    //3: Ritorno gli orari
+    return {
+        orari: orari,
+        lista: orari.map(orario => orario.nome)
     }
 }
 
@@ -624,7 +621,7 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
 
     if (testoRigaInformazioni) {
         // Recupero le informazioni dal testo
-        const match = testoRigaInformazioni.match(/Aggiornamento.+(\d\d)[\/\.](\d\d)[\/\.](\d+).+v.+(\d+).+(\d+).+Valido.+dal.+(\d\d)[\/\.](\d\d)[\/\.](\d+)/)
+        const match = testoRigaInformazioni.match(regexInformazioni)
 
         if (match) {
             // Se le informazioni sono presenti le salvo
@@ -635,12 +632,12 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
             )
 
             const dataValidita = new Date(
-                (Number(match[8]) < 2000 ? Number(match[8]) + 2000 : Number(match[8])),
-                Number(match[7]) - 1,
-                Number(match[6])
+                (Number(match[7]) < 2000 ? Number(match[7]) + 2000 : Number(match[7])),
+                Number(match[6]) - 1,
+                Number(match[5])
             )
 
-            const versione = Number(match[4]) + Number(match[5]) / ((Math.floor(Math.log10(Number(match[5]))) + 1) * 10)
+            const versione = match[4]
 
             return {
                 nome,
