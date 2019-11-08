@@ -368,6 +368,8 @@ export async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
         disableCombineTextItems: false
     }
 
+    //TODO: Controllare anche i metadati
+
     const doc = await pdfjs.getDocument(buffer).promise
 
     const numeroPagine = doc.numPages
