@@ -1,0 +1,19 @@
+{
+  "hosting": [
+    {
+      "target": "sitoweb",
+      "public": "dist/sitoweb",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ]
+}

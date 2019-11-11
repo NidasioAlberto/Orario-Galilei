@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "orario-galilei": {
+      "hosting": {
+        "sitoweb": [
+          "orario-galilei"
+        ]
+      }
+    }
+  }
+}
