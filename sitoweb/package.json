@@ -7,7 +7,11 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "firebase-deploy": "ng build --prod && gzipper --verbose ./dist/sitoweb && firebase deploy --only hosting:production",
+    "firebase-deploy-test": "ng build --prod && gzipper --verbose ./dist/sitoweb && firebase deploy --only hosting:test",
+    "firebase-serve": "ng build --prod && gzipper --verbose ./dist/sitoweb && firebase serve",
+    "analyzer": "ng build --prod --stats-json && webpack-bundle-analyzer dist/sitoweb/stats-es2015.json"
   },
   "private": true,
   "dependencies": {
@@ -24,6 +28,7 @@
     "@angular/pwa": "^0.803.18",
     "@angular/router": "~8.2.13",
     "@angular/service-worker": "~8.2.13",
+    "@ngx-pwa/local-storage": "^8.2.3",
     "firebase": ">= 5.5.7 <7",
     "hammerjs": "^2.0.8",
     "rxjs": "~6.4.0",
