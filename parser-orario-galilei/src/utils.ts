@@ -1,7 +1,5 @@
-import { inflate } from "zlib"
-
 /* Spiegazione:
-In questo file sono presenti le insterfacce usate dalla libreria, assieme ad alcune costanti
+In questo file sono presenti le interfacce e le costanti usate dalla libreria
 */
 
 // Costanti
@@ -47,6 +45,11 @@ export const percorsoListaAule = '/intraitis/didattica/orario/orarioqueryaula.as
  */
 export const percorsoListaProfessori = '/Intraitis/Lib/ListaInsegnanti.asp?prossima=/Intraitis/Didattica/Orario/OrarioCaricaDocente.asp&cosa=ORARIO%20SETTIMANALE&lettera='
 
+/**
+ * Regex utilizzata per estrarre le informazioni (date e versione)
+ */
+export const regexInformazioni = /Aggiornamento.+(\d\d)[\/\.](\d\d)[\/\.](\d+).+v. ?((?:\d+\.)+\d+).+Valido.+dal.+(\d\d)[\/\.](\d\d)[\/\.](\d+)/
+
 // Tipi
 
 export interface RigaDati {
@@ -72,7 +75,7 @@ export interface Orario {
     tabella: ElementoTabella[]
     dataAggiornamento?: Date
     dataValidita?: Date
-    versione?: number
+    versione?: string
 }
 
 export interface RisultatoConfronto {

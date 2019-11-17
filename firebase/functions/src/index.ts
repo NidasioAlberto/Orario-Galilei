@@ -2,221 +2,120 @@ import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
 import { ottieniOrariClassi, ottieniOrariAule, ottieniOrariProfessori, confrontaOrari } from 'parser-orario-galilei'
 import { Orario } from 'parser-orario-galilei/lib/utils'
+import { ImpostazioniCloudFunction } from './utils'
+import { LogOrari } from './utils/log-orari.model'
 admin.initializeApp()
 const firestore = admin.firestore()
 
 export const sincronizzaClassi = functions.runWith({
     memory: '1GB',
     timeoutSeconds: 100
-}).region('europe-west2').pubsub.schedule('10 7 */1 * *').timeZone('Europe/Rome').onRun(async context => {
-    try {
-        console.time('Classi')
-
-        // Recupero le impostaziono per le cloud function
-        const impostazioniCloudFunction = (await firestore.collection('Impostazioni generali').doc('Cloud function').get()).data()
-        
-        if (impostazioniCloudFunction !== undefined) {
-            // Recuper l'anno dalle impostazioni
-            const anno = impostazioniCloudFunction.anno as string
-
-            console.log('Anno: ' + anno)
-    
-            const orariClassi = await ottieniOrariClassi(anno)
-
-            console.log('Orari recuperati')
-    
-            // Aggiungo tutti gli orari nel database
-            let risultati = await Promise.all(orariClassi.orari.map(async classe => {
-                // Recupero l'orario attualmente salvato nel database per confrontarlo con quello appena recuperato
-                const docRef = firestore.collection('Classi').doc(classe.nome)
-                const doc = await docRef.get()
-                const orarioSalvato = doc.data() as Orario | undefined
-
-                // Confronto i due orari
-                let uguali = false // True se gli orari sono uguali
-                if (orarioSalvato !== undefined && orarioSalvato.tabella !== undefined) {
-                    uguali = confrontaOrari(orarioSalvato, classe) === undefined
-                }
-
-                // Se gli orari sono diversi salvo quello precedente nello storico
-                if (!uguali && orarioSalvato !== undefined) {
-                    await firestore.collection('Classi').doc(classe.nome).collection('Storico').add(orarioSalvato)
-                } // Altrimenti non c'è niente da salvare, mi risparmi un'operazione di scrittura
-                
-                // E salvo quello nuovo
-                if (doc.exists) {
-                    await docRef.update({
-                        ...classe,
-                        ultimoAggiornamento: admin.firestore.Timestamp.now()
-                    })
-                } else {
-                    await docRef.set({
-                        ...classe,
-                        ultimoAggiornamento: admin.firestore.Timestamp.now()
-                    })
-                }
-                
-                return {
-                    classe: classe.nome,
-                    modificato: !uguali
-                }
-            }))
-
-            risultati = risultati.filter(elemento => elemento.modificato)
-    
-            console.log('Elementi modificati', risultati.length, risultati.map(elem => elem.classe))
-            console.timeEnd('Classi')
-    
-            await firestore.collection('Classi').doc('Indici').set({
-                lista: orariClassi.lista,
-                ultimoAggiornamento: admin.firestore.Timestamp.now()                
-            })
-            
-            console.log('Aggiornate ' + orariClassi.lista.length + ' classi nel database con successo')
-        } else {
-            console.error('Impostazioni cloud function mancanti')
-        }
-    } catch(err) {
-        throw err
-    }
-})
+}).region('europe-west2').pubsub.schedule('10 7 */1 * *').timeZone('Europe/Rome').onRun(() => sincronizzaOrari('Classi'))
 
 export const sincronizzaAule = functions.runWith({
     memory: '1GB',
     timeoutSeconds: 100
-}).region('europe-west2').pubsub.schedule('15 7 */1 * *').timeZone('Europe/Rome').onRun(async context => {
-    try {
-        console.time('Aule')
-
-        // Recupero le impostaziono per le cloud function
-        const impostazioniCloudFunction = (await firestore.collection('Impostazioni generali').doc('Cloud function').get()).data()
-        
-        if (impostazioniCloudFunction !== undefined) {
-            // Recuper l'anno dalle impostazioni
-            const anno = impostazioniCloudFunction.anno as string
-
-            console.log('Anno: ' + anno)
-
-            const orariAule = await ottieniOrariAule(anno)
-
-            console.log('Orari recuperati')
-
-            // Aggiungo tutti gli orari nel database
-            let risultati = await Promise.all(orariAule.orari.map(async aula => {
-                // Recupero l'orario attualmente salvato nel database per confrontarlo con quello appena recuperato
-                const docRef = firestore.collection('Aule').doc(aula.nome)
-                const doc = await docRef.get()
-                const orarioSalvato = doc.data() as Orario | undefined
-
-                // Confronto i due orari
-                let uguali = false // True se gli orari sono uguali
-                if (orarioSalvato !== undefined && orarioSalvato.tabella !== undefined) {
-                    uguali = confrontaOrari(orarioSalvato, aula) === undefined
-                }
-
-                // Se gli orari sono diversi salvo quello precedente nello storico
-                if (!uguali && orarioSalvato !== undefined) {
-                    await firestore.collection('Aule').doc(aula.nome).collection('Storico').add(orarioSalvato)
-                } // Altrimenti non c'è niente da salvare, mi risparmi un'operazione di scrittura
-
-                // E salvo quello nuovo
-                if (doc.exists) {
-                    await docRef.update({
-                        ...aula,
-                        ultimoAggiornamento: admin.firestore.Timestamp.now()
-                    })
-                } else {
-                    await docRef.set({
-                        ...aula,
-                        ultimoAggiornamento: admin.firestore.Timestamp.now()
-                    })
-                }
-                
-                return {
-                    classe: aula.nome,
-                    modificato: !uguali
-                }
-            }))
-
-            risultati = risultati.filter(elemento => elemento.modificato)
-    
-            console.log('Elementi modificati', risultati.length, risultati.map(elem => elem.classe))
-            console.timeEnd('Aule')
-
-            await firestore.collection('Aule').doc('Indici').set({
-                lista: orariAule.lista,
-                ultimoAggiornamento: admin.firestore.Timestamp.now()                
-            })
-            
-            console.log('Aggiornate ' + orariAule.lista.length + ' aule nel database con successo')
-        } else {
-            console.error('Impostazioni cloud function mancanti')
-        }
-    } catch(err) {
-        throw err
-    }
-})
+}).region('europe-west2').pubsub.schedule('15 7 */1 * *').timeZone('Europe/Rome').onRun(() => sincronizzaOrari('Aule'))
 
 export const sincronizzaProfessori = functions.runWith({
     memory: '1GB',
     timeoutSeconds: 100
-}).region('europe-west2').pubsub.schedule('20 7 */1 * *').timeZone('Europe/Rome').onRun(async context => {
+}).region('europe-west2').pubsub.schedule('20 7 */1 * *').timeZone('Europe/Rome').onRun(() => sincronizzaOrari('Professori'))
+
+async function sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
     try {
-        console.time('Professori')
+        console.time(collection)
 
-        const orariProfessori = await ottieniOrariProfessori()
+        let orari = undefined
 
-        console.log('Orari recuperati')
+        // Recupero gli orari
+        if(collection === 'Classi') {
+            // Recupero le impostaziono per le cloud function
+            const anno = ((await firestore.collection('Impostazioni generali').doc('Cloud function').get()).data() as ImpostazioniCloudFunction).anno
+            if(anno === undefined) throw Error('Impostazioni cloud function mancanti')
+            console.log('Anno: ' + anno)
+            orari = await ottieniOrariClassi(anno)
+        } else if(collection === 'Aule') {
+            // Recupero le impostaziono per le cloud function
+            const anno = ((await firestore.collection('Impostazioni generali').doc('Cloud function').get()).data() as ImpostazioniCloudFunction).anno
+            if(anno === undefined) throw Error('Impostazioni cloud function mancanti')            
+            console.log('Anno: ' + anno)
+            orari = await ottieniOrariAule(anno)
+        } else if(collection === 'Professori') {
+            orari = await ottieniOrariProfessori()
+        }
 
+        if(orari === undefined) throw Error('Orari non definiti, collection utilizzata: ' + collection) // Probabilemtne ci sarà un errore prima
+        
         // Aggiungo tutti gli orari nel database
-        let risultati = await Promise.all(orariProfessori.orari.map(async professore => {
+        const risultati = await Promise.all(orari.orari.map(async orario => {
             // Recupero l'orario attualmente salvato nel database per confrontarlo con quello appena recuperato
-            const docRef = firestore.collection('Professori').doc(professore.nome)
+            const docRef = firestore.collection(collection).doc(orario.nome)
             const doc = await docRef.get()
             const orarioSalvato = doc.data() as Orario | undefined
 
             // Confronto i due orari
             let uguali = false // True se gli orari sono uguali
             if (orarioSalvato !== undefined && orarioSalvato.tabella !== undefined) {
-                uguali = confrontaOrari(orarioSalvato, professore) === undefined
+                uguali = confrontaOrari(orarioSalvato, orario) === undefined
             }
 
-            // Se gli orari sono diversi salvo quello precedente nello storico
+            // Se gli orari sono diversi salvo quello precedente nello storico (se non è nullo)
             if (!uguali && orarioSalvato !== undefined) {
-                await firestore.collection('Professori').doc(professore.nome).collection('Storico').add(orarioSalvato)
+                await firestore.collection(collection).doc(orario.nome).collection('Storico').add(orarioSalvato)
             } // Altrimenti non c'è niente da salvare, mi risparmi un'operazione di scrittura
-
+            
             // E salvo quello nuovo
-            if (doc.exists) {
+            if (doc.exists) { // Se il documento già esiste lo aggiorno
                 await docRef.update({
-                    ...professore,
+                    ...orario,
                     ultimoAggiornamento: admin.firestore.Timestamp.now()
                 })
-            } else {
+            } else { // Altrimenti lo assegno (creo)
                 await docRef.set({
-                    ...professore,
+                    ...orario,
                     ultimoAggiornamento: admin.firestore.Timestamp.now()
                 })
             }
             
             return {
-                classe: professore.nome,
+                nome: orario.nome,
                 modificato: !uguali
             }
         }))
 
-        risultati = risultati.filter(elemento => elemento.modificato)
+        // Recupero gli elementi modificati
+        const risultatiPositiivi = risultati.filter(elemento => elemento.modificato).map(elemento => elemento.nome)
+        const risultatiNegtivi = risultati.filter(elemento => !elemento.modificato).map(elemento => elemento.nome)
 
-        console.log('Elementi modificati', risultati.length, risultati.map(elem => elem.classe))
-        console.timeEnd('Professori')
+        console.log('Elementi modificati', risultatiPositiivi.length, risultatiPositiivi)
+        console.timeEnd(collection)
 
-        await firestore.collection('Professori').doc('Indici').set({
-            lista: orariProfessori.lista,
+        await firestore.collection(collection).doc('Indici').update({
+            lista: admin.firestore.FieldValue.arrayUnion(...orari.lista),
             ultimoAggiornamento: admin.firestore.Timestamp.now()                
         })
-            
-        console.log('Aggiornati ' + orariProfessori.lista.length + ' professori nel database con successo')
+        
+        console.log('Aggiornati ' + orari.lista.length + ' orari nel database con successo')
+
+        //Per ultimo salvo un documento di log
+        const log: LogOrari = {
+            cloudFunction: 'sincoronizza' + collection,
+            stato: 'ok',
+            orariModificati: risultatiPositiivi,
+            orariNonModificati: risultatiNegtivi,
+            data: admin.firestore.Timestamp.now()
+        }
+        await firestore.collection('Log').add(log)
     } catch(err) {
+        // Salvo un log di errore
+        const log: LogOrari = {
+            cloudFunction: 'sincoronizza' + collection,
+            stato: 'err',
+            messaggioErrore: err.toString(),
+            data: admin.firestore.Timestamp.now()
+        }
+        await firestore.collection('Log').add(log)
         throw err
     }
-})
+}

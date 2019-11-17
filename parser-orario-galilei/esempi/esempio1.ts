@@ -1,12 +1,12 @@
 import { ottieniOrariAule, ottieniOrariClassi, ottieniOrariProfessori, mostraOrario, estraiInformazioni, analizzaDati } from "../src"
-/*import * as fs from 'fs'
+import * as fs from 'fs'
 
 let buffer = fs.readFileSync('CERRI_C.pdf');
 
 estraiInformazioni(buffer).then(righe => {
     let orario = analizzaDati(righe, 'Cerri C')
     mostraOrario(orario)
-})*/
+})
 
 /*console.time('Aule')
 ottieniOrariAule('2020').then((risultato) =>{
