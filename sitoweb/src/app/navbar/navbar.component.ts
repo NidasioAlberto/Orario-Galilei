@@ -3,6 +3,21 @@ import { trigger, state, style, transition, animate, } from '@angular/animations
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { take, filter } from 'rxjs/operators';
 
+/**
+ * Questo componente è responsibile della navbar visualizzata in ogni pagina.
+ * 
+ * I componenti principali della navbar sono:
+ * - Bottone home: Questo bottone riporta l'icona della scuola e quando schiacciato
+ *    reindirizza l'utente alla schermata principale dei preferiti
+ * - Input ricerca: Questo input di testo permette di ricercare un orario nel database.
+ *    Se cliccato (quando prende focus e la tastiera di apre sui dispositivi mobili)
+ *    renderà visibili i filtri e nel momento in cui viene inserito un qualsiasi valore
+ *    viene mostrata la pagina con i risultati della ricerca
+ * - Bottone filtri: Apre e chiude i filtri
+ * - Filtri: Sono 4 bottoni che permettono di visualizzare tutti gli orari o filtrare
+ *    la ricerca per classi, aule o professori
+ */
+
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
@@ -16,7 +31,7 @@ import { take, filter } from 'rxjs/operators';
         height: '88px'
       })),
       transition('* => *', [
-        animate('0.2s ease-in'),
+        animate('0.2s ease'),
       ])
     ]),
     trigger('animazioneStrumenti', [
@@ -27,7 +42,7 @@ import { take, filter } from 'rxjs/operators';
         display: 'flex'
       })),
       transition('* => *', [
-        animate('0.2s ease-in'),
+        animate('0.2s ease'),
       ]),
     ])
   ]
@@ -44,13 +59,23 @@ export class NavbarComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    // All'avvio della navbar recupero i primi due valori dei parametri nell'url
+    // (il primo sarà vuoto mentre il secondo conterrà eventuali informazioni sullo
+    // stato dei filtri: aperti o chiusi)
     this.activatedRoute.queryParams.pipe(take(2)).subscribe(queryParams => {
+      // Recupero il valore di ricerca e il filtro selezionato
       this.valoreRicerca = queryParams.valore
       this.filtroSelezionato = queryParams.filtro
 
-      if (this.filtroSelezionato === undefined) this.filtroSelezionato = 'tutti'
+      // Se è selezionato un filtro tra quelli possibili lo imposto
+      if (queryParams.filtro !== undefined && queryParams.filtro in ['tutti', 'Classi', 'Aule', 'Professori'])
+        this.filtroSelezionato = queryParams.filtro
 
-      if (queryParams.strumenti === 'aperto') this.mostraFiltri(true)
+      // Se gli strumenti dovrebbero essere aperti li apro
+      if (queryParams.strumenti === 'aperto') this.stato = 'aperto'
+
+      // Se il valore ricerca è definito lo imposto
+      if(queryParams.ricerca)
 
       if (this.valoreRicerca === '.') {
         this.valoreRicerca = undefined
@@ -58,7 +83,7 @@ export class NavbarComponent implements OnInit {
     })
 
     this.activatedRoute.queryParams.subscribe(queryParams => {
-      if(queryParams.strumenti === 'aperto') this.stato = 'aperto'
+      if (queryParams.strumenti === 'aperto') this.stato = 'aperto'
       else this.stato = 'chiuso'
     })
 
@@ -86,7 +111,7 @@ export class NavbarComponent implements OnInit {
     console.log('mostraFiltri', this.stato, this.filtroSelezionato)
 
     this.router.navigate([], {
-      queryParams: { 
+      queryParams: {
         strumenti: this.stato
       },
       queryParamsHandling: 'merge'
@@ -107,7 +132,7 @@ export class NavbarComponent implements OnInit {
 
   aggiornaValoriRicerca(valoreRicerca?: string, filtro?: string) {
     let stato = this.stato
-    if(stato === 'chiuso') stato = undefined
+    if (stato === 'chiuso') stato = undefined
 
     if (valoreRicerca === '') valoreRicerca = undefined
 
@@ -124,7 +149,7 @@ export class NavbarComponent implements OnInit {
     if (valoreRicerca !== undefined || filtro !== undefined) {
       // Se è valido mostro la pagina ricerca
       this.router.navigate(['/ricerca'], {
-        queryParams: { 
+        queryParams: {
           valore: valoreRicerca,
           filtro: filtro,
           strumenti: stato
