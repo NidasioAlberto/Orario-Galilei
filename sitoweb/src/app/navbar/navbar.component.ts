@@ -89,8 +89,7 @@ export class NavbarComponent implements OnInit {
       if (queryParams.strumenti === 'aperto') this.stato = 'aperto'
 
       // Se il valore ricerca è definito lo imposto
-      if (queryParams.ricerca)
-
+      if (queryParams.valore)
         if (this.valoreRicerca === '.') {
           this.valoreRicerca = undefined
         }
