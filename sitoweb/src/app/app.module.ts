@@ -23,8 +23,9 @@ import { MatExpansionModule } from '@angular/material/expansion'
 import { MatInputModule } from '@angular/material/input'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { MatIconModule } from '@angular/material/icon'
-import { MatChipsModule } from '@angular/material/chips';
+import { MatChipsModule } from '@angular/material/chips'
 import { NavbarComponent } from './navbar/navbar.component'
+import { MatTooltipModule } from '@angular/material/tooltip'
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { NavbarComponent } from './navbar/navbar.component'
     MatSnackBarModule,
     MatIconModule,
     MatChipsModule,
+    MatTooltipModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

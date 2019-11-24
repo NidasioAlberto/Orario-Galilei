@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { trigger, state, style, transition, animate, } from '@angular/animations';
+import { trigger, state, style, transition, animate, group, keyframes, query, animateChild, } from '@angular/animations';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { take, filter } from 'rxjs/operators';
 
@@ -25,24 +25,37 @@ import { take, filter } from 'rxjs/operators';
   animations: [
     trigger('animazioneNavBar', [
       state('chiuso', style({
-        height: '48px',
+        height: '48px'
       })),
       state('aperto', style({
         height: '88px'
       })),
       transition('* => *', [
-        animate('0.2s ease'),
+        group([
+          query('@animazioneStrumenti', animateChild()),
+          animate('.15s ease'),
+        ]),
       ])
     ]),
     trigger('animazioneStrumenti', [
       state('chiuso', style({
-        display: 'none',
+        display: 'none'
       })),
       state('aperto', style({
-        display: 'flex'
+        display: 'block',
+        opacity: '1'
       })),
-      transition('* => *', [
-        animate('0.2s ease'),
+      transition('chiuso => aperto', [
+        animate('.15s ease', keyframes([
+          style({ display: 'block', opacity: '0', offset: 0 }),
+          style({ display: 'block', opacity: '1', offset: 1 })
+        ])),
+      ]),
+      transition('aperto => chiuso', [
+        animate('.15s ease', keyframes([
+          style({ display: 'block', opacity: '1', offset: 0 }),
+          style({ display: 'block', opacity: '0', offset: 1 })
+        ])),
       ]),
     ])
   ]
@@ -75,11 +88,11 @@ export class NavbarComponent implements OnInit {
       if (queryParams.strumenti === 'aperto') this.stato = 'aperto'
 
       // Se il valore ricerca è definito lo imposto
-      if(queryParams.ricerca)
+      if (queryParams.ricerca)
 
-      if (this.valoreRicerca === '.') {
-        this.valoreRicerca = undefined
-      }
+        if (this.valoreRicerca === '.') {
+          this.valoreRicerca = undefined
+        }
     })
 
     this.activatedRoute.queryParams.subscribe(queryParams => {
@@ -123,7 +136,8 @@ export class NavbarComponent implements OnInit {
     this.aggiornaValoriRicerca(this.valoreRicerca, filtro)
   }
 
-  tornaAllaHome() {
+  public tornaAllaHome() {
+    console.log('Torna alla home')
     this.valoreRicerca = undefined
     this.filtroSelezionato = undefined
     this.mostraFiltri(false)

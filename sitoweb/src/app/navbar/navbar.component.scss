@@ -1,3 +1,5 @@
+// Contenitore principale
+
 .contenitore-navbar {
   position: fixed;
   width: 100%;
@@ -6,20 +8,20 @@
 }
 
 .contenuto-navbar {
+  position: relative;
   height: 48px;
   margin: 12px;
 }
 
+// Contenuto principale
+
 .contenuto-principale {
+  height: 48px;
   display: flex;
 }
 
-.strumenti {
-  bottom: 0;
-  position: absolute;
-  display: none;
-  height: 48px;
-  padding-left: 48px;
+.contenuto-principale * {
+  z-index: 110;
 }
 
 .logo {
@@ -69,4 +71,32 @@
     width: 44px;
     height: 44px;
   }
+}
+
+// Contenitore strumenti
+
+.contenitore-strumenti {
+  display: none;
+  position: absolute;
+  height: 40px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-left: 48px;
+  overflow: auto;
+}
+
+.contenitore-strumenti::-webkit-scrollbar {
+  display: none;
+}
+
+.contenitore-strumenti * {
+  z-index: 109;
+}
+
+.strumenti {
+  width: 290px;
+  height: 40px;
+  box-sizing: border-box;
+  padding: 4px;
 }
