@@ -122,8 +122,6 @@ export class NavbarComponent implements OnInit {
       else this.stato = 'chiuso'
     }
 
-    console.log('mostraFiltri', this.stato, this.filtroSelezionato)
-
     let queryParams = {
       strumenti: this.stato
     }
@@ -142,7 +140,6 @@ export class NavbarComponent implements OnInit {
   }
 
   public tornaAllaHome() {
-    console.log('Torna alla home')
     this.valoreRicerca = undefined
     this.filtroSelezionato = undefined
     this.mostraFiltri(false)
