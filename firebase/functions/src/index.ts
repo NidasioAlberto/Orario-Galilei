@@ -1,10 +1,12 @@
 import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
 import { ottieniOrariClassiOAule, ottieniOrariProfessori, confrontaOrari } from 'parser-orario-galilei'
-import { Orario } from 'parser-orario-galilei/lib/utils'
-import { ImpostazioniCloudFunction } from './utils/utils'
+import { ImpostazioniCloudFunction } from './utils/impostazioni-cloud-function'
 import { LogOrari } from './utils/log-orari.model'
 import { Indici } from './utils/indici.model'
+import { Orario } from 'parser-orario-galilei/lib/utils'
+import { OrarioFirestore } from './utils/orario.model'
+import { Timestamp } from '@google-cloud/firestore'
 
 admin.initializeApp()
 const firestore = admin.firestore()
@@ -135,10 +137,27 @@ export const preparaBackupOrari = functions.region('europe-west2').pubsub.schedu
     const professori = await firestore.collection('Professori').doc('Indici').get().then(doc => doc.data() as Indici)
 
     // Recupero tutti gli orari
-    const orariClassi = await Promise.all(classi.lista.map(docId => firestore.collection('Classi').doc(docId).get())).then(docs => docs.map(doc => doc.data() as Orario))
-    const orariAule = await Promise.all(aule.lista.map(docId => firestore.collection('Aule').doc(docId).get())).then(docs => docs.map(doc => doc.data() as Orario))
-    const orariProfessori = await Promise.all(professori.lista.map(docId => firestore.collection('Professori').doc(docId).get())).then(docs => docs.map(doc => doc.data() as Orario))
+    let orariClassi = await Promise.all(classi.lista.map(docId => firestore.collection('Classi').doc(docId).get())).then(docs => docs.map(doc => doc.data() as OrarioFirestore))
+    let orariAule = await Promise.all(aule.lista.map(docId => firestore.collection('Aule').doc(docId).get())).then(docs => docs.map(doc => doc.data() as OrarioFirestore))
+    let orariProfessori = await Promise.all(professori.lista.map(docId => firestore.collection('Professori').doc(docId).get())).then(docs => docs.map(doc => doc.data() as OrarioFirestore))
 
+    // Traduco tutte le date da Firestore Timestamp in Date
+    orariClassi = orariClassi.map(orario => {
+        orario.dataAggiornamento = (orario.dataAggiornamento as admin.firestore.Timestamp).toDate()
+        orario.dataValidita = (orario.dataValidita as admin.firestore.Timestamp).toDate()
+        return orario
+    })
+    orariAule = orariAule.map(orario => {
+        orario.dataAggiornamento = (orario.dataAggiornamento as admin.firestore.Timestamp).toDate()
+        orario.dataValidita = (orario.dataValidita as admin.firestore.Timestamp).toDate()
+        return orario
+    })
+    orariProfessori = orariProfessori.map(orario => {
+        orario.dataAggiornamento = (orario.dataAggiornamento as admin.firestore.Timestamp).toDate()
+        orario.dataValidita = (orario.dataValidita as admin.firestore.Timestamp).toDate()
+        return orario
+    })
+    
     // Preparo un file json che include tutti gli orari
     const orari = { orariClassi, orariAule, orariProfessori }
 
