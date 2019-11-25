@@ -11,17 +11,17 @@ const firestore = admin.firestore()
 export const sincronizzaClassi = functions.runWith({
     memory: '1GB',
     timeoutSeconds: 100
-}).region('europe-west2').pubsub.schedule('10 7 */1 * *').timeZone('Europe/Rome').onRun(() => sincronizzaOrari('Classi'))
+}).region('europe-west2').pubsub.schedule('0 7 */1 * *').timeZone('Europe/Rome').onRun(() => sincronizzaOrari('Classi'))
 
 export const sincronizzaAule = functions.runWith({
     memory: '1GB',
     timeoutSeconds: 100
-}).region('europe-west2').pubsub.schedule('15 7 */1 * *').timeZone('Europe/Rome').onRun(() => sincronizzaOrari('Aule'))
+}).region('europe-west2').pubsub.schedule('5 7 */1 * *').timeZone('Europe/Rome').onRun(() => sincronizzaOrari('Aule'))
 
 export const sincronizzaProfessori = functions.runWith({
     memory: '1GB',
     timeoutSeconds: 100
-}).region('europe-west2').pubsub.schedule('20 7 */1 * *').timeZone('Europe/Rome').onRun(() => sincronizzaOrari('Professori'))
+}).region('europe-west2').pubsub.schedule('10 7 */1 * *').timeZone('Europe/Rome').onRun(() => sincronizzaOrari('Professori'))
 
 async function sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
     try {
