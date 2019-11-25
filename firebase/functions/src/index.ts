@@ -1,9 +1,10 @@
 import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
-import { ottieniOrariClassi, ottieniOrariAule, ottieniOrariProfessori, confrontaOrari } from 'parser-orario-galilei'
+import { ottieniOrariClassiOAule, ottieniOrariProfessori, confrontaOrari } from 'parser-orario-galilei'
 import { Orario } from 'parser-orario-galilei/lib/utils'
-import { ImpostazioniCloudFunction } from './utils'
+import { ImpostazioniCloudFunction } from './utils/utils'
 import { LogOrari } from './utils/log-orari.model'
+
 admin.initializeApp()
 const firestore = admin.firestore()
 
@@ -26,7 +27,11 @@ async function sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
     try {
         console.time(collection)
 
-        let orari = undefined
+        let orari: {
+            orari: Orario[];
+            lista: string[];
+            orariNonRecuperati: string[];
+        } | undefined = undefined
 
         // Recupero gli orari
         if(collection === 'Classi') {
@@ -34,13 +39,13 @@ async function sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
             const anno = ((await firestore.collection('Impostazioni generali').doc('Cloud function').get()).data() as ImpostazioniCloudFunction).anno
             if(anno === undefined) throw Error('Impostazioni cloud function mancanti')
             console.log('Anno: ' + anno)
-            orari = await ottieniOrariClassi(anno)
+            orari = await ottieniOrariClassiOAule(anno, 'Classi')
         } else if(collection === 'Aule') {
             // Recupero le impostaziono per le cloud function
             const anno = ((await firestore.collection('Impostazioni generali').doc('Cloud function').get()).data() as ImpostazioniCloudFunction).anno
             if(anno === undefined) throw Error('Impostazioni cloud function mancanti')            
             console.log('Anno: ' + anno)
-            orari = await ottieniOrariAule(anno)
+            orari = await ottieniOrariClassiOAule(anno, 'Aule')
         } else if(collection === 'Professori') {
             orari = await ottieniOrariProfessori()
         }
@@ -104,6 +109,7 @@ async function sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
             stato: 'ok',
             orariModificati: risultatiPositiivi,
             orariNonModificati: risultatiNegtivi,
+            orariNonRecuperati: orari.orariNonRecuperati,
             data: admin.firestore.Timestamp.now()
         }
         await firestore.collection('Log').add(log)

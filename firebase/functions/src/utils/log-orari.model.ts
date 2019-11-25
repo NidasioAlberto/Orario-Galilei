@@ -10,4 +10,5 @@ interface Log {
 export interface LogOrari extends Log {
     orariModificati?: string[]
     orariNonModificati?: string[]
+    orariNonRecuperati?: string[]
 }
