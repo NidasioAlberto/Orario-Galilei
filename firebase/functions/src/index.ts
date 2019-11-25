@@ -144,16 +144,19 @@ export const preparaBackupOrari = functions.region('europe-west2').pubsub.schedu
     orariClassi = orariClassi.map(orario => {
         orario.dataAggiornamento = (orario.dataAggiornamento as admin.firestore.Timestamp).toDate()
         orario.dataValidita = (orario.dataValidita as admin.firestore.Timestamp).toDate()
+        orario.ultimoAggiornamento = (orario.ultimoAggiornamento as admin.firestore.Timestamp).toDate()
         return orario
     })
     orariAule = orariAule.map(orario => {
         orario.dataAggiornamento = (orario.dataAggiornamento as admin.firestore.Timestamp).toDate()
         orario.dataValidita = (orario.dataValidita as admin.firestore.Timestamp).toDate()
+        orario.ultimoAggiornamento = (orario.ultimoAggiornamento as admin.firestore.Timestamp).toDate()
         return orario
     })
     orariProfessori = orariProfessori.map(orario => {
         orario.dataAggiornamento = (orario.dataAggiornamento as admin.firestore.Timestamp).toDate()
         orario.dataValidita = (orario.dataValidita as admin.firestore.Timestamp).toDate()
+        orario.ultimoAggiornamento = (orario.ultimoAggiornamento as admin.firestore.Timestamp).toDate()
         return orario
     })
     
