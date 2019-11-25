@@ -6,7 +6,6 @@ import { LogOrari } from './utils/log-orari.model'
 import { Indici } from './utils/indici.model'
 import { Orario } from 'parser-orario-galilei/lib/utils'
 import { OrarioFirestore } from './utils/orario.model'
-import { Timestamp } from '@google-cloud/firestore'
 
 admin.initializeApp()
 const firestore = admin.firestore()

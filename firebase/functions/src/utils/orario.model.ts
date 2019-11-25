@@ -1,12 +1,12 @@
-import { Timestamp } from "@google-cloud/firestore";
+import { firestore } from "firebase-admin";
 
 export interface OrarioFirestore {
     nome: string;
     tabella: ElementoTabella[];
-    dataAggiornamento?: Date | Timestamp;
-    dataValidita?: Date | Timestamp;
+    dataAggiornamento?: Date | firestore.Timestamp;
+    dataValidita?: Date | firestore.Timestamp;
     versione?: string;
-    ultimoAggiornamento?: Date | Timestamp;
+    ultimoAggiornamento?: Date | firestore.Timestamp;
 }
 
 export interface ElementoTabella {
