@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { trigger, state, style, transition, animate, group, keyframes, query, animateChild, } from '@angular/animations';
-import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
-import { take, filter } from 'rxjs/operators';
+import { Component, OnInit } from '@angular/core'
+import { trigger, state, style, transition, animate, group, keyframes, query, animateChild, } from '@angular/animations'
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router'
+import { take, filter } from 'rxjs/operators'
+import { StorageService } from '../core/storage.service'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 /**
  * Questo componente è responsibile della navbar visualizzata in ogni pagina.
@@ -63,15 +65,24 @@ import { take, filter } from 'rxjs/operators';
 export class NavbarComponent implements OnInit {
 
   stato: 'aperto' | 'chiuso' = 'chiuso'
+  loading: boolean = true
   filtroSelezionato: 'tutti' | 'Classi' | 'Aule' | 'Professori' = 'tutti'
   valoreRicerca: string
 
   constructor(
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private storage: StorageService,
+    private snackBar: MatSnackBar
   ) { }
 
   ngOnInit() {
+    // Recupero tutti gli orari all'allvio dell'app
+    this.storage.caricaOrariCompleti().then(() => {
+      this.loading = false
+      this.snackBar.open('Tutti gli orari sono stati sincronizzati', undefined, { duration: 1000 })
+    })
+
     // All'avvio della navbar recupero i primi due valori dei parametri nell'url
     // (il primo sarà vuoto mentre il secondo conterrà eventuali informazioni sullo
     // stato dei filtri: aperti o chiusi)

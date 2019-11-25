@@ -73,6 +73,16 @@
   }
 }
 
+.progress-bar {
+  position: absolute;
+  height: 8px;
+  width: 100%;
+  bottom: 0;
+  border-radius: 0 0 8px 8px;
+  clip-path: inset(4px 0 0 0);
+  background-color: greenyellow;
+}
+
 // Contenitore strumenti
 
 .contenitore-strumenti {

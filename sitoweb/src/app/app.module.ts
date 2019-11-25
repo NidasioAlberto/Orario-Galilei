@@ -26,8 +26,11 @@ import { MatInputModule } from '@angular/material/input'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { MatIconModule } from '@angular/material/icon'
 import { MatChipsModule } from '@angular/material/chips'
-import { NavbarComponent } from './navbar/navbar.component'
 import { MatTooltipModule } from '@angular/material/tooltip'
+import { MatProgressBarModule } from '@angular/material/progress-bar'
+
+// Componenti app
+import { NavbarComponent } from './navbar/navbar.component'
 import { RicercaComponent } from './ricerca/ricerca.component'
 
 @NgModule({
@@ -60,6 +63,7 @@ import { RicercaComponent } from './ricerca/ricerca.component'
     MatIconModule,
     MatChipsModule,
     MatTooltipModule,
+    MatProgressBarModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
