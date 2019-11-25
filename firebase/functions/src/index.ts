@@ -4,9 +4,11 @@ import { ottieniOrariClassiOAule, ottieniOrariProfessori, confrontaOrari } from 
 import { Orario } from 'parser-orario-galilei/lib/utils'
 import { ImpostazioniCloudFunction } from './utils/utils'
 import { LogOrari } from './utils/log-orari.model'
+import { Indici } from './utils/indici.model'
 
 admin.initializeApp()
 const firestore = admin.firestore()
+const bucket = admin.storage().bucket()
 
 export const sincronizzaClassi = functions.runWith({
     memory: '1GB',
@@ -125,3 +127,23 @@ async function sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
         throw err
     }
 }
+
+export const preparaBackupOrari = functions.region('europe-west2').pubsub.schedule('15 7 */1 * *').timeZone('Europe/Rome').onRun(async () => {
+    // Recupero gli indici da Firestore
+    const classi = await firestore.collection('Classi').doc('Indici').get().then(doc => doc.data() as Indici)
+    const aule = await firestore.collection('Aule').doc('Indici').get().then(doc => doc.data() as Indici)
+    const professori = await firestore.collection('Professori').doc('Indici').get().then(doc => doc.data() as Indici)
+
+    // Recupero tutti gli orari
+    const orariClassi = await Promise.all(classi.lista.map(docId => firestore.collection('Classi').doc(docId).get())).then(docs => docs.map(doc => doc.data() as Orario))
+    const orariAule = await Promise.all(aule.lista.map(docId => firestore.collection('Aule').doc(docId).get())).then(docs => docs.map(doc => doc.data() as Orario))
+    const orariProfessori = await Promise.all(professori.lista.map(docId => firestore.collection('Professori').doc(docId).get())).then(docs => docs.map(doc => doc.data() as Orario))
+
+    // Preparo un file json che include tutti gli orari
+    const orari = { orariClassi, orariAule, orariProfessori }
+
+    await bucket.file('backup-orari/test.json').save(JSON.stringify(orari), {
+        gzip: true,
+        contentType: 'application/json'
+    }).then(() => console.log('Creazione backup-orari completato'))
+})
