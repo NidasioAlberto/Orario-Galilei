@@ -28,6 +28,10 @@ Il codice si avvale di 2 librerie:
 
 **3.0.1** Ora vengono eliminati gli spazi nei nomi degli orari di aule e classi
 
+...
+
+**3.1.0** Aggiunta di dati per i log nei valori di ritorno delle funzioni ottieniOrari(Classi|Aule|Professori) ed eliminate delle ridondanze nel codice, ora le funzioni ottieniOrarioClassi e ottieniOrarioAule sono unite in un'unica funzione chiamata ottieniOrarioClassiOAule (lo stesso per ottieniListaClassiOAule). Migliorata inoltre la documentazione del codice
+
 ## Esempio
 
 Codice:
