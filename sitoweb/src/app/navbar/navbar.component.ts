@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { trigger, state, style, transition, animate, group, keyframes, query, animateChild, } from '@angular/animations';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { take, filter } from 'rxjs/operators';
-import undefined = require('firebase/empty-import');
 
 /**
  * Questo componente è responsibile della navbar visualizzata in ogni pagina.

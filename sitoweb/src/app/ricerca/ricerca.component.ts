@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
-import { map, distinctUntilChanged } from 'rxjs/operators';
+import { Component, OnInit } from '@angular/core'
+import { ActivatedRoute } from '@angular/router'
+import { Observable } from 'rxjs'
+import { map, distinctUntilChanged } from 'rxjs/operators'
+import { StorageService } from '../core/storage.service'
 
 @Component({
   selector: 'app-ricerca',
@@ -14,7 +15,7 @@ export class RicercaComponent implements OnInit {
   filtroRicerca: Observable<'Classi' | 'Aule' | 'Professori'>
 
   constructor(
-    private router: ActivatedRoute,
+    private router: ActivatedRoute
   ) { }
 
   ngOnInit() {

@@ -1,4 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser'
+import { HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
 
 import { AppRoutingModule } from './app-routing.module'
@@ -15,6 +16,7 @@ import { StorageModule } from '@ngx-pwa/local-storage'
 import { AngularFireModule } from '@angular/fire'
 import { AngularFirestoreModule } from '@angular/fire/firestore'
 import { AngularFirePerformanceModule } from '@angular/fire/performance'
+import { AngularFireStorageModule } from '@angular/fire/storage'
 
 // Componenti angular material
 import { MatButtonModule } from '@angular/material/button'
@@ -25,7 +27,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { MatIconModule } from '@angular/material/icon'
 import { MatChipsModule } from '@angular/material/chips'
 import { NavbarComponent } from './navbar/navbar.component'
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTooltipModule } from '@angular/material/tooltip'
 import { RicercaComponent } from './ricerca/ricerca.component'
 
 @NgModule({
@@ -36,6 +38,7 @@ import { RicercaComponent } from './ricerca/ricerca.component'
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production, registrationStrategy: 'registerImmediately' }),
@@ -46,6 +49,7 @@ import { RicercaComponent } from './ricerca/ricerca.component'
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule.enablePersistence(),
     AngularFirePerformanceModule,
+    AngularFireStorageModule,
 
     // Componenti angular material
     MatButtonModule,
