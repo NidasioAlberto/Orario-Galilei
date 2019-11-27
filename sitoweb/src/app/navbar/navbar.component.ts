@@ -4,7 +4,6 @@ import { Router, ActivatedRoute, NavigationEnd } from '@angular/router'
 import { take, filter } from 'rxjs/operators'
 import { StorageService } from '../core/storage.service'
 import { MatSnackBar } from '@angular/material/snack-bar'
-import undefined = require('firebase/empty-import')
 
 /**
  * Questo componente è responsibile della navbar visualizzata in ogni pagina.
@@ -157,8 +156,6 @@ export class NavbarComponent implements OnInit {
   }
 
   aggiornaValoriRicerca(valoreRicerca?: string, filtro?: string, event?: KeyboardEvent) {
-    console.log('Aggiorna valore ricerca', valoreRicerca, event)
-
     // Chiudo gli strumenti se viene premuto invio
     if(event !== undefined && event.key === 'Enter') this.stato = 'chiuso'
     else this.stato = 'aperto'
