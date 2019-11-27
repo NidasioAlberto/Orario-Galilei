@@ -12,7 +12,7 @@
 				<div class="ricerca">
 					<input #ricerca type="text" name="Ricerca" placeholder="Cerca classi, prof o aule"
 						aria-label="Valore ricerca" (focus)="mostraFiltri(true)"
-						(keyup)="aggiornaValoriRicerca(ricerca.value, filtroSelezionato)" [(ngModel)]="valoreRicerca">
+						(keyup)="aggiornaValoriRicerca(ricerca.value, filtroSelezionato, $event)" [(ngModel)]="valoreRicerca">
 				</div>
 				<div class="bottone">
 					<button mat-icon-button (click)="mostraFiltri()" aria-label="Filtri" matTooltip="Mostra i filtri">
