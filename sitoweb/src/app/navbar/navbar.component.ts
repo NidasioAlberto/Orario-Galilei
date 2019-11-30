@@ -4,6 +4,7 @@ import { Router, ActivatedRoute, NavigationEnd } from '@angular/router'
 import { take, filter } from 'rxjs/operators'
 import { StorageService } from '../core/storage.service'
 import { MatSnackBar } from '@angular/material/snack-bar'
+import undefined = require('firebase/empty-import')
 
 /**
  * Questo componente è responsibile della navbar visualizzata in ogni pagina.
@@ -66,7 +67,10 @@ export class NavbarComponent implements OnInit {
 
   stato: 'aperto' | 'chiuso' = 'chiuso'
   loading: boolean = true
-  filtroSelezionato: 'tutti' | 'Classi' | 'Aule' | 'Professori' = 'tutti'
+  filtriSelezionati: ('tutti' | 'Classi' | 'Aule' | 'Professori')[] = undefined
+  filtroClassi: boolean = false
+  filtroAule: boolean = false
+  filtroProfessori: boolean = false
   valoreRicerca: string
 
   constructor(
@@ -87,13 +91,11 @@ export class NavbarComponent implements OnInit {
     // (il primo sarà vuoto mentre il secondo conterrà eventuali informazioni sullo
     // stato dei filtri: aperti o chiusi)
     this.activatedRoute.queryParams.pipe(take(2)).subscribe(queryParams => {
-      // Recupero il valore di ricerca e il filtro selezionato
+      // Recupero il valore di ricerca
       this.valoreRicerca = queryParams.valore
-      this.filtroSelezionato = queryParams.filtro
 
-      // Se è selezionato un filtro tra quelli possibili lo imposto
-      if (queryParams.filtro !== undefined && queryParams.filtro in ['tutti', 'Classi', 'Aule', 'Professori'])
-        this.filtroSelezionato = queryParams.filtro
+      // Recupero e imposto i filtri
+      this.impostaFiltri(queryParams.filtri)
 
       // Se gli strumenti dovrebbero essere aperti li apro
       if (queryParams.strumenti === 'aperto') this.stato = 'aperto'
@@ -117,7 +119,7 @@ export class NavbarComponent implements OnInit {
         this.valoreRicerca = ''
       }
       if (!event.url.includes('filtro')) {
-        this.filtroSelezionato = 'tutti'
+        this.filtriSelezionati = undefined
       }
     })
   }
@@ -143,19 +145,55 @@ export class NavbarComponent implements OnInit {
     })
   }
 
-  cambiaFiltro(filtro: 'tutti' | 'Classi' | 'Aule' | 'Professori' = 'tutti') {
-    this.filtroSelezionato = filtro
-    this.aggiornaValoriRicerca(this.valoreRicerca, filtro)
+  impostaFiltri(filtri: ('Classi' | 'Aule' | 'Professori')[]) {
+    this.filtriSelezionati = filtri
+    if(filtri !== undefined) {
+      this.filtroClassi = filtri.includes('Classi')
+      this.filtroAule = filtri.includes('Aule')
+      this.filtroProfessori = filtri.includes('Professori')
+    } else {
+      this.filtroClassi = false
+      this.filtroAule = false
+      this.filtroProfessori = false
+    }
+  }
+
+  public toggleFiltro(filtro?: 'Classi' | 'Aule' | 'Professori') {
+    console.log(filtro)
+    
+    // Aggiorni i filtri
+    if(filtro === undefined) {
+      this.filtriSelezionati = undefined
+      this.filtroClassi = false
+      this.filtroAule = false
+      this.filtroProfessori = false
+    } else {
+      if(filtro === 'Classi') this.filtroClassi = !this.filtroClassi
+      if(filtro === 'Aule') this.filtroAule = !this.filtroAule
+      if(filtro === 'Professori') this.filtroProfessori = !this.filtroProfessori
+      
+      this.filtriSelezionati = []
+      
+      if(this.filtroClassi) this.filtriSelezionati.push('Classi')
+      if(this.filtroAule) this.filtriSelezionati.push('Aule')
+      if(this.filtroProfessori) this.filtriSelezionati.push('Professori')
+    }
+    this.aggiornaValoriRicerca()
+
+    console.log(this.filtroClassi, this.filtroAule, this.filtroProfessori)
+    console.log(this.filtriSelezionati)
   }
 
   public tornaAllaHome() {
     this.valoreRicerca = undefined
-    this.filtroSelezionato = undefined
+    this.filtriSelezionati = undefined
     this.mostraFiltri(false)
     this.aggiornaValoriRicerca()
   }
 
-  aggiornaValoriRicerca(valoreRicerca?: string, filtro?: string, event?: KeyboardEvent) {
+  aggiornaValoriRicerca(event?: KeyboardEvent) {
+    let valoreRicerca = this.valoreRicerca
+    let filtriSelezionati = this.filtriSelezionati
     // Chiudo gli strumenti se viene premuto invio
     if(event !== undefined && event.key === 'Enter') this.stato = 'chiuso'
     else this.stato = 'aperto'
@@ -166,22 +204,17 @@ export class NavbarComponent implements OnInit {
 
     if (valoreRicerca === '') valoreRicerca = undefined
 
-    if (filtro === 'tutti' && valoreRicerca === undefined) {
+    if (filtriSelezionati === undefined && valoreRicerca === undefined) {
       valoreRicerca = '.' // E' una regex
     }
 
-    // Se il filtro è impostato a tutti non lo inserisco
-    if (filtro === 'tutti') {
-      filtro = undefined
-    }
-
     // Ogni volta che il valore di ricerca è valido mostro la pagina di ricerca
-    if (valoreRicerca !== undefined || filtro !== undefined) {
+    if (valoreRicerca !== undefined || filtriSelezionati !== undefined) {
       // Se è valido mostro la pagina ricerca
       this.router.navigate(['/ricerca'], {
         queryParams: {
           valore: valoreRicerca,
-          filtro: filtro,
+          filtri: filtriSelezionati,
           strumenti: stato
         }
       })
