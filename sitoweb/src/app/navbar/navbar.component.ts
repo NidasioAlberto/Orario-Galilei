@@ -4,7 +4,6 @@ import { Router, ActivatedRoute, NavigationEnd } from '@angular/router'
 import { take, filter } from 'rxjs/operators'
 import { StorageService } from '../core/storage.service'
 import { MatSnackBar } from '@angular/material/snack-bar'
-import undefined = require('firebase/empty-import')
 
 /**
  * Questo componente è responsibile della navbar visualizzata in ogni pagina.
@@ -67,7 +66,7 @@ export class NavbarComponent implements OnInit {
 
   stato: 'aperto' | 'chiuso' = 'chiuso'
   loading: boolean = true
-  filtriSelezionati: ('tutti' | 'Classi' | 'Aule' | 'Professori')[] = undefined
+  filtriSelezionati: ('Classi' | 'Aule' | 'Professori')[]
   filtroClassi: boolean = false
   filtroAule: boolean = false
   filtroProfessori: boolean = false
@@ -107,6 +106,7 @@ export class NavbarComponent implements OnInit {
         }
     })
 
+    // Controllo se aprire o chiudere gli strumenti in base ai parametri della navbar
     this.activatedRoute.queryParams.subscribe(queryParams => {
       if (queryParams.strumenti === 'aperto') this.stato = 'aperto'
       else this.stato = 'chiuso'
@@ -137,7 +137,7 @@ export class NavbarComponent implements OnInit {
       strumenti: this.stato
     }
 
-    if(this.stato == 'chiuso') queryParams.strumenti = undefined
+    if (this.stato == 'chiuso') queryParams.strumenti = undefined
 
     this.router.navigate([], {
       queryParams,
@@ -147,7 +147,7 @@ export class NavbarComponent implements OnInit {
 
   impostaFiltri(filtri: ('Classi' | 'Aule' | 'Professori')[]) {
     this.filtriSelezionati = filtri
-    if(filtri !== undefined) {
+    if (filtri !== undefined) {
       this.filtroClassi = filtri.includes('Classi')
       this.filtroAule = filtri.includes('Aule')
       this.filtroProfessori = filtri.includes('Professori')
@@ -159,68 +159,55 @@ export class NavbarComponent implements OnInit {
   }
 
   public toggleFiltro(filtro?: 'Classi' | 'Aule' | 'Professori') {
-    console.log(filtro)
-    
     // Aggiorni i filtri
-    if(filtro === undefined) {
+    if (filtro === undefined) {
       this.filtriSelezionati = undefined
       this.filtroClassi = false
       this.filtroAule = false
       this.filtroProfessori = false
     } else {
-      if(filtro === 'Classi') this.filtroClassi = !this.filtroClassi
-      if(filtro === 'Aule') this.filtroAule = !this.filtroAule
-      if(filtro === 'Professori') this.filtroProfessori = !this.filtroProfessori
-      
+      if (filtro === 'Classi') this.filtroClassi = !this.filtroClassi
+      if (filtro === 'Aule') this.filtroAule = !this.filtroAule
+      if (filtro === 'Professori') this.filtroProfessori = !this.filtroProfessori
+
       this.filtriSelezionati = []
-      
-      if(this.filtroClassi) this.filtriSelezionati.push('Classi')
-      if(this.filtroAule) this.filtriSelezionati.push('Aule')
-      if(this.filtroProfessori) this.filtriSelezionati.push('Professori')
+
+      if (this.filtroClassi) this.filtriSelezionati.push('Classi')
+      if (this.filtroAule) this.filtriSelezionati.push('Aule')
+      if (this.filtroProfessori) this.filtriSelezionati.push('Professori')
     }
     this.aggiornaValoriRicerca()
-
-    console.log(this.filtroClassi, this.filtroAule, this.filtroProfessori)
-    console.log(this.filtriSelezionati)
   }
 
   public tornaAllaHome() {
     this.valoreRicerca = undefined
     this.filtriSelezionati = undefined
-    this.mostraFiltri(false)
-    this.aggiornaValoriRicerca()
+    this.impostaFiltri(this.filtriSelezionati)
+    this.router.navigate(['/'])
   }
 
   aggiornaValoriRicerca(event?: KeyboardEvent) {
     let valoreRicerca = this.valoreRicerca
     let filtriSelezionati = this.filtriSelezionati
     // Chiudo gli strumenti se viene premuto invio
-    if(event !== undefined && event.key === 'Enter') this.stato = 'chiuso'
+    if (event !== undefined && event.key === 'Enter') this.stato = 'chiuso'
     else this.stato = 'aperto'
 
     let stato = this.stato
 
     if (stato === 'chiuso') stato = undefined
 
-    if (valoreRicerca === '') valoreRicerca = undefined
-
-    if (filtriSelezionati === undefined && valoreRicerca === undefined) {
+    if (filtriSelezionati === undefined && (valoreRicerca === '' || valoreRicerca === undefined)) {
       valoreRicerca = '.' // E' una regex
     }
 
-    // Ogni volta che il valore di ricerca è valido mostro la pagina di ricerca
-    if (valoreRicerca !== undefined || filtriSelezionati !== undefined) {
-      // Se è valido mostro la pagina ricerca
-      this.router.navigate(['/ricerca'], {
-        queryParams: {
-          valore: valoreRicerca,
-          filtri: filtriSelezionati,
-          strumenti: stato
-        }
-      })
-    } else {
-      // Altrimenti la pagina principale
-      this.router.navigate(['/'])
-    }
+    // Mostro la pagina di ricerca
+    this.router.navigate(['/ricerca'], {
+      queryParams: {
+        valore: valoreRicerca,
+        filtri: filtriSelezionati,
+        strumenti: stato
+      }
+    })
   }
 }
