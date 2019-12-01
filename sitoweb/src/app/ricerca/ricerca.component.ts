@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { Observable } from 'rxjs'
-import { map, distinctUntilChanged } from 'rxjs/operators'
+import { Observable, combineLatest, from } from 'rxjs'
+import { map, distinctUntilChanged, concatMap } from 'rxjs/operators'
 import { StorageService } from '../core/storage.service'
 
 @Component({
@@ -12,10 +12,12 @@ import { StorageService } from '../core/storage.service'
 export class RicercaComponent implements OnInit {
 
   valoreRicerca: Observable<string>
-  filtroRicerca: Observable<'Classi' | 'Aule' | 'Professori'>
+  filtriRicerca: Observable<('tutti' | 'Classi' | 'Aule' | 'Professori')[]>
+
 
   constructor(
-    private router: ActivatedRoute
+    private router: ActivatedRoute,
+    private storage: StorageService
   ) { }
 
   ngOnInit() {
@@ -25,17 +27,27 @@ export class RicercaComponent implements OnInit {
       map(valore => (valore === '*' || valore === 'Tutti' ? '.' : valore)),
       distinctUntilChanged()
     )
-    this.filtroRicerca = this.router.queryParams.pipe(
-      map(params => params.filtro),
+    this.filtriRicerca = this.router.queryParams.pipe(
+      map(params => params.filtri),
       distinctUntilChanged()
     )
+
+    // Combino il valore di ricerca con i filtri da applicare per ottenere i risultati da mostrare
+    combineLatest([this.valoreRicerca, this.filtriRicerca]).pipe(
+      concatMap(([valoreRicerca, filtriRicerca]) => from(this.storage.cercaOrari(valoreRicerca, filtriRicerca)))
+    ).subscribe(risultatiRicerca => console.log('Risultati ricerca:', risultatiRicerca))
+
+    // Combino il valore di ricerca con gli indici degli orari, in questo modo creo la lista di risultati da presentare all'utente
+    /*this.indiciFiltrati = combineLatest([this.valoreRicerca, this.indici]).pipe(
+      map(elementiRicerca => elementiRicerca[1].filter(elemento => RegExp(elementiRicerca[0], 'i').test(elemento.nome)))
+    )*/
 
     // Debug
     this.valoreRicerca.subscribe(valore => {
       console.log('Valore ricerca', valore)
     })
-    this.filtroRicerca.subscribe(valore => {
-      console.log('Filtro ricerca', valore)
+    this.filtriRicerca.subscribe(valore => {
+      console.log('Filtri ricerca', valore)
     })
   }
 
