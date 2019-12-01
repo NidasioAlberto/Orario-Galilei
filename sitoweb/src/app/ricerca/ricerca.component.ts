@@ -12,7 +12,7 @@ import { StorageService } from '../core/storage.service'
 export class RicercaComponent implements OnInit {
 
   valoreRicerca: Observable<string>
-  filtriRicerca: Observable<('tutti' | 'Classi' | 'Aule' | 'Professori')[]>
+  filtriRicerca: Observable<('Classi' | 'Aule' | 'Professori')[]>
 
 
   constructor(
