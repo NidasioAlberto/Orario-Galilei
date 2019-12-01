@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router'
 import { Observable, combineLatest, from } from 'rxjs'
 import { map, distinctUntilChanged, concatMap } from 'rxjs/operators'
 import { StorageService } from '../core/storage.service'
+import { Orario } from '../utils/orario.model'
 
 @Component({
   selector: 'app-ricerca',
@@ -13,7 +14,7 @@ export class RicercaComponent implements OnInit {
 
   valoreRicerca: Observable<string>
   filtriRicerca: Observable<('Classi' | 'Aule' | 'Professori')[]>
-
+  orariFiltrati: Observable<Orario[]>
 
   constructor(
     private router: ActivatedRoute,
@@ -33,22 +34,9 @@ export class RicercaComponent implements OnInit {
     )
 
     // Combino il valore di ricerca con i filtri da applicare per ottenere i risultati da mostrare
-    combineLatest([this.valoreRicerca, this.filtriRicerca]).pipe(
+    this.orariFiltrati = combineLatest([this.valoreRicerca, this.filtriRicerca]).pipe(
       concatMap(([valoreRicerca, filtriRicerca]) => from(this.storage.cercaOrari(valoreRicerca, filtriRicerca)))
-    ).subscribe(risultatiRicerca => console.log('Risultati ricerca:', risultatiRicerca))
-
-    // Combino il valore di ricerca con gli indici degli orari, in questo modo creo la lista di risultati da presentare all'utente
-    /*this.indiciFiltrati = combineLatest([this.valoreRicerca, this.indici]).pipe(
-      map(elementiRicerca => elementiRicerca[1].filter(elemento => RegExp(elementiRicerca[0], 'i').test(elemento.nome)))
-    )*/
-
-    // Debug
-    this.valoreRicerca.subscribe(valore => {
-      console.log('Valore ricerca', valore)
-    })
-    this.filtriRicerca.subscribe(valore => {
-      console.log('Filtri ricerca', valore)
-    })
+    )
   }
 
 }

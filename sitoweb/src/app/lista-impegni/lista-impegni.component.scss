@@ -1,0 +1,20 @@
+@import "../../styles.scss";
+
+.tag-ora {
+  @extend .card-con-bordi;
+  @extend .mat-elevation-z4;
+  padding: 4px 8px;
+  margin: 4px 4px;
+  display: inline-block;
+}
+
+.tag-ora-corrente {
+  @extend .tag-ora;
+  background-color: $primary-color;
+  color: white;
+}
+
+.tag-ora-successiva {
+  @extend .tag-ora;
+  background-color: $accent-color;
+}

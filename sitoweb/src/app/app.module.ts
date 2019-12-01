@@ -7,6 +7,7 @@ import { AppComponent } from './app.component'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { ServiceWorkerModule } from '@angular/service-worker'
 import { FormsModule } from '@angular/forms'
+import { ScrollingModule } from '@angular/cdk/scrolling'
 
 // Environment
 import { environment } from '../environments/environment'
@@ -32,12 +33,18 @@ import { MatProgressBarModule } from '@angular/material/progress-bar'
 // Componenti app
 import { NavbarComponent } from './navbar/navbar.component'
 import { RicercaComponent } from './ricerca/ricerca.component'
+import { ListaOrariComponent } from './lista-orari/lista-orari.component'
+import { ElementoListaOrariComponent } from './lista-orari/elemento-lista-orari/elemento-lista-orari.component'
+import { ListaImpegniComponent } from './lista-impegni/lista-impegni.component'
 
 @NgModule({
   declarations: [
     AppComponent,
     NavbarComponent,
     RicercaComponent,
+    ListaOrariComponent,
+    ElementoListaOrariComponent,
+    ListaImpegniComponent,
   ],
   imports: [
     BrowserModule,
@@ -46,6 +53,7 @@ import { RicercaComponent } from './ricerca/ricerca.component'
     BrowserAnimationsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production, registrationStrategy: 'registerImmediately' }),
     FormsModule,
+    ScrollingModule,
 
     // Moduli firebase e storage
     StorageModule.forRoot({ IDBNoWrap: true }),

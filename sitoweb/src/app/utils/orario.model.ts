@@ -11,13 +11,13 @@ export interface Info {
 export interface Orario {
     nome: string
     tabella: ElementoTabella[]
-    dataAggiornamento?: Date | firebase.firestore.Timestamp
-    dataValidita?: Date | firebase.firestore.Timestamp
-    versione?: number
-
-    collection?: string
-    tipo?: string
+    dataAggiornamento: Date | firebase.firestore.Timestamp
+    dataValidita: Date | firebase.firestore.Timestamp
     ultimoAggiornamento: Date | firebase.firestore.Timestamp
+    versione: string
+
+    // Valori aggiuntivi
+    tipo?: string
 }
 
 export interface RisultatoConfronto {
