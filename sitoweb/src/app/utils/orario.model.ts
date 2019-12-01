@@ -18,6 +18,7 @@ export interface Orario {
 
     // Valori aggiuntivi
     tipo?: string
+    collection?: string
 }
 
 export interface RisultatoConfronto {

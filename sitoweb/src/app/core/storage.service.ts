@@ -5,6 +5,9 @@ import { Orario, ProssimoImpegno, Info } from '../utils/orario.model'
 import { StorageMap } from '@ngx-pwa/local-storage'
 import { interval, BehaviorSubject, } from 'rxjs'
 import { map, startWith } from 'rxjs/operators'
+import undefined = require('firebase/empty-import')
+
+// TODO: Aggiungere la lettura da firebase?
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +36,7 @@ export class StorageService {
     ).subscribe(tempo => {
       console.log('Controllo il tempo, ora: ' + tempo.ora + ' giorno: ' + tempo.giorno)
       const tempoSalvato = this.tempo.value
-      if(tempo.giorno !== tempoSalvato.giorno || tempo.ora !== tempoSalvato.ora) this.tempo.next(tempo)
+      if (tempo.giorno !== tempoSalvato.giorno || tempo.ora !== tempoSalvato.ora) this.tempo.next(tempo)
     })
   }
 
@@ -50,9 +53,9 @@ export class StorageService {
       }) => {
         // Salvo tutti gli orari in IndexedDB
         await Promise.all([
-          this.storageMap.set('classi', orari.orariClassi).toPromise(),
-          this.storageMap.set('aule', orari.orariAule).toPromise(),
-          this.storageMap.set('professori', orari.orariProfessori).toPromise()
+          this.storageMap.set('Classi', orari.orariClassi).toPromise(),
+          this.storageMap.set('Aule', orari.orariAule).toPromise(),
+          this.storageMap.set('Professori', orari.orariProfessori).toPromise()
         ])
       })
     })
@@ -60,27 +63,39 @@ export class StorageService {
 
   public async cercaOrari(valoreRicerca: string, filtroRicerca: ('Classi' | 'Aule' | 'Professori')[]) {
     let orari: Orario[] = []
-
-    // Recupero gli orari in base ai filtri
-    if (filtroRicerca === undefined || filtroRicerca.includes('Classi'))
-      orari.push(...(await this.storageMap.get('classi').toPromise() as Orario[]).map(orario => {
-        orario.tipo = 'Classe'
-        return orario
-      }))
-    if (filtroRicerca === undefined || filtroRicerca.includes('Aule'))
-      orari.push(...(await this.storageMap.get('aule').toPromise() as Orario[]).map(orario => {
-        orario.tipo = 'Aula'
-        return orario
-      }))
-    if (filtroRicerca === undefined || filtroRicerca.includes('Professori'))
-      orari.push(...(await this.storageMap.get('professori').toPromise() as Orario[]).map(orario => {
-        orario.tipo = 'Professore'
-        return orario
-      }))
-
-    // Filtro per il valore di ricerca
     const regex = RegExp(valoreRicerca, 'i')
-    return orari.filter(orario => regex.test(orario.nome))
+
+    // Recupero gli orari in base ai filtri controllando il valore di ricerca
+    if (filtroRicerca === undefined || filtroRicerca.includes('Classi'))
+      orari.push(...(await this.storageMap.get('Classi').toPromise() as Orario[])
+        .filter(orario => regex.test(orario.nome))
+        .map(orario => {
+          orario.tipo = 'Classe'
+          orario.collection = 'Classi'
+          return orario
+        }))
+    if (filtroRicerca === undefined || filtroRicerca.includes('Aule'))
+      orari.push(...(await this.storageMap.get('Aule').toPromise() as Orario[])
+        .filter(orario => regex.test(orario.nome))
+        .map(orario => {
+          orario.tipo = 'Aula'
+          orario.collection = 'Aule'
+          return orario
+        }))
+    if (filtroRicerca === undefined || filtroRicerca.includes('Professori'))
+      orari.push(...(await this.storageMap.get('Professori').toPromise() as Orario[])
+        .filter(orario => regex.test(orario.nome))
+        .map(orario => {
+          orario.tipo = 'Professore'
+          orario.collection = 'Professori'
+          return orario
+        }))
+
+    return orari
+  }
+
+  public async ottieniOrario(collection: 'Classi' | 'Aule' | 'Professori', nome: string) {
+    return (await this.cercaOrari(nome, [collection]))[0]
   }
 
   /**
@@ -149,12 +164,12 @@ export class StorageService {
             return {
               ora: ora.ora,
               elementi: info.elementi
-            } 
+            }
           } else {
             return undefined
           }
         }).filter(giorno => giorno !== undefined)
-        
+
         //orario.tabelleOrario.tabellaPerGiorni.find(orarioGiorno => orarioGiorno.giorno === giornoControllo)
 
         if (datiGiornoCorrente !== undefined) {
