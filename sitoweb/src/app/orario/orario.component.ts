@@ -70,7 +70,6 @@ export class OrarioComponent implements OnInit {
   async toogglePrefetiti() {
     const orarioAggiornato = this.orario.value as Orario
     orarioAggiornato.preferito = !orarioAggiornato.preferito
-    console.log('Stato preferito', orarioAggiornato.preferito)
     this.storage.aggiornaOrario(orarioAggiornato)
     this.orario.next(orarioAggiornato)
   }
