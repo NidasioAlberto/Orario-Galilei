@@ -50,7 +50,31 @@ export class StorageService {
         orariAule: Orario[],
         orariProfessori: Orario[]
       }) => {
-        // Salvo tutti gli orari in IndexedDB
+        // Salvo tutti gli orari in IndexedDB mantenendo però le preferenze
+
+        // Recupero eventuali orari già salvati localmente
+        const classi = await this.storageMap.get('Classi').toPromise() as Orario[]
+        const aule = await this.storageMap.get('Aule').toPromise() as Orario[]
+        const professori = await this.storageMap.get('Professori').toPromise() as Orario[]
+
+        // Per ogni nuovo orario controllo se era salvato come preferito
+        orari.orariClassi = orari.orariClassi.map(orario => {
+          const vecchioOrario = classi.find(classe => classe.nome === orario.nome)
+          if(vecchioOrario !== undefined && vecchioOrario.preferito) orario.preferito = true
+          return orario
+        })
+        orari.orariAule = orari.orariAule.map(orario => {
+          const vecchioOrario = aule.find(aula => aula.nome === orario.nome)
+          if(vecchioOrario !== undefined && vecchioOrario.preferito) orario.preferito = true
+          return orario
+        })
+        orari.orariProfessori = orari.orariProfessori.map(orario => {
+          const vecchioOrario = professori.find(professore => professore.nome === orario.nome)
+          if(vecchioOrario !== undefined && vecchioOrario.preferito) orario.preferito = true
+          return orario
+        })
+
+        // Salvo i nuovi orari, comprensivi delle vecchie preferenze
         await Promise.all([
           this.storageMap.set('Classi', orari.orariClassi).toPromise(),
           this.storageMap.set('Aule', orari.orariAule).toPromise(),
@@ -96,30 +120,35 @@ export class StorageService {
   public async ottieniOrario(collection: 'Classi' | 'Aule' | 'Professori', nome: string) {
     const risultati = (await this.cercaOrari(nome, [collection]))
 
-    if(risultati.length === 0) return null
+    if (risultati.length === 0) return null
     else return risultati[0]
   }
 
   public async ottieniPreferiti() {
     const preferiti: Orario[] = []
 
+    // Per mantenere la retrocompatibilità recupero anche eventuali elementi presenti nella sezione 'preferiti'
+    const vecchiPreferiti = await this.storageMap.get('preferiti').toPromise() as Orario[]
+
+    const filtroOrari = (orario: Orario) => orario.preferito || (vecchiPreferiti !== undefined && vecchiPreferiti.find(vecchioPreferito => vecchioPreferito.nome === orario.nome))
+
     // Recupero tutti gli orari con il flag preferito a true
     preferiti.push(...(await this.storageMap.get('Classi').toPromise() as Orario[])
-      .filter(orario => orario.preferito)
+      .filter(filtroOrari)
       .map(orario => {
         orario.tipo = 'Classe'
         orario.collection = 'Classi'
         return orario
       }))
     preferiti.push(...(await this.storageMap.get('Aule').toPromise() as Orario[])
-      .filter(orario => orario.preferito)
+      .filter(filtroOrari)
       .map(orario => {
         orario.tipo = 'Aula'
         orario.collection = 'Aule'
         return orario
       }))
     preferiti.push(...(await this.storageMap.get('Professori').toPromise() as Orario[])
-      .filter(orario => orario.preferito)
+      .filter(filtroOrari)
       .map(orario => {
         orario.tipo = 'Professore'
         orario.collection = 'Professori'
