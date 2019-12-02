@@ -15,10 +15,12 @@ export interface Orario {
     dataValidita: Date | firebase.firestore.Timestamp
     ultimoAggiornamento: Date | firebase.firestore.Timestamp
     versione: string
+    preferiti?: number
 
     // Valori aggiuntivi
     tipo?: string
     collection?: string
+    preferito?: boolean
 }
 
 export interface RisultatoConfronto {

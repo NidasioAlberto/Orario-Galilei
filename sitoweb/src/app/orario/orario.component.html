@@ -4,9 +4,6 @@
             <div class="titolo-orario">
                 <ng-container *ngIf="orario | async as datiOrario">
                     {{datiOrario.tipo}}: {{datiOrario.nome}}
-                    <ng-container *ngIf="datiOrario.versione !== undefined">
-                        v{{datiOrario.versione}}
-                    </ng-container>
                 </ng-container>
             </div>
 
@@ -25,12 +22,12 @@
             </div>
 
             <div class="contenitore-bottome-preferito">
-                <ng-container *ngIf="!inPreferiti; else mostraRimuovi">
-                    <button mat-raised-button color="primary" (click)="aggiungiAiPreferiti()">Aggiungi ai
+                <ng-container *ngIf="!(orario | async)?.preferito; else mostraRimuovi">
+                    <button mat-raised-button color="primary" (click)="toogglePrefetiti()">Aggiungi ai
                         preferiti</button>
                 </ng-container>
                 <ng-template #mostraRimuovi>
-                    <button mat-raised-button color="warn" (click)="rimuoviDaiPreferiti()">Rimuovi dai
+                    <button mat-raised-button color="warn" (click)="toogglePrefetiti()">Rimuovi dai
                         preferiti</button>
                 </ng-template>
             </div>

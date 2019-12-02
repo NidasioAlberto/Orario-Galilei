@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core'
 import { trigger, state, style, transition, animate } from '@angular/animations'
-import { Observable, from, combineLatest } from 'rxjs'
-import { Orario } from '../utils/orario.model'
+import { Observable, from, combineLatest, BehaviorSubject } from 'rxjs'
 import { StorageService } from '../core/storage.service'
 import { ActivatedRoute } from '@angular/router'
-import { mergeMap, filter, distinctUntilChanged, share, map } from 'rxjs/operators'
+import { mergeMap, filter, distinctUntilChanged, map } from 'rxjs/operators'
+import { Orario } from '../utils/orario.model'
 
 @Component({
   selector: 'app-orario',
@@ -26,7 +26,7 @@ import { mergeMap, filter, distinctUntilChanged, share, map } from 'rxjs/operato
 })
 export class OrarioComponent implements OnInit {
 
-  orario: Observable<Orario>
+  orario = new BehaviorSubject(undefined);
   impegni: Observable<string[]>
 
   statoContenitoreLista: 'strumentiAperti' | 'strumentiChiusi' = 'strumentiChiusi'
@@ -43,12 +43,11 @@ export class OrarioComponent implements OnInit {
     })
 
     // Recupero l'orario in base ai parametri url
-    this.orario = this.activatedRoute.queryParams.pipe(
+    this.activatedRoute.queryParams.pipe(
       distinctUntilChanged((x, y) => x.collection === y.collection && x.nome === y.nome),
       mergeMap(params => from(this.storage.ottieniOrario(params.collection, params.nome))),
-      filter(orario => orario !== undefined),
-      share()
-    )
+      filter(orario => orario !== undefined)
+    ).subscribe(orario => this.orario.next(orario))
 
     this.impegni = combineLatest([this.storage.tempo, this.orario]).pipe(
       map(([tempo, orario]) => {
@@ -66,5 +65,13 @@ export class OrarioComponent implements OnInit {
 
   cambiaStato(stato: 'strumentiAperti' | 'strumentiChiusi') {
     this.statoContenitoreLista = stato
+  }
+
+  async toogglePrefetiti() {
+    const orarioAggiornato = this.orario.value as Orario
+    orarioAggiornato.preferito = !orarioAggiornato.preferito
+    console.log('Stato preferito', orarioAggiornato.preferito)
+    this.storage.aggiornaOrario(orarioAggiornato)
+    this.orario.next(orarioAggiornato)
   }
 }

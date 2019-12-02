@@ -5,7 +5,6 @@ import { Orario, ProssimoImpegno, Info } from '../utils/orario.model'
 import { StorageMap } from '@ngx-pwa/local-storage'
 import { interval, BehaviorSubject, } from 'rxjs'
 import { map, startWith } from 'rxjs/operators'
-import undefined = require('firebase/empty-import')
 
 // TODO: Aggiungere la lettura da firebase?
 
@@ -235,6 +234,22 @@ export class StorageService {
       case 4: return 'Ven'
       case 5: return 'Sab'
       default: return 'Err'
+    }
+  }
+
+  public async aggiornaOrario(orario: Orario) {
+    if (orario.collection !== undefined) {
+      // Recupero gli orari
+      let orari = await this.storageMap.get(orario.collection).toPromise() as Orario[]
+
+      // Cerco l'orario da modificare
+      const indexOrarioSalvato = orari.map((value, index) => [value, index]).find(element => (element[0] as Orario).nome === orario.nome)[1] as number
+
+      // Imposto l'orario salvato preferito in base all'orario fornito alla fiìunzione
+      orari[indexOrarioSalvato].preferito = orario.preferito
+
+      // Salvo gli orari in IndexedDB
+      await this.storageMap.set(orario.collection, orari).toPromise()
     }
   }
 }
