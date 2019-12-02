@@ -94,7 +94,10 @@ export class StorageService {
   }
 
   public async ottieniOrario(collection: 'Classi' | 'Aule' | 'Professori', nome: string) {
-    return (await this.cercaOrari(nome, [collection]))[0]
+    const risultati = (await this.cercaOrari(nome, [collection]))
+
+    if(risultati.length === 0) return null
+    else return risultati[0]
   }
 
   public async ottieniPreferiti() {

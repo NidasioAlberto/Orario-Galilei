@@ -1,19 +1,19 @@
 <div class="contenitore-orario" [@animazioneContenitoreLista]="statoContenitoreLista">
     <div class="contenuto animated zoomIn">
-        <div class="card-orario">
-            <ng-container *ngIf="orario | async as datiOrario; else orarioMancante">
+        <div class="card-orario" *ngIf="orario | async; let datiOrario">
+            <ng-container *ngIf="datiOrario !== 'orario_mancante'; else orarioMancante">
                 <div class="titolo-orario">
                     <ng-container *ngIf="orario | async as datiOrario">
                         {{datiOrario.tipo}}: {{datiOrario.nome}}
                     </ng-container>
                 </div>
-    
+
                 <div class="orario-lista-impegni">
                     <app-lista-impegni [impegni]="impegni"></app-lista-impegni>
                 </div>
-    
+
                 <app-grafico-orario [orario]="orario"></app-grafico-orario>
-    
+
                 <div *ngIf="orario | async as datiOrario" class="extra-info">
                     Aggiornato il: {{datiOrario.dataAggiornamento | date:'dd/MM/yyyy'}}
                     <br>
@@ -21,7 +21,7 @@
                     <br>
                     Controllato il: {{datiOrario.ultimoAggiornamento | date:'dd/MM/yyyy hh:mm:ss'}}
                 </div>
-    
+
                 <div class="contenitore-bottome-preferito">
                     <ng-container *ngIf="!(orario | async)?.preferito; else mostraRimuovi">
                         <button mat-raised-button color="primary" (click)="toogglePrefetiti()">Aggiungi ai

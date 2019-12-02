@@ -46,7 +46,8 @@ export class OrarioComponent implements OnInit {
     this.activatedRoute.queryParams.pipe(
       distinctUntilChanged((x, y) => x.collection === y.collection && x.nome === y.nome),
       mergeMap(params => from(this.storage.ottieniOrario(params.collection, params.nome))),
-      filter(orario => orario !== undefined)
+      filter(orario => orario !== undefined),
+      map(orario => orario === null ? 'orario_mancante' : orario), // Traduco null in 'dati mancanti' così da poter mostrare un messaggio di avvison appropriato
     ).subscribe(orario => this.orario.next(orario))
 
     this.impegni = combineLatest([this.storage.tempo, this.orario]).pipe(
