@@ -3,10 +3,12 @@
         <div class="card-orario" *ngIf="orario | async; let datiOrario">
             <ng-container *ngIf="datiOrario !== 'orario_mancante'; else orarioMancante">
                 <div class="titolo-orario">
-                    <ng-container *ngIf="orario | async as datiOrario">
-                        {{datiOrario.tipo}}: {{datiOrario.nome}}
+                    {{datiOrario.tipo}}: {{datiOrario.nome}}
+                    <ng-container *ngIf="datiOrario.versione !== undefined">
+                        v{{datiOrario.versione}}
                     </ng-container>
                 </div>
+
 
                 <div class="orario-lista-impegni">
                     <app-lista-impegni [impegni]="impegni"></app-lista-impegni>
