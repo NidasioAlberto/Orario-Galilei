@@ -97,6 +97,35 @@ export class StorageService {
     return (await this.cercaOrari(nome, [collection]))[0]
   }
 
+  public async ottieniPreferiti() {
+    const preferiti: Orario[] = []
+
+    // Recupero tutti gli orari con il flag preferito a true
+    preferiti.push(...(await this.storageMap.get('Classi').toPromise() as Orario[])
+      .filter(orario => orario.preferito)
+      .map(orario => {
+        orario.tipo = 'Classe'
+        orario.collection = 'Classi'
+        return orario
+      }))
+    preferiti.push(...(await this.storageMap.get('Aule').toPromise() as Orario[])
+      .filter(orario => orario.preferito)
+      .map(orario => {
+        orario.tipo = 'Aula'
+        orario.collection = 'Aule'
+        return orario
+      }))
+    preferiti.push(...(await this.storageMap.get('Professori').toPromise() as Orario[])
+      .filter(orario => orario.preferito)
+      .map(orario => {
+        orario.tipo = 'Professore'
+        orario.collection = 'Professori'
+        return orario
+      }))
+
+    return preferiti
+  }
+
   /**
    * Trovo n impegni all'interno dell'orario specificato a partire dall'ora e dal giorno indicati
    * @param ora ora da cui partire
