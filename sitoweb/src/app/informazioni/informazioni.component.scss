@@ -1,0 +1,71 @@
+@import "../../styles.scss";
+
+.contenitore {
+  padding-top: 72px;
+  padding-bottom: 12px;
+}
+
+.informazioni {
+  @extend .card-con-bordi;
+  @extend .mat-elevation-z4;
+  padding-top: 12px;
+  padding-bottom: 8px;
+  padding-left: 12px;
+  padding-right: 12px;
+  margin-top: 12px;
+  margin-left: 12px;
+  margin-right: 12px;
+}
+
+.titolo {
+    width: 100%;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.messaggio-importante {
+    @extend .card-con-bordi;
+    @extend .mat-elevation-z4;
+    background-color: $primary-color;
+    color: white;
+    padding: 4px 8px;
+    display: inline-block;
+}
+
+.versione-app {
+    @extend .messaggio-importante;
+    background-color: $accent-color;
+    font-size: 16px;
+    color: black;
+}
+
+.contenitore-versione-app {
+    @extend .sezione;
+    margin-top: 8px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.mat-dialog-content {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+mat-panel-description {
+    white-space: nowrap;
+}
+
+.sezione {
+    margin-top: 16px;
+}
+
+.larghezza-completa {
+    width: 100%;
+}
+
+.bottone-aggiornamento {
+    width: 100%;
+    margin-top: 16px;
+}

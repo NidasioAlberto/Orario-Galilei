@@ -51,14 +51,14 @@ import { DomSanitizer } from '@angular/platform-browser'
       })),
       transition('chiuso => aperto', [
         animate('.15s ease', keyframes([
-          style({ display: 'block', opacity: '0', offset: 0 }),
+          style({ display: 'block', opacity: '0', offset: 0.2 }),
           style({ display: 'block', opacity: '1', offset: 1 })
         ])),
       ]),
       transition('aperto => chiuso', [
         animate('.15s ease', keyframes([
           style({ display: 'block', opacity: '1', offset: 0 }),
-          style({ display: 'block', opacity: '0', offset: 1 })
+          style({ display: 'block', opacity: '0', offset: 0.8 })
         ])),
       ]),
     ])
@@ -82,8 +82,8 @@ export class NavbarComponent implements OnInit {
     iconRegistry: MatIconRegistry,
     sanitizer: DomSanitizer
   ) {
-    iconRegistry.addSvgIcon(
-        'menu', sanitizer.bypassSecurityTrustResourceUrl('assets/material-icons/menu-24px.svg'));
+    iconRegistry.addSvgIcon('menu', sanitizer.bypassSecurityTrustResourceUrl('assets/material-icons/menu-24px.svg'));
+    iconRegistry.addSvgIcon('info', sanitizer.bypassSecurityTrustResourceUrl('assets/material-icons/info-24px.svg'));
   }
 
   ngOnInit() {
@@ -216,5 +216,12 @@ export class NavbarComponent implements OnInit {
         strumenti: stato
       }
     })
+  }
+
+  public apriInformazioni() {
+    this.valoreRicerca = undefined
+    this.filtriSelezionati = undefined
+    this.impostaFiltri(this.filtriSelezionati)
+    this.router.navigate(['/informazioni'])
   }
 }

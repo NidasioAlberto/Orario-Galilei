@@ -11,32 +11,41 @@
 				</div>
 				<div class="ricerca">
 					<input #ricerca type="text" name="Ricerca" placeholder="Cerca classi, prof o aule"
-						aria-label="Valore ricerca" (focus)="mostraFiltri(true)"
-						(keyup)="aggiornaValoriRicerca($event)" [(ngModel)]="valoreRicerca">
+						aria-label="Valore ricerca" (focus)="mostraFiltri(true)" (keyup)="aggiornaValoriRicerca($event)"
+						[(ngModel)]="valoreRicerca">
 				</div>
 				<div class="bottone">
 					<button mat-icon-button (click)="mostraFiltri()" aria-label="Filtri" matTooltip="Mostra i filtri">
 						<mat-icon svgIcon="menu"></mat-icon>
 					</button>
 				</div>
-				<mat-progress-bar class="progress-bar" mode="indeterminate" *ngIf="stato === 'chiuso' && loading"></mat-progress-bar>
+				<mat-progress-bar class="progress-bar" mode="indeterminate" *ngIf="stato === 'chiuso' && loading">
+				</mat-progress-bar>
 			</div>
 
 			<!-- Strumenti -->
 			<div class="contenitore-strumenti" [@animazioneStrumenti]="stato">
 				<div class="strumenti">
+					<div class="bottone-info">
+						<button mat-icon-button (click)="apriInformazioni()" aria-label="Informazioni"
+							matTooltip="Mostra le informazioni">
+							<mat-icon svgIcon="info"></mat-icon>
+						</button>
+					</div>
 					<mat-chip-list aria-label="Strumenti" multiple>
 						<mat-chip color="accent" (click)="toggleFiltro()" matTooltip="Cerca tra tutti gli orari"
 							[selected]="!filtroClassi && !filtroAule && !filtroProfessori">
 							Tutti
 						</mat-chip>
-						<mat-chip (click)="toggleFiltro('Classi')" [selected]="filtroClassi" matTooltip="Cerca tra le classi">
+						<mat-chip (click)="toggleFiltro('Classi')" [selected]="filtroClassi"
+							matTooltip="Cerca tra le classi">
 							Classi
 						</mat-chip>
 						<mat-chip (click)="toggleFiltro('Aule')" [selected]="filtroAule" matTooltip="Cerca tra le aule">
 							Aule
 						</mat-chip>
-						<mat-chip (click)="toggleFiltro('Professori')" [selected]="filtroProfessori" matTooltip="Cerca tra i profettori">
+						<mat-chip (click)="toggleFiltro('Professori')" [selected]="filtroProfessori"
+							matTooltip="Cerca tra i profettori">
 							Professori
 						</mat-chip>
 					</mat-chip-list>

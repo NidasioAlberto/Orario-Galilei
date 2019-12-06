@@ -92,7 +92,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-  padding-left: 48px;
   overflow: auto;
 }
 
@@ -104,9 +103,20 @@
   z-index: 109;
 }
 
+
+.bottone-info {
+  display: inline-block;
+  padding-left: 6px;
+}
+
 .strumenti {
-  width: 290px;
+  display: inline-block;
+  width: 328px;
   height: 40px;
   box-sizing: border-box;
-  padding: 4px;
+
+  .mat-chip-list {
+    display: inline-block;
+    padding: 4px 0;
+  }
 }

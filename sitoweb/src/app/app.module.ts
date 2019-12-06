@@ -38,7 +38,8 @@ import { ElementoListaOrariComponent } from './lista-orari/elemento-lista-orari/
 import { ListaImpegniComponent } from './lista-impegni/lista-impegni.component'
 import { OrarioComponent } from './orario/orario.component'
 import { GraficoOrarioComponent } from './orario/grafico-orario/grafico-orario.component'
-import { PreferitiComponent } from './preferiti/preferiti.component'
+import { PreferitiComponent } from './preferiti/preferiti.component';
+import { InformazioniComponent } from './informazioni/informazioni.component'
 
 @NgModule({
   declarations: [
@@ -51,6 +52,7 @@ import { PreferitiComponent } from './preferiti/preferiti.component'
     OrarioComponent,
     GraficoOrarioComponent,
     PreferitiComponent,
+    InformazioniComponent,
   ],
   imports: [
     BrowserModule,
