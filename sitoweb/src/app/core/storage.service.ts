@@ -59,18 +59,24 @@ export class StorageService {
 
         // Per ogni nuovo orario controllo se era salvato come preferito
         orari.orariClassi = orari.orariClassi.map(orario => {
-          const vecchioOrario = classi.find(classe => classe.nome === orario.nome)
-          if(vecchioOrario !== undefined && vecchioOrario.preferito) orario.preferito = true
+          if (classi !== undefined) {
+            const vecchioOrario = classi.find(classe => classe.nome === orario.nome)
+            if (vecchioOrario !== undefined && vecchioOrario.preferito) orario.preferito = true
+          }
           return orario
         })
         orari.orariAule = orari.orariAule.map(orario => {
-          const vecchioOrario = aule.find(aula => aula.nome === orario.nome)
-          if(vecchioOrario !== undefined && vecchioOrario.preferito) orario.preferito = true
+          if (aule !== undefined) {
+            const vecchioOrario = aule.find(aula => aula.nome === orario.nome)
+            if (vecchioOrario !== undefined && vecchioOrario.preferito) orario.preferito = true
+          }
           return orario
         })
         orari.orariProfessori = orari.orariProfessori.map(orario => {
-          const vecchioOrario = professori.find(professore => professore.nome === orario.nome)
-          if(vecchioOrario !== undefined && vecchioOrario.preferito) orario.preferito = true
+          if (professori !== undefined) {
+            const vecchioOrario = professori.find(professore => professore.nome === orario.nome)
+            if (vecchioOrario !== undefined && vecchioOrario.preferito) orario.preferito = true
+          }
           return orario
         })
 
@@ -133,23 +139,24 @@ export class StorageService {
     const filtroOrari = (orario: Orario) => orario.preferito || (vecchiPreferiti !== undefined && vecchiPreferiti.find(vecchioPreferito => vecchioPreferito.nome === orario.nome))
 
     // Recupero tutti gli orari con il flag preferito a true
-    preferiti.push(...(await this.storageMap.get('Classi').toPromise() as Orario[])
-      .filter(filtroOrari)
-      .map(orario => {
+    const classi = await this.storageMap.get('Classi').toPromise() as Orario[]
+    const aule = await this.storageMap.get('Aule').toPromise() as Orario[]
+    const professori = await this.storageMap.get('Professori').toPromise() as Orario[]
+
+    if (classi !== undefined)
+      preferiti.push(...classi.filter(filtroOrari).map(orario => {
         orario.tipo = 'Classe'
         orario.collection = 'Classi'
         return orario
       }))
-    preferiti.push(...(await this.storageMap.get('Aule').toPromise() as Orario[])
-      .filter(filtroOrari)
-      .map(orario => {
+    if (aule !== undefined)
+      preferiti.push(...aule.filter(filtroOrari).map(orario => {
         orario.tipo = 'Aula'
         orario.collection = 'Aule'
         return orario
       }))
-    preferiti.push(...(await this.storageMap.get('Professori').toPromise() as Orario[])
-      .filter(filtroOrari)
-      .map(orario => {
+    if (professori !== undefined)
+      preferiti.push(...professori.filter(filtroOrari).map(orario => {
         orario.tipo = 'Professore'
         orario.collection = 'Professori'
         return orario

@@ -4,6 +4,8 @@ import { Router, ActivatedRoute, NavigationEnd } from '@angular/router'
 import { take, filter } from 'rxjs/operators'
 import { StorageService } from '../core/storage.service'
 import { MatSnackBar } from '@angular/material/snack-bar'
+import { MatIconRegistry } from '@angular/material/icon'
+import { DomSanitizer } from '@angular/platform-browser'
 
 /**
  * Questo componente è responsibile della navbar visualizzata in ogni pagina.
@@ -76,8 +78,13 @@ export class NavbarComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private storage: StorageService,
-    private snackBar: MatSnackBar
-  ) { }
+    private snackBar: MatSnackBar,
+    iconRegistry: MatIconRegistry,
+    sanitizer: DomSanitizer
+  ) {
+    iconRegistry.addSvgIcon(
+        'menu', sanitizer.bypassSecurityTrustResourceUrl('assets/material-icons/menu-24px.svg'));
+  }
 
   ngOnInit() {
     // Recupero tutti gli orari all'allvio dell'app
