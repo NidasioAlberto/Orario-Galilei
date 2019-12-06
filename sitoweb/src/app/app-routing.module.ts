@@ -5,12 +5,12 @@ import { OrarioComponent } from './orario/orario.component'
 import { PreferitiComponent } from './preferiti/preferiti.component'
 
 const routes: Routes = [
+  { path: '', component: PreferitiComponent },
   { path: 'ricerca', component: RicercaComponent },
   { path: 'orario', component: OrarioComponent },
-  { path: 'preferiti', component: PreferitiComponent },
   {
     path: '**',
-    redirectTo: 'preferiti'
+    redirectTo: ''
   }
 ];
 

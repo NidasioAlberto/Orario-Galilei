@@ -19,7 +19,7 @@ export interface Orario {
 
     // Valori aggiuntivi
     tipo?: string
-    collection?: string
+    collection?: 'Classi' | 'Aule' | 'Professori'
     preferito?: boolean
 }
 

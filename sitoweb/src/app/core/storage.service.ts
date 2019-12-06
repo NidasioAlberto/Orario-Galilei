@@ -57,12 +57,20 @@ export class StorageService {
         const aule = await this.storageMap.get('Aule').toPromise() as Orario[]
         const professori = await this.storageMap.get('Professori').toPromise() as Orario[]
 
+        // Controllo se l'utente sta transitando dalla versione 0 alle versione 1
+        const vecchiPreferiti = await this.storageMap.get('preferiti').toPromise() as Orario[]
+
         // Per ogni nuovo orario controllo se era salvato come preferito
         orari.orariClassi = orari.orariClassi.map(orario => {
           if (classi !== undefined) {
             const vecchioOrario = classi.find(classe => classe.nome === orario.nome)
             if (vecchioOrario !== undefined && vecchioOrario.preferito) orario.preferito = true
           }
+          // Se ci sono i vecchi preferiti e l'orario che sto controllando ne faceva parte allora lo segno come preferiro
+          if (vecchiPreferiti !== undefined &&
+            !orario.preferito &&
+            vecchiPreferiti.find(vecchioPreferito => vecchioPreferito.nome === orario.nome))
+            orario.preferito = true
           return orario
         })
         orari.orariAule = orari.orariAule.map(orario => {
@@ -70,6 +78,11 @@ export class StorageService {
             const vecchioOrario = aule.find(aula => aula.nome === orario.nome)
             if (vecchioOrario !== undefined && vecchioOrario.preferito) orario.preferito = true
           }
+          // Se ci sono i vecchi preferiti e l'orario che sto controllando ne faceva parte allora lo segno come preferiro
+          if (vecchiPreferiti !== undefined &&
+            !orario.preferito &&
+            vecchiPreferiti.find(vecchioPreferito => vecchioPreferito.nome === orario.nome))
+            orario.preferito = true
           return orario
         })
         orari.orariProfessori = orari.orariProfessori.map(orario => {
@@ -77,8 +90,19 @@ export class StorageService {
             const vecchioOrario = professori.find(professore => professore.nome === orario.nome)
             if (vecchioOrario !== undefined && vecchioOrario.preferito) orario.preferito = true
           }
+          // Se ci sono i vecchi preferiti e l'orario che sto controllando ne faceva parte allora lo segno come preferiro
+          if (vecchiPreferiti !== undefined &&
+            !orario.preferito &&
+            vecchiPreferiti.find(vecchioPreferito => vecchioPreferito.nome === orario.nome))
+            orario.preferito = true
           return orario
         })
+
+        if (vecchiPreferiti !== undefined) {
+          // Se ci sono i vecchi preferiti li elimino
+          await this.storageMap.delete('preferiti').toPromise()
+        } else
+          console.log('Vecchi preferiti non trovati')
 
         // Salvo i nuovi orari, comprensivi delle vecchie preferenze
         await Promise.all([
