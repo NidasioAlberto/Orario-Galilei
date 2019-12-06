@@ -5,6 +5,7 @@ import { StorageService } from '../core/storage.service'
 import { ActivatedRoute } from '@angular/router'
 import { mergeMap, filter, distinctUntilChanged, map } from 'rxjs/operators'
 import { Orario } from '../utils/orario.model'
+import { NgNavigatorShareService } from 'ng-navigator-share'
 
 @Component({
   selector: 'app-orario',
@@ -33,7 +34,8 @@ export class OrarioComponent implements OnInit {
 
   constructor(
     private storage: StorageService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    public ngNavigatorShareService: NgNavigatorShareService
   ) { }
 
   ngOnInit() {
@@ -73,5 +75,14 @@ export class OrarioComponent implements OnInit {
     orarioAggiornato.preferito = !orarioAggiornato.preferito
     this.storage.aggiornaOrario(orarioAggiornato)
     this.orario.next(orarioAggiornato)
+  }
+
+  condividiOrario() {
+    const datiOrario = this.orario.value as Orario
+    this.ngNavigatorShareService.share({
+      title: 'Orario ' + datiOrario.nome,
+      text: 'Orario ' + datiOrario.nome + ':',
+      url: window.location.href
+    })
   }
 }

@@ -9,7 +9,6 @@
                     </ng-container>
                 </div>
 
-
                 <div class="orario-lista-impegni">
                     <app-lista-impegni [impegni]="impegni"></app-lista-impegni>
                 </div>
@@ -24,7 +23,7 @@
                     Controllato il: {{datiOrario.ultimoAggiornamento | date:'dd/MM/yyyy hh:mm:ss'}}
                 </div>
 
-                <div class="contenitore-bottome-preferito">
+                <div class="contenitore-bottoni">
                     <ng-container *ngIf="!(orario | async)?.preferito; else mostraRimuovi">
                         <button mat-raised-button color="primary" (click)="toogglePrefetiti()">Aggiungi ai
                             preferiti</button>
@@ -33,6 +32,8 @@
                         <button mat-raised-button color="warn" (click)="toogglePrefetiti()">Rimuovi dai
                             preferiti</button>
                     </ng-template>
+
+                    <button mat-raised-button *ngIf="ngNavigatorShareService.webNavigator.share !== undefined" color="primary" (click)="condividiOrario()">Condividi</button>
                 </div>
             </ng-container>
             <ng-template #orarioMancante>

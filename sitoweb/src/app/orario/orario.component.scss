@@ -23,10 +23,14 @@
   text-align: center;
 }
 
-.contenitore-bottome-preferito {
+.contenitore-bottoni {
   margin: 0 auto;
   display: table;
   padding-bottom: 8px;
+
+  * {
+    margin: 0 4px;
+  }
 }
 
 .extra-info {

@@ -5,7 +5,6 @@ import { Orario, ProssimoImpegno, Info } from '../utils/orario.model'
 import { StorageMap } from '@ngx-pwa/local-storage'
 import { interval, BehaviorSubject, } from 'rxjs'
 import { map, startWith } from 'rxjs/operators'
-import undefined = require('firebase/empty-import')
 
 // TODO: Aggiungere la lettura da firebase?
 
