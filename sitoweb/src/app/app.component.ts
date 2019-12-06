@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core'
 import { SwUpdate } from '@angular/service-worker'
 import { MatSnackBar } from '@angular/material/snack-bar'
+import { StorageService } from './core/storage.service'
+import { Router } from '@angular/router'
 
 @Component({
   selector: 'app-root',
@@ -12,6 +14,8 @@ export class AppComponent implements OnInit {
   constructor(
     private swUpdate: SwUpdate,
     private snakBar: MatSnackBar,
+    private storage: StorageService,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -24,5 +28,10 @@ export class AppComponent implements OnInit {
         })
       })
     }
+
+    // Se è il primo avvio dell'app mostro le informazioni
+    this.storage.controllaPrimoAvvio().then(esecuzioni => {
+      if(esecuzioni === 0) this.router.navigate(['/informazioni'])
+    })
   }
 }

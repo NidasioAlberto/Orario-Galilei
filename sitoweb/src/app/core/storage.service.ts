@@ -5,6 +5,7 @@ import { Orario, ProssimoImpegno, Info } from '../utils/orario.model'
 import { StorageMap } from '@ngx-pwa/local-storage'
 import { interval, BehaviorSubject, } from 'rxjs'
 import { map, startWith } from 'rxjs/operators'
+import undefined = require('firebase/empty-import')
 
 // TODO: Aggiungere la lettura da firebase?
 
@@ -342,6 +343,20 @@ export class StorageService {
 
       // Salvo gli orari in IndexedDB
       await this.storageMap.set(orario.collection, orari).toPromise()
+    }
+  }
+
+  public async controllaPrimoAvvio(): Promise<number> {
+    // Controllo se l'app è già stata avviata
+    let numeroDiEsecuzioni = await this.storageMap.get('esecuzioni').toPromise() as number
+
+    if(numeroDiEsecuzioni === undefined) {
+      await this.storageMap.set('esecuzioni', 0).toPromise()
+      return 0
+    } else {
+      numeroDiEsecuzioni++
+      await this.storageMap.set('esecuzioni', numeroDiEsecuzioni).toPromise()
+      return numeroDiEsecuzioni
     }
   }
 }
