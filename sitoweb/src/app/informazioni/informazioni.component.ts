@@ -25,8 +25,13 @@ export class InformazioniComponent implements OnInit {
 
   statoContenitore: 'strumentiAperti' | 'strumentiChiusi' = 'strumentiChiusi'
 
-  versione = '0.8'
+  versione = '0.9'
   aggiornamentiApp: Aggiornamento[] = [
+    {
+      dataPubblicazione: '6/12/19',
+      descrizioneBreve: 'Condivisione e dati offline',
+      descrizione: 'È stata aggiunta la possibilità di condividere un orario. Tutti gli orari vengono ora salvati sul dispositivo così da consultare anche senza connessione. Sono state rimosse le informazioni dalla pagina principale a una pagina separata accessibile tramite il bottone apposito negli strumenti. Si può poi selezionare più filtri nel caso si voglia fare una ricerca specifica (si possono usare anche le regex nella barra di ricerca!).'
+    },
     {
       dataPubblicazione: '30/10/19',
       descrizioneBreve: 'Filtri',

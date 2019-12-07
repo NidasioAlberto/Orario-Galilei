@@ -101,6 +101,7 @@ export class StorageService {
         if (vecchiPreferiti !== undefined) {
           // Se ci sono i vecchi preferiti li elimino
           await this.storageMap.delete('preferiti').toPromise()
+          console.log('Vecchi preferiti recuperati')
         } else
           console.log('Vecchi preferiti non trovati')
 
