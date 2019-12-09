@@ -24,7 +24,7 @@
 			</div>
 
 			<!-- Strumenti -->
-			<div class="contenitore-strumenti" [@animazioneStrumenti]="stato">
+			<div class="contenitore-strumenti" [ngStyle]="{'display': stato == 'aperto' ? 'block' : 'none'}" [@animazioneStrumenti]="stato">
 				<div class="strumenti">
 					<div class="bottone-info">
 						<button mat-icon-button (click)="apriInformazioni()" aria-label="Informazioni"

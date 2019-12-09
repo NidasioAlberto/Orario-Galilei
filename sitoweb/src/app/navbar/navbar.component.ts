@@ -36,7 +36,7 @@ import { DomSanitizer } from '@angular/platform-browser'
       })),
       transition('* => *', [
         group([
-          query('@animazioneStrumenti', animateChild()),
+          //query('@animazioneStrumenti', animateChild()),
           animate('.15s ease'),
         ]),
       ])
