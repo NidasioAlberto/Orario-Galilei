@@ -1,0 +1,47 @@
+<div class="contenitore-orario" [@animazioneContenitoreLista]="statoContenitoreLista">
+    <div class="contenuto animated zoomIn">
+        <div class="card-orario" *ngIf="orario | async; let datiOrario">
+            <ng-container *ngIf="datiOrario !== 'orario_mancante'; else orarioMancante">
+                <div class="titolo-orario">
+                    {{datiOrario.tipo}}: {{datiOrario.nome}}
+                    <ng-container *ngIf="datiOrario.versione !== undefined">
+                        v{{datiOrario.versione}}
+                    </ng-container>
+                </div>
+
+                <div class="orario-lista-impegni">
+                    <app-lista-impegni [impegni]="impegni"></app-lista-impegni>
+                </div>
+
+                <app-grafico-orario [orario]="orario"></app-grafico-orario>
+
+                <div *ngIf="orario | async as datiOrario" class="extra-info">
+                    Aggiornato il: {{datiOrario.dataAggiornamento | date:'dd/MM/yyyy'}}
+                    <br>
+                    Valido dal: {{datiOrario.dataValidita | date:'dd/MM/yyyy'}}
+                    <br>
+                    Controllato il: {{datiOrario.ultimoAggiornamento | date:'dd/MM/yyyy hh:mm:ss'}}
+                </div>
+
+                <div class="contenitore-bottoni">
+                    <ng-container *ngIf="!(orario | async)?.preferito; else mostraRimuovi">
+                        <button mat-raised-button color="primary" (click)="toogglePrefetiti()">Aggiungi ai
+                            preferiti</button>
+                    </ng-container>
+                    <ng-template #mostraRimuovi>
+                        <button mat-raised-button color="warn" (click)="toogglePrefetiti()">Rimuovi dai
+                            preferiti</button>
+                    </ng-template>
+
+                    <button mat-raised-button *ngIf="ngNavigatorShareService.webNavigator.share !== undefined" color="primary" (click)="condividiOrario()">Condividi</button>
+                </div>
+            </ng-container>
+            <ng-template #orarioMancante>
+                <div class="orario-mancante">
+                    Orario mancante
+                </div>
+                <img src="assets/sad_cat.png" alt="Ufff..." class="sad-cat-image">
+            </ng-template>
+        </div>
+    </div>
+</div>
