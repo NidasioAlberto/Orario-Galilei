@@ -18,6 +18,7 @@ import { AngularFireModule } from '@angular/fire'
 import { AngularFirestoreModule } from '@angular/fire/firestore'
 import { AngularFirePerformanceModule } from '@angular/fire/performance'
 import { AngularFireStorageModule } from '@angular/fire/storage'
+import { AngularFireAnalyticsModule, ScreenTrackingService } from '@angular/fire/analytics'
 
 // Componenti angular material
 import { MatButtonModule } from '@angular/material/button'
@@ -38,7 +39,7 @@ import { ElementoListaOrariComponent } from './lista-orari/elemento-lista-orari/
 import { ListaImpegniComponent } from './lista-impegni/lista-impegni.component'
 import { OrarioComponent } from './orario/orario.component'
 import { GraficoOrarioComponent } from './orario/grafico-orario/grafico-orario.component'
-import { PreferitiComponent } from './preferiti/preferiti.component';
+import { PreferitiComponent } from './preferiti/preferiti.component'
 import { InformazioniComponent } from './informazioni/informazioni.component'
 
 @NgModule({
@@ -69,6 +70,7 @@ import { InformazioniComponent } from './informazioni/informazioni.component'
     AngularFirestoreModule.enablePersistence(),
     AngularFirePerformanceModule,
     AngularFireStorageModule,
+    AngularFireAnalyticsModule,
 
     // Componenti angular material
     MatButtonModule,
@@ -81,7 +83,9 @@ import { InformazioniComponent } from './informazioni/informazioni.component'
     MatTooltipModule,
     MatProgressBarModule,
   ],
-  providers: [],
+  providers: [
+    ScreenTrackingService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
