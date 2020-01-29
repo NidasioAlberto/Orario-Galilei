@@ -365,9 +365,9 @@ export async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
                         //1: Controllo se la riga è già stata registrata
                         let trovato = false
                         righe.forEach(riga => {
-                            if (Math.abs(riga.y - elemento.transform[4]) <= 1) {
+                            if (Math.abs(riga.y - elemento.transform[5]) <= 1) {
                                 riga.elementi.push({
-                                    x: elemento.transform[5],
+                                    x: elemento.transform[4],
                                     //y: item.y,
                                     testo: elemento.text
                                 })
@@ -378,9 +378,9 @@ export async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
 
                         //2: altrimenti la aggiungo
                         if (!trovato) righe.push({
-                            y: elemento.transform[4],
+                            y: elemento.transform[5],
                             elementi: [{
-                                x: elemento.transform[5],
+                                x: elemento.transform[4],
                                 testo: elemento.text
                             }]
                         })
@@ -400,6 +400,7 @@ export async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
  * @param {string} nome Nome da inserire nell'orario
  */
 export function analizzaDati(righe: RigaDati[], nome: string): Orario {
+
     // 1: Trovo la riga con SOLO i giorni della settimana
     const rigaGiorni = righe.find(riga => {
         // N.B. Questo questa parte richiede che i giorni nella tabella del pdf siano per forza quelli impostati come giorni
@@ -433,23 +434,21 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
     const righeEtichetteOre = righe.map(riga => {
         // Parto dalla riga successiva a quella dei giorni
 
-        // Controllo solo le righe successive a quella dei giorni
-        if (riga.y > rigaGiorni.y) { // Questo funziona anche nel caso le righe non siano ordinate per y
-            // Controllo se la riga contiene l'etichetta di un'ora
-            const elementoEtichetta = riga.elementi.find(elemento => { // Controllo in tutti gli elementi della riga
-                const etichetta = elemento.testo.replace(/ /g, '') // Elimino tutti gli spazi
-                return etichetteOreDaTrovare.includes(etichetta) // Controllo se l'elemento è una etichetta, se sì l'ho trovato
-            })
+        // Controllo se la riga contiene l'etichetta di un'ora
+        const elementoEtichetta = riga.elementi.find(elemento => { // Controllo in tutti gli elementi della riga
+            const etichetta = elemento.testo.replace(/ /g, '') // Elimino eventuali spazi
+            return etichetteOreDaTrovare.includes(etichetta) // Controllo se l'elemento è una etichetta, se sì l'ho trovato
+        })
 
-            // Se ho trovato l'etichetta la rimuovo da quelle ancora da trovare
-            if (elementoEtichetta !== undefined) {
-                etichetteOreDaTrovare.splice(etichetteOreDaTrovare.indexOf(elementoEtichetta.testo.replace(/ /g, '')), 1)
+        // Se ho trovato l'etichetta la rimuovo da quelle ancora da trovare
+        if (elementoEtichetta !== undefined) {
+            etichetteOreDaTrovare.splice(etichetteOreDaTrovare.indexOf(elementoEtichetta.testo.replace(/ /g, '')), 1)
 
-                return {
-                    x: elementoEtichetta.x,
-                    y: riga.y,
-                    testo: elementoEtichetta.testo
-                }
+            return {
+                x: elementoEtichetta.x,
+                y: riga.y,
+                testo: elementoEtichetta.testo,
+                index: etichetteOre.indexOf(elementoEtichetta.testo.replace(/ /g, ''))
             }
         }
 
@@ -458,7 +457,9 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
         x: number;
         y: number;
         testo: string;
+        index: number;
     }[]
+    righeEtichetteOre.sort((a, b) => a.index - b.index)
 
     // 4: Controllo che il numero di etichette trovare sia maggiore o uguale del limite minimo e non superiore al numero delle etichette
     if (righeEtichetteOre === undefined || righeEtichetteOre.length === 0) {
@@ -507,42 +508,38 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
     }
 
     // 6: Calcolo la divisione delle righe
-    let divisoriOre: number[] = []
-
-    // 6.1: Trovo il massimo e il minimo dei valori y delle righe con le etichette (ovviamente il minimo sarà la riga con la prima ora
-    // e il massimo quella con l'ultima ora)
-    righeEtichetteOre.forEach((riga, i) => {
-        if (i == 0) {
-            min = riga.y
-            max = riga.y
-        } else {
-            if (riga.y < min) min = riga.y
-            if (riga.y > max) max = riga.y
-        }
-    })
+    let divisoriOre: {
+        start: number
+        end: number
+        index: number
+    }[] = []
 
     // 6.2: Creo i divisori
     // N.B. Questi divisori saranno diversi da quelli dei giorni, per come è fatta la tabella devo avere anche gli estremi esterni,
     //      non solo i divisori interni
-    const spazioOre = (max - min) / (righeEtichetteOre.length - 1)
-    const minYOre = min - (spazioOre / 2)
-    const maxYOre = max + (spazioOre / 2)
-    for (let i = 0; i <= righeEtichetteOre.length; i++) { // Parto dall'estremo sinistro e arrivo a quello destro passando per i divisori
-        divisoriOre.push(min - (spazioOre / 2) + (spazioOre * i))
+    const spazioOre = (righeEtichetteOre[righeEtichetteOre.length - 1].y - righeEtichetteOre[0].y) / (righeEtichetteOre.length - 1)
+    const maxYOre = righeEtichetteOre[righeEtichetteOre.length - 1].y + (spazioOre / 2)
+    const minYOre = righeEtichetteOre[0].y - (spazioOre / 2)
+    for (let i = 0; i < righeEtichetteOre.length; i++) { // Parto dall'estremo sinistro e arrivo a quello destro passando per i divisori
+        divisoriOre.push({
+            start: righeEtichetteOre[0].y - (spazioOre / 2) + (spazioOre * i),
+            end: righeEtichetteOre[0].y - (spazioOre / 2) + (spazioOre * (i + 1)),
+            index: righeEtichetteOre[i].index
+        })
     }
 
     // 7: Ora trovo le righe all'interno dei divisori ore
     let righeOre: RigaDati[][] = [] // [ora][righe]
-    for (let i = 0; i < righeEtichetteOre.length; i++) righeOre.push([])
+    for (let i = 0; i < righeEtichetteOre.length; i++) righeOre.push([]) // Riempo l'array con 7 elementi vuoti
     righe.forEach(riga => {
-        if (minYOre < riga.y && riga.y <= maxYOre) {
-            const oraCorrente = Math.floor((riga.y - minYOre) / spazioOre)
-
-            righeOre[oraCorrente].push(riga)
+        // Test, Controllo se la riga corrente ricade in qualche divisore ore
+        const divisoreRiga = divisoriOre.find(divisore => riga.y > Math.min(divisore.start, divisore.end) && riga.y < Math.max(divisore.start, divisore.end))
+        if(divisoreRiga !== undefined) {
+            righeOre[divisoreRiga.index].push(riga)
         }
     })
 
-    // 8: Per ciascuna riga di ciascuna ora trovo le info di ciscun giorno
+    // 8: Per ciascuna riga di ciascuna ora trovo le info di caiscun giorno
     let tabella: ElementoTabella[] = righeOre.map((righeOra, i) => { // righe dell'ora i
         const info: Info[] = []
 
