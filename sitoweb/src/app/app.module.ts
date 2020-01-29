@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser'
+import { BrowserModule, Title } from '@angular/platform-browser'
 import { HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
 
@@ -84,7 +84,8 @@ import { InformazioniComponent } from './informazioni/informazioni.component'
     MatProgressBarModule,
   ],
   providers: [
-    ScreenTrackingService
+    ScreenTrackingService,
+    Title
   ],
   bootstrap: [AppComponent]
 })

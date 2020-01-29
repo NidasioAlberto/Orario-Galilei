@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { Aggiornamento } from '../utils/aggiornamento.model'
 import { trigger, state, style, transition, animate } from '@angular/animations'
 import { ActivatedRoute } from '@angular/router'
+import { Title } from '@angular/platform-browser'
 
 @Component({
   selector: 'app-informazioni',
@@ -72,7 +73,8 @@ export class InformazioniComponent implements OnInit {
   hideToggle = false
 
   constructor(
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private title: Title
   ) { }
 
   ngOnInit() {
@@ -80,6 +82,8 @@ export class InformazioniComponent implements OnInit {
       if (queryParams.strumenti === 'aperto') this.cambiaStato('strumentiAperti')
       else this.cambiaStato('strumentiChiusi')
     })
+    
+    this.title.setTitle('Orario Galilei - informazioni')
   }
 
   cambiaStato(stato: 'strumentiAperti' | 'strumentiChiusi') {

@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router'
 import { mergeMap, filter, distinctUntilChanged, map } from 'rxjs/operators'
 import { Orario } from '../utils/orario.model'
 import { NgNavigatorShareService } from 'ng-navigator-share'
+import { Title } from '@angular/platform-browser'
 
 @Component({
   selector: 'app-orario',
@@ -27,7 +28,7 @@ import { NgNavigatorShareService } from 'ng-navigator-share'
 })
 export class OrarioComponent implements OnInit {
 
-  orario = new BehaviorSubject(undefined);
+  orario = new BehaviorSubject<Orario>(undefined);
   impegni: Observable<string[]>
 
   statoContenitoreLista: 'strumentiAperti' | 'strumentiChiusi' = 'strumentiChiusi'
@@ -35,7 +36,8 @@ export class OrarioComponent implements OnInit {
   constructor(
     private storage: StorageService,
     private activatedRoute: ActivatedRoute,
-    public ngNavigatorShareService: NgNavigatorShareService
+    public ngNavigatorShareService: NgNavigatorShareService,
+    private title: Title
   ) { }
 
   ngOnInit() {
@@ -48,9 +50,11 @@ export class OrarioComponent implements OnInit {
     this.activatedRoute.queryParams.pipe(
       distinctUntilChanged((x, y) => x.collection === y.collection && x.nome === y.nome),
       mergeMap(params => from(this.storage.ottieniOrario(params.collection, params.nome))),
-      filter(orario => orario !== undefined),
-      map(orario => orario === null ? 'orario_mancante' : orario), // Traduco null in 'dati mancanti' così da poter mostrare un messaggio di avvison appropriato
-    ).subscribe(orario => this.orario.next(orario))
+      filter(orario => orario !== undefined && orario !== null),
+    ).subscribe(orario => {
+      this.orario.next(orario)
+      this.title.setTitle(orario.nome)
+    })
 
     this.impegni = combineLatest([this.storage.tempo, this.orario]).pipe(
       map(([tempo, orario]) => {
