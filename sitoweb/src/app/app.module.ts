@@ -67,7 +67,7 @@ import { InformazioniComponent } from './informazioni/informazioni.component'
     // Moduli firebase e storage
     StorageModule.forRoot({ IDBNoWrap: true }),
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule.enablePersistence(),
+   // AngularFirestoreModule.enablePersistence(),
     AngularFirePerformanceModule,
     AngularFireStorageModule,
     AngularFireAnalyticsModule,
