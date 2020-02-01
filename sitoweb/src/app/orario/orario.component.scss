@@ -1,5 +1,7 @@
 @import "../../styles.scss";
 
+$app-min-width-for-expansion-panel-description: 500px;
+
 .contenitore-orario {
   padding-top: 72px;
 }
@@ -49,4 +51,37 @@
   width: 60%;
   margin: 0 20%;
   margin-bottom: -3px;
+}
+
+.orari-precedenti {
+  margin: 0 12px;
+}
+
+mat-panel-title {
+  white-space: nowrap;
+}
+
+mat-panel-description {
+  white-space: nowrap;
+}
+
+@media only screen and (max-width: $app-min-width-for-expansion-panel-description) {
+  mat-panel-description {
+    display: none;
+  }
+}
+
+.loading-progress-bar {
+  padding: 12px;
+}
+
+.lista-storico-orari {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.elemento-lista-storico-orari {
+  display: block;
+  min-width: 120px;
+  margin: 6px;
 }

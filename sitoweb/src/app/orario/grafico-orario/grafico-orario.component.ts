@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core'
+import { Component, Input } from '@angular/core'
 import { Info, Orario } from 'src/app/utils/orario.model'
 import { Observable } from 'rxjs';
 
@@ -7,14 +7,11 @@ import { Observable } from 'rxjs';
   templateUrl: './grafico-orario.component.html',
   styleUrls: ['./grafico-orario.component.scss']
 })
-export class GraficoOrarioComponent implements OnInit {
+export class GraficoOrarioComponent {
 
   @Input() orario: Observable<Orario>
 
   constructor() { }
-
-  ngOnInit() {
-  }
 
   trovaInfo(orario: Orario, ora: number, giorno: number, info: number): string {
     if (ora === -1) {

@@ -30,6 +30,7 @@ import { MatIconModule } from '@angular/material/icon'
 import { MatChipsModule } from '@angular/material/chips'
 import { MatTooltipModule } from '@angular/material/tooltip'
 import { MatProgressBarModule } from '@angular/material/progress-bar'
+import { MatListModule } from '@angular/material/list'
 
 // Componenti app
 import { NavbarComponent } from './navbar/navbar.component'
@@ -67,7 +68,7 @@ import { InformazioniComponent } from './informazioni/informazioni.component'
     // Moduli firebase e storage
     StorageModule.forRoot({ IDBNoWrap: true }),
     AngularFireModule.initializeApp(environment.firebase),
-   // AngularFirestoreModule.enablePersistence(),
+    AngularFirestoreModule.enablePersistence(),
     AngularFirePerformanceModule,
     AngularFireStorageModule,
     AngularFireAnalyticsModule,
@@ -82,6 +83,7 @@ import { InformazioniComponent } from './informazioni/informazioni.component'
     MatChipsModule,
     MatTooltipModule,
     MatProgressBarModule,
+    MatListModule,
   ],
   providers: [
     ScreenTrackingService,
