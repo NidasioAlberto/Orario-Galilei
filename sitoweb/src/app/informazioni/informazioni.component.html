@@ -18,14 +18,16 @@
 
             <div class="sezione">
                 <h4>Contatti</h4>
-                Applicazione a cura di Nidasio Alberto (<a href="mailto:nidasioalberto@gmail.com?subject=Feedback per l'app Orario Galilei">nidasioalberto@gmail.com</a>)
+                Applicazione a cura di Nidasio Alberto (<a
+                    href="mailto:nidasioalberto@gmail.com?subject=Feedback per l'app Orario Galilei">nidasioalberto@gmail.com</a>)
                 <br>
                 Se riscontrate problemi o avete un'idea per possibli migliorie contattetemi pure via mail.
             </div>
 
             <h4>Registro aggiornamenti app</h4>
             <mat-accordion>
-                <mat-expansion-panel *ngFor="let aggiornamento of aggiornamentiApp" [hideToggle]="hideToggle">
+                <mat-expansion-panel *ngFor="let aggiornamento of aggiornamentiApp" [hideToggle]="hideToggle"
+                    (opened)="registraAperturaInfo(aggiornamento.dataPubblicazione)">
                     <mat-expansion-panel-header>
                         <mat-panel-title>
                             {{aggiornamento.dataPubblicazione}}

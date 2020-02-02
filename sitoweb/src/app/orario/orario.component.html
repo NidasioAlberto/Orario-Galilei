@@ -20,7 +20,7 @@
                             *ngIf="orarioDaVisualizzare === 'attuale'; else mostraAvviso"></app-lista-impegni>
                         <ng-template #mostraAvviso>
                             <div class="avviso-storico"
-                                (click)="visualizzaOrarioStorico(orario.value); statoPannelloStorico = false">
+                                (click)="tornaAllaVersioneCorrente()">
                                 Torna alla versione corrente
                             </div>
                         </ng-template>

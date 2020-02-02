@@ -369,7 +369,7 @@ export class StorageService {
    * @param nome
    */
   public async recuperaStoricoOrario(collection: 'Classi' | 'Aule' | 'Professori', nome: string) {
-    console.log('Recupero lo storico per ', nome, collection)
+    console.log('Recupero lo storico per', nome, collection)
 
     return this.firestore.collection(collection).doc(nome).collection<Orario>('Storico').valueChanges().pipe(
       take(1),

@@ -4,6 +4,7 @@ import { Observable, combineLatest, BehaviorSubject } from 'rxjs'
 import { StorageService } from 'src/app/core/storage.service'
 import { map } from 'rxjs/operators'
 import { Router } from '@angular/router'
+import { AngularFireAnalytics } from '@angular/fire/analytics'
 
 @Component({
   selector: 'app-elemento-lista-orari',
@@ -18,7 +19,8 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
 
   constructor(
     private storage: StorageService,
-    private router: Router
+    private router: Router,
+    private analytics: AngularFireAnalytics
   ) { }
 
   ngOnInit() {
@@ -41,6 +43,12 @@ export class ElementoListaOrariComponent implements OnInit, OnChanges {
   }
 
   apriOrario() {
+    console.log('Mostro la pagina dell\'orario di', this.datiOrario.nome)
+    this.analytics.logEvent('apertura_orario', {
+      nome: this.datiOrario.nome,
+      collection: this.datiOrario.collection,
+    })
+    
     this.router.navigate(['/orario'], {
       queryParams: {
         collection: this.datiOrario.collection,
