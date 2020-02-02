@@ -14,7 +14,7 @@ const bucket = admin.storage().bucket()
 export const sincronizzaClassi = functions.runWith({
     memory: '1GB',
     timeoutSeconds: 100
-}).region('europe-west2').pubsub.schedule('0 7 */1 * *').timeZone('Europe/Rome').onRun(() => sincronizzaOrari('Classi'))
+}).region('europe-west2').pubsub.schedule('0 7 */2 * *').timeZone('Europe/Rome').onRun(() => sincronizzaOrari('Classi'))
 
 export const sincronizzaAule = functions.runWith({
     memory: '1GB',
@@ -24,7 +24,7 @@ export const sincronizzaAule = functions.runWith({
 export const sincronizzaProfessori = functions.runWith({
     memory: '1GB',
     timeoutSeconds: 100
-}).region('europe-west2').pubsub.schedule('10 7 */1 * *').timeZone('Europe/Rome').onRun(() => sincronizzaOrari('Professori'))
+}).region('europe-west2').pubsub.schedule('10 7 */2 * *').timeZone('Europe/Rome').onRun(() => sincronizzaOrari('Professori'))
 
 async function sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
     try {
