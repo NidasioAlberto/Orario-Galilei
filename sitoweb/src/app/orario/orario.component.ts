@@ -34,7 +34,7 @@ export class OrarioComponent implements OnInit {
   orarioVisualizzato = new BehaviorSubject<Orario>(undefined);
   orarioDaVisualizzare: 'attuale' | 'storico' = 'attuale'
   impegni: Observable<string[]>
-  storico: Orario[]
+  storico: Orario[] = undefined
   statoPannelloStorico: boolean = false
 
   statoContenitoreLista: 'strumentiAperti' | 'strumentiChiusi' = 'strumentiChiusi'
@@ -100,7 +100,9 @@ export class OrarioComponent implements OnInit {
   }
 
   async caricaStoricoOrario() {
-    this.storico = await this.storage.recuperaStoricoOrario(this.orario.value.collection, this.orario.value.nome)
+    if (this.storico === undefined) {
+      this.storico = await this.storage.recuperaStoricoOrario(this.orario.value.collection, this.orario.value.nome)
+    }
   }
 
   visualizzaOrarioStorico(orario: Orario) {

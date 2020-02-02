@@ -58,23 +58,24 @@
                             </mat-panel-description>
                         </mat-expansion-panel-header>
 
-                        <!--
-                            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-                        -->
 
                         <ng-template matExpansionPanelContent>
-                            <div class="lista-storico-orari">
-                                <button mat-raised-button class="elemento-lista-storico-orari"
-                                    *ngFor="let orario of storico" (click)="visualizzaOrarioStorico(orario)"
-                                    [color]="orario.versione === datiOrario.versione ? 'accent' : 'white'">
-                                    Dal {{orario.dataValidita | date:'dd/MM/yyyy'}}
-                                </button>
-                                <button mat-raised-button class="elemento-lista-storico-orari"
-                                    (click)="visualizzaOrarioStorico(orario.value)"
-                                    [color]="orario.value.versione === datiOrario.versione ? 'primary' : 'white'">
-                                    Dal {{orario.value.dataValidita | date:'dd/MM/yyyy'}}
-                                </button>
-                            </div>
+                            <mat-progress-bar mode="indeterminate" *ngIf="storico === undefined; else listaVersioni">
+                            </mat-progress-bar>
+                            <ng-template #listaVersioni>
+                                <div class="lista-storico-orari">
+                                    <button mat-raised-button class="elemento-lista-storico-orari"
+                                        *ngFor="let orario of storico" (click)="visualizzaOrarioStorico(orario)"
+                                        [color]="orario.versione === datiOrario.versione ? 'accent' : 'white'">
+                                        Dal {{orario.dataValidita | date:'dd/MM/yyyy'}}
+                                    </button>
+                                    <button mat-raised-button class="elemento-lista-storico-orari"
+                                        (click)="visualizzaOrarioStorico(orario.value)"
+                                        [color]="orario.value.versione === datiOrario.versione ? 'primary' : 'white'">
+                                        Dal {{orario.value.dataValidita | date:'dd/MM/yyyy'}}
+                                    </button>
+                                </div>
+                            </ng-template>
                         </ng-template>
                     </mat-expansion-panel>
                 </ng-container>
