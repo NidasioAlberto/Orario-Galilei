@@ -10,13 +10,13 @@ import { ottieniOrariClassiOAule, ottieniOrariProfessori, mostraOrario, estraiIn
 
 console.time('Classi')
 ottieniOrariClassiOAule('2020', 'Classi').then((risultato) =>{
-    //risultato.orari.forEach(orario => mostraOrario(orario))
+    risultato.orari.forEach(orario => mostraOrario(orario))
     console.timeEnd('Classi')
     console.log('Orari:', risultato.lista)
     console.log('Orari non recuperati:', risultato.orariNonRecuperati)
 }).catch(console.log)
 
-console.time('Aule')
+/*console.time('Aule')
 ottieniOrariClassiOAule('2020', 'Aule').then((risultato) =>{
     //risultato.orari.forEach(orario => mostraOrario(orario))
     console.timeEnd('Aule')
@@ -30,4 +30,4 @@ ottieniOrariProfessori().then((risultato) =>{
     console.timeEnd('Prof')
     console.log('Orari:', risultato.lista)
     console.log('Orari non recuperati:', risultato.orariNonRecuperati)
-}).catch(console.log)
+}).catch(console.log)*/
