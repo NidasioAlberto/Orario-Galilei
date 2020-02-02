@@ -4,6 +4,7 @@ import { Observable, combineLatest, from } from 'rxjs'
 import { map, distinctUntilChanged, concatMap } from 'rxjs/operators'
 import { StorageService } from '../core/storage.service'
 import { Orario } from '../utils/orario.model'
+import { Title } from '@angular/platform-browser'
 
 @Component({
   selector: 'app-ricerca',
@@ -18,10 +19,13 @@ export class RicercaComponent implements OnInit {
 
   constructor(
     private router: ActivatedRoute,
-    private storage: StorageService
+    private storage: StorageService,
+    private title: Title
   ) { }
 
   ngOnInit() {
+    this.title.setTitle('Orario Galilei')
+    
     // Ottengo il valore di ricerca e il filtro dai parametri url
     this.valoreRicerca = this.router.queryParams.pipe(
       map(params => params.valore),

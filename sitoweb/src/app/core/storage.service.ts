@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core'
+import { AngularFirestore } from '@angular/fire/firestore'
 import { AngularFireStorage } from '@angular/fire/storage'
 import { HttpClient } from '@angular/common/http'
 import { Orario, ProssimoImpegno, Info } from '../utils/orario.model'
 import { StorageMap } from '@ngx-pwa/local-storage'
 import { interval, BehaviorSubject, } from 'rxjs'
-import { map, startWith } from 'rxjs/operators'
+import { map, startWith, take } from 'rxjs/operators'
+import { firestore } from 'firebase'
 
 // TODO: Aggiungere la lettura da firebase?
 
@@ -20,6 +22,7 @@ export class StorageService {
 
   constructor(
     private storage: AngularFireStorage,
+    private firestore: AngularFirestore,
     private http: HttpClient,
     private storageMap: StorageMap
   ) {
@@ -350,7 +353,7 @@ export class StorageService {
     // Controllo se l'app è già stata avviata
     let numeroDiEsecuzioni = await this.storageMap.get('esecuzioni').toPromise() as number
 
-    if(numeroDiEsecuzioni === undefined) {
+    if (numeroDiEsecuzioni === undefined) {
       await this.storageMap.set('esecuzioni', 0).toPromise()
       return 0
     } else {
@@ -358,5 +361,28 @@ export class StorageService {
       await this.storageMap.set('esecuzioni', numeroDiEsecuzioni).toPromise()
       return numeroDiEsecuzioni
     }
+  }
+
+  /**
+   * Recupara da firestore lo storico dell'orario specificato
+   * @param collection
+   * @param nome
+   */
+  public async recuperaStoricoOrario(collection: 'Classi' | 'Aule' | 'Professori', nome: string) {
+    console.log('Recupero lo storico per', nome, collection)
+
+    return this.firestore.collection(collection).doc(nome).collection<Orario>('Storico').valueChanges().pipe(
+      take(1),
+    ).toPromise().then(storico => {
+      return storico.map<Orario>(orario => {
+        if (orario.dataValidita !== undefined) orario.dataValidita = (orario.dataValidita as firestore.Timestamp).toDate()
+        else orario.dataValidita = new Date('2019-09-12')
+        return orario
+      }).sort((a, b) => {
+        if ((a.dataValidita as Date) === (b.dataValidita as Date)) return 0
+        if ((a.dataValidita as Date) < (b.dataValidita as Date)) return -1
+        else return 2
+      })
+    })
   }
 }

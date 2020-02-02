@@ -1,46 +1,90 @@
 <div class="contenitore-orario" [@animazioneContenitoreLista]="statoContenitoreLista">
     <div class="contenuto animated zoomIn">
-        <div class="card-orario" *ngIf="orario | async; let datiOrario">
-            <ng-container *ngIf="datiOrario !== 'orario_mancante'; else orarioMancante">
-                <div class="titolo-orario">
-                    {{datiOrario.tipo}}: {{datiOrario.nome}}
-                    <ng-container *ngIf="datiOrario.versione !== undefined">
-                        v{{datiOrario.versione}}
-                    </ng-container>
-                </div>
-
-                <div class="orario-lista-impegni">
-                    <app-lista-impegni [impegni]="impegni"></app-lista-impegni>
-                </div>
-
-                <app-grafico-orario [orario]="orario"></app-grafico-orario>
-
-                <div *ngIf="orario | async as datiOrario" class="extra-info">
-                    Aggiornato il: {{datiOrario.dataAggiornamento | date:'dd/MM/yyyy'}}
-                    <br>
-                    Valido dal: {{datiOrario.dataValidita | date:'dd/MM/yyyy'}}
-                    <br>
-                    Controllato il: {{datiOrario.ultimoAggiornamento | date:'dd/MM/yyyy hh:mm:ss'}}
-                </div>
-
-                <div class="contenitore-bottoni">
-                    <ng-container *ngIf="!(orario | async)?.preferito; else mostraRimuovi">
-                        <button mat-raised-button color="primary" (click)="toogglePrefetiti()">Aggiungi ai
-                            preferiti</button>
-                    </ng-container>
-                    <ng-template #mostraRimuovi>
-                        <button mat-raised-button color="warn" (click)="toogglePrefetiti()">Rimuovi dai
-                            preferiti</button>
-                    </ng-template>
-
-                    <button mat-raised-button *ngIf="ngNavigatorShareService.webNavigator.share !== undefined" color="primary" (click)="condividiOrario()">Condividi</button>
+        <div class="card-orario">
+            <ng-container *ngIf="loading; else contenutoOrario">
+                <div class="loading-progress-bar">
+                    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
                 </div>
             </ng-container>
-            <ng-template #orarioMancante>
-                <div class="orario-mancante">
-                    Orario mancante
-                </div>
-                <img src="assets/sad_cat.png" alt="Ufff..." class="sad-cat-image">
+            <ng-template #contenutoOrario>
+                <ng-container *ngIf="orarioVisualizzato | async; let datiOrario; else orarioMancante">
+                    <div class="titolo-orario">
+                        {{datiOrario.tipo}}: {{datiOrario.nome}}
+                        <ng-container *ngIf="datiOrario.versione !== undefined">
+                            v{{datiOrario.versione}}
+                        </ng-container>
+                    </div>
+
+                    <div class="orario-lista-impegni">
+                        <app-lista-impegni [impegni]="impegni"
+                            *ngIf="orarioDaVisualizzare === 'attuale'; else mostraAvviso"></app-lista-impegni>
+                        <ng-template #mostraAvviso>
+                            <div class="avviso-storico"
+                                (click)="tornaAllaVersioneCorrente()">
+                                Torna alla versione corrente
+                            </div>
+                        </ng-template>
+                    </div>
+
+                    <app-grafico-orario [orario]="orarioVisualizzato"></app-grafico-orario>
+
+                    <div class="extra-info">
+                        Valido dal: {{datiOrario.dataValidita | date:'dd/MM/yyyy'}}
+                    </div>
+
+                    <div class="contenitore-bottoni">
+                        <ng-container *ngIf="!(orario | async)?.preferito; else mostraRimuovi">
+                            <button mat-raised-button color="primary" (click)="toogglePrefetiti()">Aggiungi ai
+                                preferiti</button>
+                        </ng-container>
+                        <ng-template #mostraRimuovi>
+                            <button mat-raised-button color="warn" (click)="toogglePrefetiti()">Rimuovi dai
+                                preferiti</button>
+                        </ng-template>
+
+                        <button mat-raised-button *ngIf="ngNavigatorShareService.webNavigator.share !== undefined"
+                            color="primary" (click)="condividiOrario()">Condividi</button>
+                    </div>
+
+                    <!-- Lista precedenti orari -->
+                    <mat-expansion-panel class="orari-precedenti" [expanded]="statoPannelloStorico"
+                        (opened)="statoPannelloStorico = true" (opened)="caricaStoricoOrario()">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                Storico orario
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                Visualizza le precedenti versioni dell'orario
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+
+                        <ng-template matExpansionPanelContent>
+                            <mat-progress-bar mode="indeterminate" *ngIf="storico === undefined; else listaVersioni">
+                            </mat-progress-bar>
+                            <ng-template #listaVersioni>
+                                <div class="lista-storico-orari">
+                                    <button mat-raised-button class="elemento-lista-storico-orari"
+                                        *ngFor="let orario of storico" (click)="visualizzaOrarioStorico(orario)"
+                                        [color]="orario.versione === datiOrario.versione ? 'accent' : 'white'">
+                                        Dal {{orario.dataValidita | date:'dd/MM/yyyy'}}
+                                    </button>
+                                    <button mat-raised-button class="elemento-lista-storico-orari"
+                                        (click)="visualizzaOrarioStorico(orario.value)"
+                                        [color]="orario.value.versione === datiOrario.versione ? 'primary' : 'white'">
+                                        Dal {{orario.value.dataValidita | date:'dd/MM/yyyy'}}
+                                    </button>
+                                </div>
+                            </ng-template>
+                        </ng-template>
+                    </mat-expansion-panel>
+                </ng-container>
+                <ng-template #orarioMancante>
+                    <div class="orario-mancante">
+                        Orario mancante
+                    </div>
+                    <img src="assets/sad_cat.png" alt="Ufff..." class="sad-cat-image">
+                </ng-template>
             </ng-template>
         </div>
     </div>

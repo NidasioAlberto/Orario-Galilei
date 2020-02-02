@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser'
+import { BrowserModule, Title } from '@angular/platform-browser'
 import { HttpClientModule } from '@angular/common/http'
 import { NgModule } from '@angular/core'
 
@@ -18,6 +18,7 @@ import { AngularFireModule } from '@angular/fire'
 import { AngularFirestoreModule } from '@angular/fire/firestore'
 import { AngularFirePerformanceModule } from '@angular/fire/performance'
 import { AngularFireStorageModule } from '@angular/fire/storage'
+import { AngularFireAnalyticsModule, ScreenTrackingService } from '@angular/fire/analytics'
 
 // Componenti angular material
 import { MatButtonModule } from '@angular/material/button'
@@ -29,6 +30,8 @@ import { MatIconModule } from '@angular/material/icon'
 import { MatChipsModule } from '@angular/material/chips'
 import { MatTooltipModule } from '@angular/material/tooltip'
 import { MatProgressBarModule } from '@angular/material/progress-bar'
+import { MatListModule } from '@angular/material/list'
+import { MatTableModule } from '@angular/material/table'
 
 // Componenti app
 import { NavbarComponent } from './navbar/navbar.component'
@@ -38,7 +41,7 @@ import { ElementoListaOrariComponent } from './lista-orari/elemento-lista-orari/
 import { ListaImpegniComponent } from './lista-impegni/lista-impegni.component'
 import { OrarioComponent } from './orario/orario.component'
 import { GraficoOrarioComponent } from './orario/grafico-orario/grafico-orario.component'
-import { PreferitiComponent } from './preferiti/preferiti.component';
+import { PreferitiComponent } from './preferiti/preferiti.component'
 import { InformazioniComponent } from './informazioni/informazioni.component'
 
 @NgModule({
@@ -69,6 +72,7 @@ import { InformazioniComponent } from './informazioni/informazioni.component'
     AngularFirestoreModule.enablePersistence(),
     AngularFirePerformanceModule,
     AngularFireStorageModule,
+    AngularFireAnalyticsModule,
 
     // Componenti angular material
     MatButtonModule,
@@ -80,8 +84,13 @@ import { InformazioniComponent } from './informazioni/informazioni.component'
     MatChipsModule,
     MatTooltipModule,
     MatProgressBarModule,
+    MatListModule,
+    MatTableModule,
   ],
-  providers: [],
+  providers: [
+    ScreenTrackingService,
+    Title
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

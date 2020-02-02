@@ -6,6 +6,8 @@ import { StorageService } from '../core/storage.service'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { MatIconRegistry } from '@angular/material/icon'
 import { DomSanitizer } from '@angular/platform-browser'
+import { AngularFireAnalytics } from '@angular/fire/analytics'
+import { firestore } from 'firebase'
 
 /**
  * Questo componente è responsibile della navbar visualizzata in ogni pagina.
@@ -80,7 +82,8 @@ export class NavbarComponent implements OnInit {
     private storage: StorageService,
     private snackBar: MatSnackBar,
     iconRegistry: MatIconRegistry,
-    sanitizer: DomSanitizer
+    sanitizer: DomSanitizer,
+    private analytics: AngularFireAnalytics
   ) {
     iconRegistry.addSvgIcon('menu', sanitizer.bypassSecurityTrustResourceUrl('assets/material-icons/menu-24px.svg'));
     iconRegistry.addSvgIcon('info', sanitizer.bypassSecurityTrustResourceUrl('assets/material-icons/info-24px.svg'));
@@ -132,6 +135,9 @@ export class NavbarComponent implements OnInit {
   }
 
   mostraFiltri(apri?: boolean) {
+    console.log(apri || this.stato === 'chiuso' ? 'Mostro i filtri' : 'Nascondo i filtri')
+    this.analytics.logEvent(apri || this.stato === 'chiuso' ? 'apertura_filtri' : 'chiusura_filtri')
+
     if (apri === undefined) {
       if (this.stato === 'aperto') this.stato = 'chiuso'
       else this.stato = 'aperto'
@@ -166,6 +172,9 @@ export class NavbarComponent implements OnInit {
   }
 
   public toggleFiltro(filtro?: 'Classi' | 'Aule' | 'Professori') {
+    console.log('Toggle filtro', filtro)
+    this.analytics.logEvent('toggle_filtri', { filtro })
+
     // Aggiorni i filtri
     if (filtro === undefined) {
       this.filtriSelezionati = undefined
@@ -187,6 +196,8 @@ export class NavbarComponent implements OnInit {
   }
 
   public tornaAllaHome() {
+    console.log('Torno alla home')
+    this.analytics.logEvent('bottome_home')
     this.valoreRicerca = undefined
     this.filtriSelezionati = undefined
     this.impostaFiltri(this.filtriSelezionati)
@@ -219,6 +230,8 @@ export class NavbarComponent implements OnInit {
   }
 
   public apriInformazioni() {
+    console.log('Apro la pagina informazioni')
+    this.analytics.logEvent('bottone_informazioni')
     this.valoreRicerca = undefined
     this.filtriSelezionati = undefined
     this.impostaFiltri(this.filtriSelezionati)

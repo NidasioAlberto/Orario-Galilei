@@ -3,9 +3,11 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { Observable, from, combineLatest, BehaviorSubject } from 'rxjs'
 import { StorageService } from '../core/storage.service'
 import { ActivatedRoute } from '@angular/router'
-import { mergeMap, filter, distinctUntilChanged, map } from 'rxjs/operators'
+import { mergeMap, distinctUntilChanged, map } from 'rxjs/operators'
 import { Orario } from '../utils/orario.model'
 import { NgNavigatorShareService } from 'ng-navigator-share'
+import { Title } from '@angular/platform-browser'
+import { AngularFireAnalytics } from '@angular/fire/analytics'
 
 @Component({
   selector: 'app-orario',
@@ -27,15 +29,22 @@ import { NgNavigatorShareService } from 'ng-navigator-share'
 })
 export class OrarioComponent implements OnInit {
 
-  orario = new BehaviorSubject(undefined);
+  loading: boolean = true
+  orario = new BehaviorSubject<Orario>(undefined);
+  orarioVisualizzato = new BehaviorSubject<Orario>(undefined);
+  orarioDaVisualizzare: 'attuale' | 'storico' = 'attuale'
   impegni: Observable<string[]>
+  storico: Orario[] = undefined
+  statoPannelloStorico: boolean = false
 
   statoContenitoreLista: 'strumentiAperti' | 'strumentiChiusi' = 'strumentiChiusi'
 
   constructor(
     private storage: StorageService,
     private activatedRoute: ActivatedRoute,
-    public ngNavigatorShareService: NgNavigatorShareService
+    public ngNavigatorShareService: NgNavigatorShareService,
+    private title: Title,
+    private analytics: AngularFireAnalytics
   ) { }
 
   ngOnInit() {
@@ -48,9 +57,12 @@ export class OrarioComponent implements OnInit {
     this.activatedRoute.queryParams.pipe(
       distinctUntilChanged((x, y) => x.collection === y.collection && x.nome === y.nome),
       mergeMap(params => from(this.storage.ottieniOrario(params.collection, params.nome))),
-      filter(orario => orario !== undefined),
-      map(orario => orario === null ? 'orario_mancante' : orario), // Traduco null in 'dati mancanti' così da poter mostrare un messaggio di avvison appropriato
-    ).subscribe(orario => this.orario.next(orario))
+    ).subscribe(orario => {
+      this.loading = false
+      this.orario.next(orario)
+      this.orarioVisualizzato.next(orario)
+      if (orario !== null) this.title.setTitle(orario.nome)
+    })
 
     this.impegni = combineLatest([this.storage.tempo, this.orario]).pipe(
       map(([tempo, orario]) => {
@@ -72,6 +84,13 @@ export class OrarioComponent implements OnInit {
 
   async toogglePrefetiti() {
     const orarioAggiornato = this.orario.value as Orario
+
+    console.log('Aggiorno la preferenza dell\'orario')
+    this.analytics.logEvent(!orarioAggiornato.preferito ? 'aggiunta_preferito' : 'rimuovi_preferito', {
+      nome: orarioAggiornato.nome,
+      collection: orarioAggiornato.collection,
+    })
+
     orarioAggiornato.preferito = !orarioAggiornato.preferito
     this.storage.aggiornaOrario(orarioAggiornato)
     this.orario.next(orarioAggiornato)
@@ -84,5 +103,46 @@ export class OrarioComponent implements OnInit {
       text: 'Orario ' + datiOrario.nome + ':',
       url: window.location.href
     })
+  }
+
+  async caricaStoricoOrario() {
+    console.log('Visualizzo la lista delle versioni dell\'orario')
+    this.analytics.logEvent('lista_orario_storico', {
+      nome: this.orario.value.nome,
+      collection: this.orario.value.collection
+    })
+    if (this.storico === undefined) {
+      this.storico = await this.storage.recuperaStoricoOrario(this.orario.value.collection, this.orario.value.nome)
+    }
+  }
+
+  visualizzaOrarioStorico(orario: Orario) {
+    console.log('Visualizzo l\'orario di', orario.nome, 'versione', orario.versione)
+    this.analytics.logEvent('orario_storico', {
+      nome: orario.nome,
+      collection: orario.collection,
+      dataValidita: orario.dataValidita,
+      versione: orario.versione
+    })
+
+    if (orario.versione !== this.orario.value.versione) {
+      this.orarioDaVisualizzare = 'storico'
+      orario.tipo = this.orario.value.tipo
+    } else {
+      this.orarioDaVisualizzare = 'attuale'
+    }
+    this.orarioVisualizzato.next(orario)
+  }
+
+  tornaAllaVersioneCorrente() {
+    console.log('Torno a visualizzare l\'orario corrente')
+    this.analytics.logEvent('torna_a_orario_corrente', {
+      nome: this.orario.value.nome,
+      collection: this.orario.value.collection
+    })
+    
+    this.statoPannelloStorico = false
+    this.orarioDaVisualizzare = 'attuale'
+    this.orarioVisualizzato.next(this.orario.value)
   }
 }
