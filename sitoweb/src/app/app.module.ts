@@ -31,6 +31,7 @@ import { MatChipsModule } from '@angular/material/chips'
 import { MatTooltipModule } from '@angular/material/tooltip'
 import { MatProgressBarModule } from '@angular/material/progress-bar'
 import { MatListModule } from '@angular/material/list'
+import { MatTableModule } from '@angular/material/table'
 
 // Componenti app
 import { NavbarComponent } from './navbar/navbar.component'
@@ -84,6 +85,7 @@ import { InformazioniComponent } from './informazioni/informazioni.component'
     MatTooltipModule,
     MatProgressBarModule,
     MatListModule,
+    MatTableModule,
   ],
   providers: [
     ScreenTrackingService,

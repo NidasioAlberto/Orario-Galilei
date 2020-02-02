@@ -6,7 +6,8 @@ import { ActivatedRoute } from '@angular/router'
 import { mergeMap, distinctUntilChanged, map } from 'rxjs/operators'
 import { Orario } from '../utils/orario.model'
 import { NgNavigatorShareService } from 'ng-navigator-share'
-import { Title } from '@angular/platform-browser'
+import { Title, DomSanitizer } from '@angular/platform-browser'
+import { MatIconRegistry } from '@angular/material/icon'
 
 @Component({
   selector: 'app-orario',
@@ -41,8 +42,12 @@ export class OrarioComponent implements OnInit {
     private storage: StorageService,
     private activatedRoute: ActivatedRoute,
     public ngNavigatorShareService: NgNavigatorShareService,
-    private title: Title
-  ) { }
+    private title: Title,
+    iconRegistry: MatIconRegistry,
+    sanitizer: DomSanitizer
+  ) {
+    iconRegistry.addSvgIcon('open', sanitizer.bypassSecurityTrustResourceUrl('assets/material-icons/open_in_browser-24px.svg'));
+  }
 
   ngOnInit() {
     this.activatedRoute.queryParams.subscribe(queryParams => {
