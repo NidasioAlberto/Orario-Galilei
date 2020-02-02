@@ -26,7 +26,7 @@ La pagina ricerca viene visualizzata quando si inserisce un termine di ricerca n
 
 ### Orario
 
-Qui viene visualizzato tutto un singolo orario. Vengono proposti i prossimi due impegni, il grafico dell'orario e alcune sue informazioni (versione, data di aggiornamento, validità) insieme a due bottoni, uno per aggiungere l'orario come preferito e uno per condividerlo (visualizzato solo su mobile)
+Qui viene visualizzato tutto un singolo orario. Vengono proposti i prossimi due impegni, il grafico dell'orario e alcune sue informazioni (versione, data di aggiornamento, validità) insieme a due bottoni, uno per aggiungere l'orario come preferito e uno per condividerlo (visualizzato solo su mobile) e un menù per visualizzare le versioni precedenti dell'orario (sostituisce i dati mostrati nella tabella e viene mostrato un messaggio di avviso grigio)
 
 ![Navbar chiusa](./readme_screenshots/orario.png)
 
