@@ -3,3 +3,4 @@
 **/dist/
 **/admin_key.json
 **/.firebase/
+.vscode/**
