@@ -10,6 +10,7 @@ $app-min-width-for-expansion-panel-description: 500px;
   @extend .card-con-bordi;
   @extend .mat-elevation-z4;
   margin: 12px;
+  padding-bottom: 4px;
 }
 
 .titolo-orario {
@@ -26,9 +27,8 @@ $app-min-width-for-expansion-panel-description: 500px;
 }
 
 .contenitore-bottoni {
-  margin: 0 auto;
+  margin: 8px auto;
   display: table;
-  padding-bottom: 8px;
 
   * {
     margin: 0 4px;
@@ -54,7 +54,7 @@ $app-min-width-for-expansion-panel-description: 500px;
 }
 
 .orari-precedenti {
-  margin: 0 12px;
+  margin: 8px 12px;
 }
 
 mat-panel-title {
@@ -86,6 +86,12 @@ mat-panel-description {
   margin: 6px;
 }
 
-.tabella-storico {
-  width: 100%;
+.avviso-storico {
+  @extend .card-con-bordi;
+  @extend .mat-elevation-z4;
+  padding: 4px 8px;
+  margin: 4px 4px;
+  display: inline-block;
+  background-color: lightgrey;
+  cursor: pointer;
 }

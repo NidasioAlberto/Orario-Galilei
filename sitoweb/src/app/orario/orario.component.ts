@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core'
 import { trigger, state, style, transition, animate } from '@angular/animations'
-import { Observable, from, combineLatest, BehaviorSubject, of } from 'rxjs'
+import { Observable, from, combineLatest, BehaviorSubject } from 'rxjs'
 import { StorageService } from '../core/storage.service'
 import { ActivatedRoute } from '@angular/router'
 import { mergeMap, distinctUntilChanged, map } from 'rxjs/operators'
 import { Orario } from '../utils/orario.model'
 import { NgNavigatorShareService } from 'ng-navigator-share'
-import { Title, DomSanitizer } from '@angular/platform-browser'
-import { MatIconRegistry } from '@angular/material/icon'
+import { Title } from '@angular/platform-browser'
+import { MatExpansionPanelState } from '@angular/material/expansion'
 
 @Component({
   selector: 'app-orario',
@@ -35,6 +35,7 @@ export class OrarioComponent implements OnInit {
   orarioDaVisualizzare: 'attuale' | 'storico' = 'attuale'
   impegni: Observable<string[]>
   storico: Orario[]
+  statoPannelloStorico: boolean = false
 
   statoContenitoreLista: 'strumentiAperti' | 'strumentiChiusi' = 'strumentiChiusi'
 
@@ -43,11 +44,7 @@ export class OrarioComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     public ngNavigatorShareService: NgNavigatorShareService,
     private title: Title,
-    iconRegistry: MatIconRegistry,
-    sanitizer: DomSanitizer
-  ) {
-    iconRegistry.addSvgIcon('open', sanitizer.bypassSecurityTrustResourceUrl('assets/material-icons/open_in_browser-24px.svg'));
-  }
+  ) { }
 
   ngOnInit() {
     this.activatedRoute.queryParams.subscribe(queryParams => {
