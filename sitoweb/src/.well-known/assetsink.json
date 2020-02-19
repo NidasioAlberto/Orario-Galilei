@@ -1,0 +1,14 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "app.web.orario-galilei",
+            "sha256_cert_fingerprints": [
+                "25:43:FD:AB:73:A3:E4:6F:6B:EA:C3:F6:9B:08:0B:07:06:47:D2:DC:18:7A:1B:17:F0:55:65:88:DA:5B:86:48"
+            ]
+        }
+    }
+]
