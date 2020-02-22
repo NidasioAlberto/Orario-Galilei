@@ -5,9 +5,9 @@
         ],
         "target": {
             "namespace": "android_app",
-            "package_name": "app.web.orario-galilei",
+            "package_name": "app.web.orariogalilei",
             "sha256_cert_fingerprints": [
-                "25:43:FD:AB:73:A3:E4:6F:6B:EA:C3:F6:9B:08:0B:07:06:47:D2:DC:18:7A:1B:17:F0:55:65:88:DA:5B:86:48"
+                "7D:EA:ED:41:07:5E:0A:F4:C1:91:39:FC:4F:A8:B8:5E:5A:C9:80:A8:87:09:D4:17:FA:EB:67:02:60:A3:6C:06"
             ]
         }
     }
