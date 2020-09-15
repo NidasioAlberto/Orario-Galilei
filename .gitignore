@@ -1,3 +1,7 @@
 .DS_Store
-**/node_modules
+**/node_modules/
+**/dist/
+**/lib/
+**/admin_key.json
+**/.firebase/
 .vscode/**
