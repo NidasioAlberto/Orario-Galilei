@@ -75,11 +75,21 @@ async function spostaOrario(docId: string, annoScolastico: string, collection: s
 export const sincronizzaOrari = functions.runWith({
     memory: '1GB',
     timeoutSeconds: 300
-}).region('europe-west2').firestore.document('Sincronizzazioni/{idSincronizzazione}').onCreate(async (change, context) => {
+}).region('europe-west2').firestore.document('Sincronizzazioni/{idRichiesta}').onCreate(async (change, context) => {
+    // Imposto lo stato della richiesta a "Sincronizzazione iniziata"
+    await change.ref.update({ stato: "Sincronizzazione avviata"})
 
+    // Sincronizzo gli orari di classi, aule e professori
+    await _sincronizzaOrari('Classi')
+    await _sincronizzaOrari('Aule')
+    await _sincronizzaOrari('Professori')
+
+    // Aggiorno lo stato della richiesta a "Sincronizzazione attivata"
+    // TODO: inserisco i risultati ottenuti
+    await change.ref.update({ stato: "Sincronizzazione completata", dataSincronizzazione: admin.firestore.Timestamp.now()})
 })
 
-async function sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
+async function _sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
     try {
         console.time(collection)
 
