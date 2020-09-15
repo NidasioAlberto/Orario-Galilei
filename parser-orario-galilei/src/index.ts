@@ -20,7 +20,7 @@ const pdfjs = require('../pdfjs-2.2.228-dist/build/pdf')
 /**
  * Lo scopo di questa libreria è di recuperare gli orari del Galilei Crema dai pdf pubblicati sul sito.
  * 
- * Le funzoini principali che il modulo offre sono:
+ * Le funzioni principali che il modulo offre sono:
  * - ottieniOrari(Classi|Aule|Professori): recuperano tutti gli orari dal sito
  * - ottieniOrario: dato un url di un pdf restituisce l'orario contenuto del documento
  * - ottieniLista(Classi|Aule|Professori): recupera la lista degli orari con o il loro nome o anche il link al pdf
@@ -129,6 +129,8 @@ export async function ottieniOrario(urlPdf: string, nome: string): Promise<Orari
         //2: Estraggo le informazioni
         let righe = await estraiInformazioni(buffer as Buffer)
 
+        //console.log(JSON.stringify(righe))
+
         //3: Cambio il formato dei dati
         let orario = analizzaDati(righe, nome)
 
@@ -153,7 +155,7 @@ export async function ottieniOrariClassiOAule(anno: string, tipo: 'Classi' | 'Au
         let orariNonRecuperati: string[] = []
         let orari = await Promise.all(nomiOrari.map(async nomeOrario => {
             try {
-                return await ottieniOrario('http://www.galileicrema.it:8080/intraitis/didattica/orario/' + anno + '/' + nomeOrario + '.pdf', nomeOrario)
+                return await ottieniOrario('https://www.galileicrema.edu.it/extra/orario/' + anno + '/' + nomeOrario + '.pdf', nomeOrario)
             } catch (err) {
                 orariNonRecuperati.push(nomeOrario)
                 return undefined
@@ -365,9 +367,9 @@ export async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
                         //1: Controllo se la riga è già stata registrata
                         let trovato = false
                         righe.forEach(riga => {
-                            if (Math.abs(riga.y - elemento.transform[5]) <= 1) {
+                            if (Math.abs(riga.y - elemento.transform[4]) <= 1) {
                                 riga.elementi.push({
-                                    x: elemento.transform[4],
+                                    x: elemento.transform[5],
                                     //y: item.y,
                                     testo: elemento.text
                                 })
@@ -378,9 +380,9 @@ export async function estraiInformazioni(buffer: Buffer): Promise<RigaDati[]> {
 
                         //2: altrimenti la aggiungo
                         if (!trovato) righe.push({
-                            y: elemento.transform[5],
+                            y: elemento.transform[4],
                             elementi: [{
-                                x: elemento.transform[4],
+                                x: elemento.transform[5],
                                 testo: elemento.text
                             }]
                         })
