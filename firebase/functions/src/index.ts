@@ -78,19 +78,25 @@ export const sincronizzaOrari = functions.runWith({
     timeoutSeconds: 300
 }).region('europe-west2').firestore.document('Sincronizzazioni/{idRichiesta}').onCreate(async (change, context) => {
     // Imposto lo stato della richiesta a "Sincronizzazione iniziata"
-    await change.ref.update({ stato: "Sincronizzazione avviata"})
-
-    // Sincronizzo gli orari di classi, aule e professori
-    await _sincronizzaOrari('Classi')
-    await _sincronizzaOrari('Aule')
-    await _sincronizzaOrari('Professori')
+    await change.ref.update({ stato: "Sincronizzazione avviata" })
 
     // Preparo il file json degli orari
-    await preparaBackupOrari()
+    try {
+        // Sincronizzo gli orari di classi, aule e professori
+        await _sincronizzaOrari('Classi')
+        await _sincronizzaOrari('Aule')
+        await _sincronizzaOrari('Professori')
 
-    // Aggiorno lo stato della richiesta a "Sincronizzazione attivata"
-    // TODO: inserisco i risultati ottenuti
-    await change.ref.update({ stato: "Sincronizzazione completata", dataSincronizzazione: admin.firestore.Timestamp.now()})
+        await preparaBackupOrari()
+
+        // Aggiorno lo stato della richiesta a "Sincronizzazione attivata"
+        // TODO: inserisco i risultati ottenuti
+        await change.ref.update({ stato: "Sincronizzazione completata", dataSincronizzazione: admin.firestore.Timestamp.now() })
+    } catch (err) {
+        // Aggiorno lo stato della richiesta a "Sincronizzazione fallita"
+        await change.ref.update({ stato: "Sincronizzazione fallita", dataSincronizzazione: admin.firestore.Timestamp.now(), errore: String(err) })
+    }
+
 })
 
 async function _sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
@@ -104,24 +110,24 @@ async function _sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
         } | undefined = undefined
 
         // Recupero gli orari
-        if(collection === 'Classi') {
+        if (collection === 'Classi') {
             // Recupero le impostaziono per le cloud function
             const anno = ((await firestore.collection('Impostazioni generali').doc('Cloud function').get()).data() as ImpostazioniCloudFunction).anno
-            if(anno === undefined) throw Error('Impostazioni cloud function mancanti')
+            if (anno === undefined) throw Error('Impostazioni cloud function mancanti')
             console.log('Anno: ' + anno)
             orari = await ottieniOrariClassiOAule(anno, 'Classi')
-        } else if(collection === 'Aule') {
+        } else if (collection === 'Aule') {
             // Recupero le impostaziono per le cloud function
             const anno = ((await firestore.collection('Impostazioni generali').doc('Cloud function').get()).data() as ImpostazioniCloudFunction).anno
-            if(anno === undefined) throw Error('Impostazioni cloud function mancanti')            
+            if (anno === undefined) throw Error('Impostazioni cloud function mancanti')
             console.log('Anno: ' + anno)
             orari = await ottieniOrariClassiOAule(anno, 'Aule')
-        } else if(collection === 'Professori') {
+        } else if (collection === 'Professori') {
             orari = await ottieniOrariProfessori()
         }
 
-        if(orari === undefined) throw Error('Orari non definiti, collection utilizzata: ' + collection) // Probabilemtne ci sarà un errore prima
-        
+        if (orari === undefined) throw Error('Orari non definiti, collection utilizzata: ' + collection) // Probabilemtne ci sarà un errore prima
+
         // Aggiungo tutti gli orari nel database
         const risultati = await Promise.all(orari.orari.map(async orario => {
             // Recupero l'orario attualmente salvato nel database per confrontarlo con quello appena recuperato
@@ -139,7 +145,7 @@ async function _sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
             if (!uguali && orarioSalvato !== undefined) {
                 await firestore.collection(collection).doc(orario.nome).collection('Storico').add(orarioSalvato)
             } // Altrimenti non c'è niente da salvare, mi risparmi un'operazione di scrittura
-            
+
             // E salvo quello nuovo
             if (doc.exists) { // Se il documento già esiste lo aggiorno
                 await docRef.update({
@@ -152,7 +158,7 @@ async function _sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
                     ultimoAggiornamento: admin.firestore.Timestamp.now()
                 })
             }
-            
+
             return {
                 nome: orario.nome,
                 modificato: !uguali
@@ -168,9 +174,9 @@ async function _sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
 
         await firestore.collection(collection).doc('Indici').update({
             lista: admin.firestore.FieldValue.arrayUnion(...orari.lista),
-            ultimoAggiornamento: admin.firestore.Timestamp.now()                
+            ultimoAggiornamento: admin.firestore.Timestamp.now()
         })
-        
+
         console.log('Aggiornati ' + orari.lista.length + ' orari nel database con successo')
 
         //Per ultimo salvo un documento di log
@@ -183,7 +189,7 @@ async function _sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
             data: admin.firestore.Timestamp.now()
         }
         await firestore.collection('Log').add(log)
-    } catch(err) {
+    } catch (err) {
         // Salvo un log di errore
         const log: LogOrari = {
             cloudFunction: 'sincoronizza' + collection,
@@ -226,7 +232,7 @@ async function preparaBackupOrari() {
         orario.ultimoAggiornamento = (orario.ultimoAggiornamento as admin.firestore.Timestamp).toDate()
         return orario
     })
-    
+
     // Preparo un file json che include tutti gli orari
     const orari = { orariClassi, orariAule, orariProfessori }
 
