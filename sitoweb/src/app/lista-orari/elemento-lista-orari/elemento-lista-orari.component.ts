@@ -13,8 +13,8 @@ import { AngularFireAnalytics } from '@angular/fire/analytics'
 })
 export class ElementoListaOrariComponent implements OnInit, OnChanges {
 
-  @Input('orario') datiOrario: Orario
-  orario = new BehaviorSubject<Orario>(this.datiOrario);
+  @Input('orario') datiOrario: Orario = undefined
+  orario = new BehaviorSubject<Orario>(this.datiOrario)
   prossimiImpegni: Observable<string[]>
 
   constructor(

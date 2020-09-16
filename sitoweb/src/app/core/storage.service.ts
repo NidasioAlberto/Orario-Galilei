@@ -45,7 +45,7 @@ export class StorageService {
   public async caricaOrariCompleti() {
     // Recupero tutti gli orari dal backup
     console.log('Recupero il file json con gli orari')
-    return this.storage.ref('backup-orari/test.json').getDownloadURL().toPromise().then(backupUrl => {
+    return this.storage.ref('backup-orari/ultima_versione.json').getDownloadURL().toPromise().then(backupUrl => {
       return this.http.get(backupUrl, {
         responseType: 'json'
       }).toPromise().then(async (orari: {

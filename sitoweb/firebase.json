@@ -1,27 +1,21 @@
 {
   "hosting": [
     {
-      "target": "production",
+      "target": "sitoweb",
       "public": "dist/sitoweb",
       "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
+        "**/.*"
       ],
-      "rewrites": [
+      "headers": [
         {
-          "source": "**",
-          "destination": "/index.html"
+          "source": "*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public,max-age=31536000,immutable"
+            }
+          ]
         }
-      ]
-    },
-    {
-      "target": "test",
-      "public": "dist/sitoweb",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
       ],
       "rewrites": [
         {

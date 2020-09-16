@@ -90,7 +90,7 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Recupero tutti gli orari all'allvio dell'app
+    // Recupero tutti gli orari all'avvio dell'app
     this.storage.caricaOrariCompleti().then(() => {
       this.loading = false
       this.snackBar.open('Tutti gli orari sono stati sincronizzati', undefined, { duration: 1000 })
