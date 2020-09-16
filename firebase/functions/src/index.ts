@@ -11,6 +11,7 @@ import { OrarioFirestore } from './utils/orario.model'
 
 admin.initializeApp()
 const firestore = admin.firestore()
+const bucket = admin.storage().bucket()
 
 // Funzione per spostare nella collection storico tutti gli orari attualmente salvati nelle collection Classi, Aule e Professori. Usata alla fine dell'anno scolastico
 export const concludiAnno = functions.region('europe-west2').firestore.document('Storico/{annoScolastico}').onCreate(async (change, context) => {
@@ -83,6 +84,9 @@ export const sincronizzaOrari = functions.runWith({
     await _sincronizzaOrari('Classi')
     await _sincronizzaOrari('Aule')
     await _sincronizzaOrari('Professori')
+
+    // Preparo il file json degli orari
+    await preparaBackupOrari()
 
     // Aggiorno lo stato della richiesta a "Sincronizzazione attivata"
     // TODO: inserisco i risultati ottenuti
@@ -190,4 +194,44 @@ async function _sincronizzaOrari(collection: 'Classi' | 'Aule' | 'Professori') {
         await firestore.collection('Log').add(log)
         throw err
     }
+}
+
+async function preparaBackupOrari() {
+    // Recupero gli indici da Firestore
+    const classi = await firestore.collection('Classi').doc('Indici').get().then(doc => doc.data() as Indici)
+    const aule = await firestore.collection('Aule').doc('Indici').get().then(doc => doc.data() as Indici)
+    const professori = await firestore.collection('Professori').doc('Indici').get().then(doc => doc.data() as Indici)
+
+    // Recupero tutti gli orari
+    let orariClassi = await Promise.all(classi.lista.map(docId => firestore.collection('Classi').doc(docId).get())).then(docs => docs.map(doc => doc.data() as OrarioFirestore))
+    let orariAule = await Promise.all(aule.lista.map(docId => firestore.collection('Aule').doc(docId).get())).then(docs => docs.map(doc => doc.data() as OrarioFirestore))
+    let orariProfessori = await Promise.all(professori.lista.map(docId => firestore.collection('Professori').doc(docId).get())).then(docs => docs.map(doc => doc.data() as OrarioFirestore))
+
+    // Traduco tutte le date da Firestore Timestamp in Date
+    orariClassi = orariClassi.map(orario => {
+        orario.dataAggiornamento = (orario.dataAggiornamento as admin.firestore.Timestamp).toDate()
+        orario.dataValidita = (orario.dataValidita as admin.firestore.Timestamp).toDate()
+        orario.ultimoAggiornamento = (orario.ultimoAggiornamento as admin.firestore.Timestamp).toDate()
+        return orario
+    })
+    orariAule = orariAule.map(orario => {
+        orario.dataAggiornamento = (orario.dataAggiornamento as admin.firestore.Timestamp).toDate()
+        orario.dataValidita = (orario.dataValidita as admin.firestore.Timestamp).toDate()
+        orario.ultimoAggiornamento = (orario.ultimoAggiornamento as admin.firestore.Timestamp).toDate()
+        return orario
+    })
+    orariProfessori = orariProfessori.map(orario => {
+        orario.dataAggiornamento = (orario.dataAggiornamento as admin.firestore.Timestamp).toDate()
+        orario.dataValidita = (orario.dataValidita as admin.firestore.Timestamp).toDate()
+        orario.ultimoAggiornamento = (orario.ultimoAggiornamento as admin.firestore.Timestamp).toDate()
+        return orario
+    })
+    
+    // Preparo un file json che include tutti gli orari
+    const orari = { orariClassi, orariAule, orariProfessori }
+
+    await bucket.file('backup-orari/ultima_versione.json').save(JSON.stringify(orari), {
+        gzip: true,
+        contentType: 'application/json'
+    }).then(() => console.log('Creazione backup-orari completato'))
 }
