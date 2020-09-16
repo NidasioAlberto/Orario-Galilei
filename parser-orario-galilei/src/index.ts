@@ -16,6 +16,7 @@ import {
     regexEntrata
 } from "./utils"
 import axios from 'axios'
+import { version } from "process"
 const pdfjs = require('../pdfjs-2.2.228-dist/build/pdf')
 
 /**
@@ -616,14 +617,16 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
         }
     }
 
-    return {
-        nome,
-        tabella,
-        dataAggiornamento,
-        dataValidita,
-        versione,
-        entrata
+    let risultato: Orario = {
+        nome, tabella
     }
+
+    if(dataAggiornamento !== undefined) risultato.dataAggiornamento = dataAggiornamento
+    if(dataValidita !== undefined) risultato.dataValidita = dataValidita
+    if(versione !== undefined) risultato.versione = versione
+    if(entrata !== undefined) risultato.entrata = entrata
+
+    return risultato
 }
 
 /**

@@ -34,7 +34,7 @@ Il codice si avvale di 2 librerie:
 
 **3.2.0** Aggiornato parser per anno scolastico 2020-2021
 
-**3.2.1** Aggiuntala lettura dell'entrata per le classi
+**3.2.2** Aggiuntala lettura dell'entrata per le classi
 
 ## Esempio
 
