@@ -14,8 +14,8 @@ export interface Orario {
     dataAggiornamento: Date | firebase.firestore.Timestamp
     dataValidita: Date | firebase.firestore.Timestamp
     ultimoAggiornamento: Date | firebase.firestore.Timestamp
-    versione: string
-    preferiti?: number
+    versione?: string,
+    entrata?: string
 
     // Valori aggiuntivi
     tipo?: string
