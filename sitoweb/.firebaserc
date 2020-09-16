@@ -1,8 +1,14 @@
 {
+  "projects": {
+    "default": "orario-galilei"
+  },
   "targets": {
     "orario-galilei": {
       "hosting": {
-        "sitoweb": [
+        "test": [
+          "test-orario-galilei"
+        ],
+        "production": [
           "orario-galilei"
         ]
       }
