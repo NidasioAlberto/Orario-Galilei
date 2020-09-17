@@ -51,6 +51,11 @@ export const percorsoListaProfessori = '/Intraitis/Lib/ListaInsegnanti.asp?pross
  */
 export const regexInformazioni = /Aggiornamento.+(\d\d)[\/\.](\d\d)[\/\.](\d+).+v. ?((?:\d+\.)+\d+).+Valido.+dal.+(\d\d)[\/\.](\d\d)[\/\.](\d+)/
 
+/**
+ * Regex utilizzata per estrarre l'entrata nell'orario delle classi
+ */
+export const regexEntrata = /entrata.*da.*:(.*)/i
+
 // Tipi
 
 export interface RigaDati {
@@ -76,7 +81,8 @@ export interface Orario {
     tabella: ElementoTabella[]
     dataAggiornamento?: Date
     dataValidita?: Date
-    versione?: string
+    versione?: string,
+    entrata?: string
 }
 
 export interface RisultatoConfronto {

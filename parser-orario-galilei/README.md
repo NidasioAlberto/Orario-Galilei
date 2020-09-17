@@ -34,16 +34,18 @@ Il codice si avvale di 2 librerie:
 
 **3.2.0** Aggiornato parser per anno scolastico 2020-2021
 
+**3.2.1** Aggiuntala lettura dell'entrata per le classi
+
 ## Esempio
 
 Codice:
 
 ```Typescript
-const anno = '2020'
+const anno = '2021'
 
 //Classi
 console.time('Classi')
-ottieniOrariClassi('2020').then((risultato) =>{
+ottieniOrariClassi('2021').then((risultato) =>{
     risultato.orari.forEach(orario => mostraOrario(orario))
     console.timeEnd('Classi')
 }).catch(console.log)

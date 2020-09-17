@@ -13,6 +13,7 @@ import {
     Info,
     RisultatoConfronto,
     regexInformazioni,
+    regexEntrata
 } from "./utils"
 import axios from 'axios'
 const pdfjs = require('../pdfjs-2.2.228-dist/build/pdf')
@@ -536,7 +537,7 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
     righe.forEach(riga => {
         // Test, Controllo se la riga corrente ricade in qualche divisore ore
         const divisoreRiga = divisoriOre.find(divisore => riga.y > Math.min(divisore.start, divisore.end) && riga.y < Math.max(divisore.start, divisore.end))
-        if(divisoreRiga !== undefined) {
+        if (divisoreRiga !== undefined) {
             righeOre[divisoreRiga.index].push(riga)
         }
     })
@@ -564,13 +565,23 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
     }).filter(elemento => elemento.info.length > 0) // Rimuovo gli elementi senza info
 
     // 9: Recupero le altre informazioni come versione, data, ecc...
-    const testoRigaInformazioni = righe.map(riga => {
+    const righeCollassate = righe.map(riga => {
         // Concateno tutto il contenuto della riga
         return riga.elementi.reduce((acc, elemento) => acc += elemento.testo, '')
-    }).find(testoRiga => {
+    })
+
+    const testoRigaInformazioni = righeCollassate.find(testoRiga => {
         // Controllo se contine gli elementi
         return testoRiga.match(/Aggiornamento/)
     })
+
+    // Controllo se è presente l'entrata per le classi
+    const testoRigaEntrata = righeCollassate.find(testoRiga => {
+        // Controllo se contine gli elementi
+        return testoRiga.match(/entrata/i)
+    })
+
+    let dataAggiornamento, dataValidita, versione, entrata
 
     if (testoRigaInformazioni) {
         // Recupero le informazioni dal testo
@@ -578,33 +589,40 @@ export function analizzaDati(righe: RigaDati[], nome: string): Orario {
 
         if (match) {
             // Se le informazioni sono presenti le salvo
-            const dataAggiornamento = new Date(
+            dataAggiornamento = new Date(
                 (Number(match[3]) < 2000 ? Number(match[3]) + 2000 : Number(match[3])),
                 Number(match[2]) - 1,
                 Number(match[1])
             )
 
-            const dataValidita = new Date(
+            dataValidita = new Date(
                 (Number(match[7]) < 2000 ? Number(match[7]) + 2000 : Number(match[7])),
                 Number(match[6]) - 1,
                 Number(match[5])
             )
 
-            const versione = match[4]
+            versione = match[4]
 
-            return {
-                nome,
-                tabella,
-                dataAggiornamento,
-                dataValidita,
-                versione
-            }
+        }
+    }
+
+    if (testoRigaEntrata) {
+        // Recuper le informazioni
+        const match = testoRigaEntrata.match(regexEntrata)
+
+        if(match) {
+            entrata = match[1].trim()
+            entrata = entrata.charAt(0).toUpperCase() + entrata.slice(1)
         }
     }
 
     return {
         nome,
-        tabella
+        tabella,
+        dataAggiornamento,
+        dataValidita,
+        versione,
+        entrata
     }
 }
 
@@ -640,8 +658,9 @@ export function mostraOrario(orario: Orario) {
     })
 
     console.log(orario.nome);
-    if (orario.versione !== undefined) console.log('Versione: ', orario.versione)
-    if (orario.dataAggiornamento !== undefined) console.log('Data aggiornamento: ', orario.dataAggiornamento.toDateString())
-    if (orario.dataValidita !== undefined) console.log('Data validità: ', orario.dataValidita.toDateString())
+    if (orario.versione !== undefined) console.log('Versione: ' + orario.versione)
+    if (orario.dataAggiornamento !== undefined) console.log('Data aggiornamento: ' + orario.dataAggiornamento.toDateString())
+    if (orario.dataValidita !== undefined) console.log('Data validità: ' + orario.dataValidita.toDateString())
+    if (orario.entrata !== undefined) console.log('Entrata: ' + orario.entrata)
     console.table(tabellaPerConsole)
 }
